@@ -15,11 +15,11 @@
 </head>
 <body>
   <h1>ESP32 Web BLE Application</h1>
-  <script>
     <h1>Touch Test</h1>
       <p>This paragraph is touch sensitive. It is here to test our connection to the phone and how
       we will write and debug javascript clients for ESP BLE.
     </p>
+  <script>
     document.queryselector('p').addEventListener('TouchStart', TStart);
     function TStart(ev) {
       console.log(ev.touches);
