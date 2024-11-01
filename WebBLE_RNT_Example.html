@@ -12,31 +12,9 @@
     <title>ESP32 Web BLE App</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/png" href="">
-    <style>
-      .dot {
-        height: 100px;
-        width: 100px;
-        background-color: #bbb;
-        border-radius: 50%;
-        display: inline-block;
-      }
-    </style>
 </head>
 <body>
   <h1>ESP32 Web BLE Application</h1>
-    <h1>Touch Test</h1>
-    <p id=area>
-    <span class="dot" id=area></span>
-    <p>
-  <script>
-    document.querySelector('.dot').addEventListener('touchstart', TStart);
-    document.querySelector('.dot').addEventListener('touchend', TStart);
-    document.querySelector('.dot').addEventListener('touchmove', TStart);
-    function TStart(ev) {
-      console.log(ev.touches, ev.type);
-    }
-  </script>
-  
   <button id="connectBleButton">Connect to BLE Device</button>
   <button id="disconnectBleButton">Disconnect BLE Device</button>
   <p>BLE state: <strong><span id="bleState" style="color:#d13a30;">Disconnected</span></strong></p>
