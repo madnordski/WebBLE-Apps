@@ -23,8 +23,8 @@
     document.querySelector('p').addEventListener('touchstart', TStart);
     document.querySelector('p').addEventListener('touchend', TStart);
     document.querySelector('p').addEventListener('touchchange', TStart);
-    function TStart(ev, ev.type) {
-      console.log(ev.touches);
+    function TStart(ev) {
+      console.log(ev.touches, ev.type);
     }
   </script>
   
