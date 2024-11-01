@@ -68,7 +68,10 @@
       <td><span class="redled"></span></td>
     </tr>
   </table>
-  
+  document.querySelector('.grnled').addEventListener('click',
+                                    () => writeOnCharacteristic(1));
+  document.querySelector('.grnled').addEventListener('click',
+                                    () => writeOnCharacteristic(0));
 
 </body>
     
