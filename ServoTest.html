@@ -68,10 +68,6 @@
       <td><span class="redled"></span></td>
     </tr>
   </table>
-  document.querySelector('.grnled').addEventListener('click',
-                                    () => writeOnCharacteristic(1));
-  document.querySelector('.grnled').addEventListener('click',
-                                    () => writeOnCharacteristic(0));
 
 </body>
     
@@ -113,6 +109,10 @@ disconnectButton.addEventListener('click', disconnectDevice);
 // Write to the ESP32 LED Characteristic
 //onButton.addEventListener('click', () => writeOnCharacteristic(1));
 //offButton.addEventListener('click', () => writeOnCharacteristic(0));
+document.querySelector('.grnled').addEventListener('click',
+    () => writeOnCharacteristic(1));
+document.querySelector('.grnled').addEventListener('click',
+    () => writeOnCharacteristic(0));
 
 // **** Function definitions ***
 
