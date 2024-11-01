@@ -29,9 +29,9 @@
     <span class="dot"></span>
     <p>
   <script>
-    document.querySelector('area').addEventListener('touchstart', TStart);
-    document.querySelector('area').addEventListener('touchend', TStart);
-    document.querySelector('area').addEventListener('touchmove', TStart);
+    document.querySelector('dot').addEventListener('touchstart', TStart);
+    document.querySelector('dot').addEventListener('touchend', TStart);
+    document.querySelector('dot').addEventListener('touchmove', TStart);
     function TStart(ev) {
       console.log(ev.touches, ev.type);
     }
