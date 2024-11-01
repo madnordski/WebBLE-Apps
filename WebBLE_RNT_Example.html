@@ -26,12 +26,12 @@
   <h1>ESP32 Web BLE Application</h1>
     <h1>Touch Test</h1>
     <div id="DOT">
-    <span class="dot"></span>
+    <span class="dot" id="dot"></span>
     </div>
   <script>
-    document.querySelector('DOT').addEventListener('touchstart', TStart);
-    document.querySelector('DOT').addEventListener('touchend', TStart);
-    document.querySelector('DOT').addEventListener('touchmove', TStart);
+    document.querySelector('dot').addEventListener('touchstart', TStart);
+    document.querySelector('dot').addEventListener('touchend', TStart);
+    document.querySelector('dot').addEventListener('touchmove', TStart);
     function TStart(ev) {
       console.log(ev.touches, ev.type);
     }
