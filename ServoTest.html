@@ -31,7 +31,8 @@
         border-radius: 50%;
         display: inline-block;
 	margin: auto;
-	text-align: right;
+        text-align: right;
+        padding: 15px;
       }
       .grnled {
         height: 20px;
@@ -41,6 +42,7 @@
         display: inline-block;
 	margin: auto;
 	text-align: left;
+        padding: 15px;
       }
     </style>
 </head>
@@ -61,7 +63,12 @@
   <button id="connectBleButton">Connect to BLE Device</button><br>
   <button id="disconnectBleButton">Disconnect BLE Device</button></p>
   <p align="center">BLE state: <strong><span id="bleState" style="color:#d13a30;">Disconnected</span></strong></p>
-  <span class="grnled"></span><span class="redled"></span>
+  <table align="center">
+    <tr><td><span class="grnled"></span></td>
+      <td><span class="redled"></span></td>
+    </tr>
+  </table>
+  
 
 </body>
     
