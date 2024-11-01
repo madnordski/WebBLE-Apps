@@ -12,17 +12,24 @@
     <title>ESP32 Web BLE App</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/png" href="">
+    <style>
+      .dot {
+        height: 100px;
+        width: 100px;
+        background-color: #bbb;
+        border-radius: 50%;
+        display: inline-block;
+      }
+    </style>
 </head>
 <body>
   <h1>ESP32 Web BLE Application</h1>
     <h1>Touch Test</h1>
-      <p>This paragraph is touch sensitive. It is here to test our connection to the phone and how
-      we will write and debug javascript clients for ESP BLE.
-    </p>
+    <span class="dot">
   <script>
-    document.querySelector('p').addEventListener('touchstart', TStart);
-    document.querySelector('p').addEventListener('touchend', TStart);
-    document.querySelector('p').addEventListener('touchmove', TStart);
+    document.querySelector('dot').addEventListener('touchstart', TStart);
+    document.querySelector('dot').addEventListener('touchend', TStart);
+    document.querySelector('dot').addEventListener('touchmove', TStart);
     function TStart(ev) {
       console.log(ev.touches, ev.type);
     }
