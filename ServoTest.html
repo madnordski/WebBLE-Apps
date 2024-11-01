@@ -83,7 +83,7 @@ const bleStateContainer = document.getElementById('bleState');
 const timestampContainer = document.getElementById('timestamp');
 
 //Define BLE Device Specs -- change these
-var deviceName ='ESP32';
+var deviceName ='ServoTest';
 var bleService = '19b10000-e8f2-537e-4f6c-d104768a1214';
 var ledCharacteristic = '19b10002-e8f2-537e-4f6c-d104768a1214';
 var sensorCharacteristic= '19b10001-e8f2-537e-4f6c-d104768a1214';
@@ -106,7 +106,7 @@ connectButton.addEventListener('click', (event) => {
 disconnectButton.addEventListener('click', disconnectDevice);
 
 // SERVO LISTENER GOES HERE
-// Write to the ESP32 LED Characteristic
+// Write to the LED Characteristic
 //onButton.addEventListener('click', () => writeOnCharacteristic(1));
 //offButton.addEventListener('click', () => writeOnCharacteristic(0));
 document.querySelector('.grnled').addEventListener('click',
