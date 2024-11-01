@@ -21,7 +21,7 @@
     </p>
   <script>
     document.querySelector('p').addEventListener('touchstart', TStart);
-    function TStart(ev) {
+    function TStart(ev, ev.type) {
       console.log(ev.touches);
     }
   </script>
