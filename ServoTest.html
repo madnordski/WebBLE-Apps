@@ -1,15 +1,17 @@
-<!--
-  Rui Santos
-  Complete project details at https://RandomNerdTutorials.com/esp32-web-bluetooth/
+<!-- ServoTest
+     This is used to test javascript touch elements for controlling
+     motors.
+     J. King 31 Oct 2024
 
-  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files.
-  The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+     This code is based on the work of Rui Santos.
+     Find his project details at
+     https://RandomNerdTutorials.com/esp32-web-bluetooth/
 -->
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>ESP32 Web BLE App</title>
+    <title>ServoTest Web BLE App</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/png" href="">
     <style>
@@ -23,7 +25,7 @@
     </style>
 </head>
 <body>
-  <h1>ESP32 Web BLE Application</h1>
+  <h1>ServoTest Application</h1>
     <h1>Touch Test</h1>
     <p id=area>
     <span class="dot" id=area></span>
@@ -80,7 +82,7 @@
     });
 
     // Disconnect Button
-    disconnectButton.addEventListener('click', disconnectDevice);
+  disconnectButton.addEventListener('click', disconnectDevice());
 
     // Write to the ESP32 LED Characteristic
     onButton.addEventListener('click', () => writeOnCharacteristic(1));
