@@ -191,7 +191,7 @@ function writeOnCharacteristic(value){
         bleServiceFound.getCharacteristic(ledCharacteristic)
             .then(characteristic => {
                 console.log("Found the LED characteristic: ", characteristic.uuid);
-                const data = new Uint8Array([value]);
+                const data = Array.from(value, char => char.charCodeAt(0));
                 return characteristic.writeValue(data);
             })
             .then(() => {
