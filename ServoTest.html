@@ -56,7 +56,11 @@
     document.querySelector('.dot').addEventListener('touchend', TStart);
     document.querySelector('.dot').addEventListener('touchmove', TStart);
     function TStart(ev) {
-      console.log(ev.touches, ev.type);
+	console.log(ev.touches, ev.type);
+	if ( ev.type == 'touchmove' ) {
+	    console.log(ev.touches[0].clientX,
+			ev.touches[0].clientY);
+	}
     }
   </script>
   <p align="center">
