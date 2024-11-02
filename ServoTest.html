@@ -220,7 +220,14 @@ function writeOnCharacteristic(value){
     }
 }
 
-async function writeOnServo1Characteristic(value){
+let servo1OpInProgress = false;
+
+function writeOnServo1Characteristic(value){
+    if ( servo1OpInProgress ) {
+	console.log("In progress and that's okay.");
+	return;
+    }
+    servo1OpInProgress = true;
     if (bleServer && bleServer.connected) {
         await bleServiceFound.getCharacteristic(servo1Characteristic)
             .then(characteristic => {
@@ -234,7 +241,10 @@ async function writeOnServo1Characteristic(value){
             })
             .catch(error => {
                 console.error("Error writing to the Servo1 characteristic: ", error);
-            });
+            })
+	    .finally(() => {
+		servo1OpInProgress = false;
+	    });
     } else {
         console.error ("Bluetooth is not connected. Cannot write to characteristic.")
         window.alert("Bluetooth is not connected. Cannot write to characteristic. \n Connect to BLE first!")
