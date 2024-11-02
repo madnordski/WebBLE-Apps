@@ -111,9 +111,9 @@ disconnectButton.addEventListener('click', disconnectDevice);
 //onButton.addEventListener('click', () => writeOnCharacteristic(1));
 //offButton.addEventListener('click', () => writeOnCharacteristic(0));
 document.querySelector('.grnled').addEventListener('click',
-    () => writeOnCharacteristic(1));
+    () => writeOnCharacteristic("on"));
 document.querySelector('.redled').addEventListener('click',
-    () => writeOnCharacteristic(0));
+    () => writeOnCharacteristic("off"));
 
 // **** Function definitions ***
 
