@@ -223,7 +223,7 @@ function writeOnServo1Characteristic(value){
             .then(characteristic => {
                 console.log("Found the Servo1 characteristic: ", characteristic.uuid);
                 const data = new Uint8Array(Array.from(value, char => char.charCodeAt(0)));
-                return characteristic.writeValue(data);
+                return await characteristic.writeValue(data);
             })
             .then(() => {
                 latestValueSent.innerHTML = value;
