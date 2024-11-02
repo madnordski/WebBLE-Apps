@@ -58,8 +58,10 @@
     function TStart(ev) {
 	console.log(ev.touches, ev.type);
 	if ( ev.type == 'touchmove' ) {
-	    console.log(ev.touches[0].clientX,
-			ev.touches[0].clientY);
+	    var x = Math.floor(ev.touches[0].clientX);
+	    var y = Math.floor(ev.touches[0].clientY);
+	    console.log(x, y);
+	    console.log(new UintArray(x));
 	}
     }
   </script>
