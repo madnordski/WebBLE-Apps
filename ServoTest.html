@@ -52,12 +52,15 @@
     <span class="dot"></span>
     <p>
   <script>
-    document.querySelector('.dot').addEventListener('touchstart', TStart);
-    document.querySelector('.dot').addEventListener('touchend', TStart);
-    document.querySelector('.dot').addEventListener('touchmove', TStart);
+    document.querySelector('.dot').addEventListener('touchstart',
+						    TStart, {passive: false});
+    document.querySelector('.dot').addEventListener('touchend',
+						    TStart, {passive: false});
+    document.querySelector('.dot').addEventListener('touchmove',
+						    TStart, {passive: false});
     function TStart(ev) {
 	console.log(ev.touches, ev.type);
-	event.preventDefault();
+	ev.preventDefault();
 	if ( ev.type == 'touchmove' ) {
 	    var x = Math.floor(ev.touches[0].clientX);
 	    var y = Math.floor(ev.touches[0].clientY);
