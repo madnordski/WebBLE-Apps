@@ -59,8 +59,8 @@
     document.querySelector('.dot').addEventListener('touchmove',
 						    TStart, {passive: false});
     function TStart(ev) {
-	console.log(ev.touches, ev.type);
 	ev.preventDefault();
+	console.log(ev.touches, ev.type);
 	if ( ev.type == 'touchmove' ) {
 	    var x = Math.floor(ev.touches[0].clientX);
 	    var y = Math.floor(ev.touches[0].clientY);
@@ -222,7 +222,7 @@ function writeOnCharacteristic(value){
 
 function writeOnServo1Characteristic(value){
     if (bleServer && bleServer.connected) {
-        bleServiceFound.getCharacteristic(servo1Characteristic)
+        await bleServiceFound.getCharacteristic(servo1Characteristic)
             .then(characteristic => {
                 console.log("Found the Servo1 characteristic: ", characteristic.uuid);
                 const data = new Uint8Array(Array.from(value, char => char.charCodeAt(0)));
