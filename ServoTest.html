@@ -220,7 +220,7 @@ function writeOnCharacteristic(value){
     }
 }
 
-function writeOnServo1Characteristic(value){
+async function writeOnServo1Characteristic(value){
     if (bleServer && bleServer.connected) {
         await bleServiceFound.getCharacteristic(servo1Characteristic)
             .then(characteristic => {
