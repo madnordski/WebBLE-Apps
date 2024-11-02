@@ -63,6 +63,7 @@
 	    var y = Math.floor(ev.touches[0].clientY);
 	    var msg = x.toString() + " " + y.toString();
 	    console.log(msg);
+	    writeOnServo1Characteristic(msg);
 	}
     }
   </script>
@@ -78,7 +79,8 @@
   </table>
 
 </body>
-    
+<!-- ' -->
+
 <script>
     // DOM Elements
 const connectButton = document.getElementById('connectBleButton');
@@ -94,7 +96,8 @@ const timestampContainer = document.getElementById('timestamp');
 var deviceName ='ServoTest';
 var bleService = '19b10000-e8f2-537e-4f6c-d104768a1214';
 var ledCharacteristic = '19b10002-e8f2-537e-4f6c-d104768a1214';
-var sensorCharacteristic= '19b10001-e8f2-537e-4f6c-d104768a1214';
+var sensorCharacteristic = '19b10001-e8f2-537e-4f6c-d104768a1214';
+var servo1Characteristic = '99819a8b-59cc-4174-beee-fcc74b02fc5b';
 
 //Global Variables to Handle Bluetooth
 var bleServer;
@@ -207,6 +210,27 @@ function writeOnCharacteristic(value){
             })
             .catch(error => {
                 console.error("Error writing to the LED characteristic: ", error);
+            });
+    } else {
+        console.error ("Bluetooth is not connected. Cannot write to characteristic.")
+        window.alert("Bluetooth is not connected. Cannot write to characteristic. \n Connect to BLE first!")
+    }
+}
+
+function writeOnServo1Characteristic(value){
+    if (bleServer && bleServer.connected) {
+        bleServiceFound.getCharacteristic(servo1Characteristic)
+            .then(characteristic => {
+                console.log("Found the Servo1 characteristic: ", characteristic.uuid);
+                const data = new Uint8Array(Array.from(value, char => char.charCodeAt(0)));
+                return characteristic.writeValue(data);
+            })
+            .then(() => {
+                latestValueSent.innerHTML = value;
+                console.log("Value written to Servo1 characteristic:", value);
+            })
+            .catch(error => {
+                console.error("Error writing to the Servo1 characteristic: ", error);
             });
     } else {
         console.error ("Bluetooth is not connected. Cannot write to characteristic.")
