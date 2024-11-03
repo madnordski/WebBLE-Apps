@@ -107,6 +107,9 @@ var bleServer;
 var bleServiceFound;
 var sensorCharacteristicFound;
 
+// led state
+var ledState = "off";
+
 // **** EVENT LISTENERS ***
 
 // Connect Button (search for BLE Devices only if BLE is available)
@@ -122,9 +125,9 @@ disconnectButton.addEventListener('click', disconnectDevice);
 // SERVO LISTENER GOES HERE
 // Write to the LED Characteristic
 document.querySelector('.grnled').addEventListener('click',
-    () => writeOnCharacteristic("on"));
-document.querySelector('.redled').addEventListener('click',
-    () => writeOnCharacteristic("off"));
+    () => writeOnCharacteristic("toggle"));
+//document.querySelector('.redled').addEventListener('click',
+//    () => writeOnCharacteristic("off"));
 
 // **** Function definitions ***
 
@@ -206,13 +209,15 @@ function writeOnCharacteristic(value){
                 return characteristic.writeValue(data);
             })
             .then(() => {
-		if ( value == "on" ) {
+		if ( value == "toggle" && ledState == "off" ) {
+		    ledState = "on";
 		    redLED.style="backgroud-color:red";
 		}
 		else {
+		    ledState = "off";
 		    redLED.style="backgroud-color:blue";
 		}
-                console.log("Value written to LEDcharacteristic:", value);
+                console.log("Value written to LEDcharacteristic:", ledState);
             })
             .catch(error => {
                 console.error("Error writing to the LED characteristic: ", error);
