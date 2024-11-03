@@ -212,7 +212,6 @@ function writeOnCharacteristic(value){
 		else {
 		    redLED.style="backgroud-color:grey";
 		}
-                latestValueSent.innerHTML = value;
                 console.log("Value written to LEDcharacteristic:", value);
             })
             .catch(error => {
