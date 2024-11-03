@@ -91,7 +91,7 @@ const disconnectButton = document.getElementById('disconnectBleButton');
 const onButton = document.getElementById('onButton');
 const offButton = document.getElementById('offButton');
 const retrievedValue = document.getElementById('valueContainer');
-const latestValueSent = document.getElementById('valueSent');
+const redLED = document.getElementById('redled');
 const bleStateContainer = document.getElementById('bleState');
 const timestampContainer = document.getElementById('timestamp');
 
@@ -207,10 +207,10 @@ function writeOnCharacteristic(value){
             })
             .then(() => {
 		if ( value == "on" ) {
-		    document.getElementById("redled").background-color = "#b00";
+		    redLED.background-color = "#b00";
 		}
 		else {
-		    document.getElementById("redled").background-color = "#bbb";
+		    redLED.background-color = "#bbb";
 		}
                 latestValueSent.innerHTML = value;
                 console.log("Value written to LEDcharacteristic:", value);
