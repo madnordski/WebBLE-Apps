@@ -77,7 +77,7 @@
   <!-- probably don't need this table but keep the contents (i.e. spans) -->
   <table align="center">
     <tr><td><span class="grnled" id="grnled"></span></td>
-      <td><span class="redled" id="rled"></span></td>
+      <td><span class="redled" id="rled" style="background-color:grey"></span></td>
     </tr>
   </table>
 
@@ -207,10 +207,10 @@ function writeOnCharacteristic(value){
             })
             .then(() => {
 		if ( value == "on" ) {
-		    redLED.redled.backgroundColor = "#b00";
+		    redLED.style="backgroud-color:red";
 		}
 		else {
-		    redLED.redled.backgroundColor = "#bbb";
+		    redLED.style="backgroud-color:grey";
 		}
                 latestValueSent.innerHTML = value;
                 console.log("Value written to LEDcharacteristic:", value);
