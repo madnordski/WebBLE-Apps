@@ -108,7 +108,7 @@ var bleServiceFound;
 var sensorCharacteristicFound;
 
 // led state
-var ledState = "off";
+var ledState = "on";
 
 // **** EVENT LISTENERS ***
 
@@ -205,19 +205,19 @@ function writeOnCharacteristic(value){
         bleServiceFound.getCharacteristic(ledCharacteristic)
             .then(characteristic => {
                 console.log("Found the LED characteristic: ", characteristic.uuid);
-                const data = new Uint8Array(Array.from(value, char => char.charCodeAt(0)));
+                const data = new Uint8Array(Array.from(ledState, char => char.charCodeAt(0)));
                 return characteristic.writeValue(data);
             })
             .then(() => {
-		if ( value == "toggle" && ledState == "off" ) {
-		    ledState = "on";
+                console.log("Value written to LEDcharacteristic:", ledState);
+		if ( ledState == "on" ) {
 		    redLED.style="backgroud-color:red";
+		    ledState = "off";
 		}
 		else {
-		    ledState = "off";
 		    redLED.style="backgroud-color:blue";
+		    ledState = "on";
 		}
-                console.log("Value written to LEDcharacteristic:", ledState);
             })
             .catch(error => {
                 console.error("Error writing to the LED characteristic: ", error);
