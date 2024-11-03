@@ -211,11 +211,11 @@ function writeOnCharacteristic(value){
             .then(() => {
                 console.log("Value written to LEDcharacteristic:", ledState);
 		if ( ledState == "on" ) {
-		    redLED.style="backgroud-color:red";
+		    redLED.style="backgroud-color:blue";
 		    ledState = "off";
 		}
 		else {
-		    redLED.style="backgroud-color:blue";
+		    redLED.style="backgroud-color:red";
 		    ledState = "on";
 		}
             })
