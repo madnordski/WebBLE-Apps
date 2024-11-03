@@ -77,7 +77,7 @@
   <!-- probably don't need this table but keep the contents (i.e. spans) -->
   <table align="center">
     <tr><td><span class="grnled" id="grnled"></span></td>
-      <td><span class="redled"></span></td>
+      <td><span class="redled" id="rled"></span></td>
     </tr>
   </table>
 
@@ -91,7 +91,8 @@ const disconnectButton = document.getElementById('disconnectBleButton');
 const onButton = document.getElementById('onButton');
 const offButton = document.getElementById('offButton');
 const retrievedValue = document.getElementById('valueContainer');
-const redLED = document.getElementById('.redled');
+const redLED = document.getElementById('rled');
+console.log(redLED);
 const bleStateContainer = document.getElementById('bleState');
 const timestampContainer = document.getElementById('timestamp');
 
