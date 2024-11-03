@@ -27,7 +27,7 @@
       .redled {
         height: 20px;
         width: 20px;
-        background-color: #b00;
+        background-color: #bbb;
         border-radius: 50%;
         display: inline-block;
 	margin: auto;
@@ -93,7 +93,7 @@ const offButton = document.getElementById('offButton');
 const retrievedValue = document.getElementById('valueContainer');
 const bleStateContainer = document.getElementById('bleState');
 const timestampContainer = document.getElementById('timestamp');
-const redLED = document.getElementById('rled');
+const redLED = document.getElementById('rled').redled;
 
 //Define BLE Device Specs -- change these
 var deviceName ='ServoTest';
