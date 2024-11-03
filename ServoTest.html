@@ -207,10 +207,10 @@ function writeOnCharacteristic(value){
             })
             .then(() => {
 		if ( value == "on" ) {
-		    redled.backgroud-color = "#b00";
+		    document.redled.backgroud-color = "#b00";
 		}
 		else {
-		    redled.background-color = "#bbb";
+		    document.redled.background-color = "#bbb";
 		}
                 latestValueSent.innerHTML = value;
                 console.log("Value written to LEDcharacteristic:", value);
