@@ -121,8 +121,6 @@ disconnectButton.addEventListener('click', disconnectDevice);
 
 // SERVO LISTENER GOES HERE
 // Write to the LED Characteristic
-//onButton.addEventListener('click', () => writeOnCharacteristic(1));
-//offButton.addEventListener('click', () => writeOnCharacteristic(0));
 document.querySelector('.grnled').addEventListener('click',
     () => writeOnCharacteristic("on"));
 document.querySelector('.redled').addEventListener('click',
@@ -208,6 +206,12 @@ function writeOnCharacteristic(value){
                 return characteristic.writeValue(data);
             })
             .then(() => {
+		if ( value == "on" ) {
+		    redled.backgroud-color = "#b00";
+		}
+		else {
+		    redled.background-color = "#bbb";
+		}
                 latestValueSent.innerHTML = value;
                 console.log("Value written to LEDcharacteristic:", value);
             })
