@@ -84,19 +84,23 @@
 	else if ( ev.type == 'touchmove' ) {
 	    var x = Math.floor(ev.touches[0].clientX) - xStart;
 	    var y = yStart - Math.floor(ev.touches[0].clientY);
-	    if ( (!xMove && Math.abs(x) > fuzz) || (!yMove && Math.abs(y) > fuzz) ) {
-		var msg = x.toString() + " " + y.toString();
-		console.log(msg);
-		writeOnServo1Characteristic(msg);
-		if ( Math.abs(x) > fuzz ) xMove = true;
-		if ( Math.abs(y) > fuzz ) yMove = true;
+	    if ( !xMove || !yMove ) {
+		if ( Math.abs(x) < fuzz ) x = 0;
+		if ( Math.abs(y) < fuzz ) y = 0;
+		if ( x > 0 || y > 0 ) {
+		    var msg = x.toString() + " " + y.toString();
+		    console.log(msg);
+		    writeOnServo1Characteristic(msg);
+		    if ( Math.abs(x) > fuzz ) xMove = true;
+		    if ( Math.abs(y) > fuzz ) yMove = true;
+		}
 	    }
 	}
 	else if ( ev.type == 'touchend' ) {
 	    console.log("STOP");
 	    writeOnServo1Characteristic("STOP");
-	    xMove = true;
-	    yMove = true;
+	    xMove = false;
+	    yMove = false;
 	}
     }
   </script>
