@@ -76,8 +76,8 @@
 	    yStart = ev.touches[0].clientY;
 	}
 	else if ( ev.type == 'touchmove' ) {
-	    var x = x.Start - Math.floor(ev.touches[0].clientX);
-	    var y = y.Start - Math.floor(ev.touches[0].clientY);
+	    var x = xStart - Math.floor(ev.touches[0].clientX);
+	    var y = yStart - Math.floor(ev.touches[0].clientY);
 	    var msg = x.toString() + " " + y.toString();
 	    console.log(msg);
 	    writeOnServo1Characteristic(msg);
