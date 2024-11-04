@@ -329,11 +329,11 @@ function TStart(ev) {
 	}
     }
     else if ( ev.type == 'touchend' ) {
-	while ( servo1OpInProgress ) {
-	    console.log("wait...");
-	    sleep(1000);
-	}
 	console.log("STOP");
+	writeOnServo1Characteristic("STOP");
+	wait(500);
+	writeOnServo1Characteristic("STOP");
+	wait(500);
 	writeOnServo1Characteristic("STOP");
 	xMove = false;
 	yMove = false;
