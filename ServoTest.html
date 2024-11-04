@@ -87,7 +87,7 @@
   <!-- probably don't need this table but keep the contents (i.e. spans) -->
   <table align="center">
     <tr><td><span class="grnled" id="grnled"></span></td>
-      <td><span class="redled" id="rled" style="background-color:grey"></span></td>
+      <td><span class="redled" id="rled"></span></td>
     </tr>
   </table>
 
@@ -222,11 +222,11 @@ function writeOnCharacteristic(value){
             .then(() => {
                 console.log("Value written to LEDcharacteristic:", ledState);
 		if ( ledState == "on" ) {
-		    redLED.className = "redled";
+		    redLED.className = ".redled";
 		    ledState = "off";
 		}
 		else {
-		    redLED.className = "gryled";
+		    redLED.className = ".gryled";
 		    ledState = "on";
 		}
             })
