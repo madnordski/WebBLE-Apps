@@ -250,12 +250,16 @@ function writeOnCharacteristic(value){
     }
 }
 
-let servo1OpInProgress = false;
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
-function writeOnServo1Characteristic(value){
-    if ( servo1OpInProgress ) {
+let servo1OpInProgress = false;
+      
+async function writeOnServo1Characteristic(value){
+    while ( servo1OpInProgress ) {
 	console.log("In progress and that's okay.");
-	return;
+	await sleep(100);
     }
     servo1OpInProgress = true;
     if (bleServer && bleServer.connected) {
