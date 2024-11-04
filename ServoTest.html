@@ -102,6 +102,8 @@
 <!-- ' -->
 
 <script>
+document.querySelector('.grnled').addEventListener('click', () => writeOnCharacteristic("toggle"));
+
     // DOM Elements
 const connectButton = document.getElementById('connectBleButton');
 const disconnectButton = document.getElementById('disconnectBleButton');
@@ -144,8 +146,6 @@ disconnectButton.addEventListener('click', disconnectDevice);
 
 // SERVO LISTENER GOES HERE
 // Write to the LED Characteristic
-document.querySelector('.grnled').addEventListener('click',
-    () => writeOnCharacteristic("toggle"));
 //document.querySelector('.redled').addEventListener('click',
 //    () => writeOnCharacteristic("off"));
 
