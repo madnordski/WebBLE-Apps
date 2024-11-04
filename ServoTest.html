@@ -254,7 +254,7 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-let servo1OpInProgress = false;
+var servo1OpInProgress = false;
       
 async function writeOnServo1Characteristic(value){
     while ( servo1OpInProgress ) {
