@@ -269,10 +269,10 @@ function writeOnCharacteristic(value){
 var servo1OpInProgress = false;
       
 async function writeOnServo1Characteristic(value){
-    //while ( servo1OpInProgress ) {
-	//console.log("In progress and that's okay.");
-	//sleep(100);
-    //}
+    while ( servo1OpInProgress ) {
+	console.log("wait...");
+	sleep(100);
+    }
     servo1OpInProgress = true;
     if (bleServer && bleServer.connected) {
         await bleServiceFound.getCharacteristic(servo1Characteristic)
