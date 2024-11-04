@@ -290,7 +290,7 @@ function getDateTime() {
     return datetime;
 }
 
-function sleep(ms) {
+function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -332,9 +332,9 @@ function TStart(ev) {
     else if ( ev.type == 'touchend' ) {
 	console.log("STOP");
 	writeOnServo1Characteristic("STOP");
-	wait(500);
+	delay(500);
 	writeOnServo1Characteristic("STOP");
-	wait(500);
+	delay(500);
 	writeOnServo1Characteristic("STOP");
 	xMove = false;
 	yMove = false;
