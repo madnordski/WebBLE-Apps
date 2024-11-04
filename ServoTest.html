@@ -61,53 +61,6 @@
     <p align="center">
     <span class="dot"></span>
     <p>
-  <script>
-    var xStart, yStart;
-    var xMove = false;
-    var yMove = false;
-    var fuzz = 10;
-    var servo1OpInProgress = false;
-
-    document.querySelector('.dot').addEventListener('touchstart',
-						    TStart, {passive: false});
-    document.querySelector('.dot').addEventListener('touchend',
-						    TStart, {passive: false});
-    document.querySelector('.dot').addEventListener('touchmove',
-						    TStart, {passive: false});
-    function TStart(ev) {
-	ev.preventDefault();
-	console.log(ev.touches, ev.type);
-	if ( ev.type == 'touchstart' ) { // reset our starting point
-	                                 // everything is relative to that
-	    xStart = Math.floor(ev.touches[0].clientX);
-	    yStart = Math.floor(ev.touches[0].clientY);
-	}
-	else if ( ev.type == 'touchmove' ) {
-	    var x = Math.floor(ev.touches[0].clientX) - xStart;
-	    var y = yStart - Math.floor(ev.touches[0].clientY);
-	    if ( !xMove || !yMove ) {
-		if ( Math.abs(x) < fuzz ) x = 0;
-		if ( Math.abs(y) < fuzz ) y = 0;
-		if ( x > 0 || y > 0 ) {
-		    var msg = x.toString() + " " + y.toString();
-		    console.log(msg);
-		    writeOnServo1Characteristic(msg);
-		    if ( Math.abs(x) > fuzz ) xMove = true;
-		    if ( Math.abs(y) > fuzz ) yMove = true;
-		}
-	    }
-	}
-	else if ( ev.type == 'touchend' ) {
-	    if ( servo1OpInProgress ) {
-		sleep(500);
-	    }
-	    console.log("STOP");
-	    writeOnServo1Characteristic("STOP");
-	    xMove = false;
-	    yMove = false;
-	}
-    }
-  </script>
   <p align="center">
   <button id="connectBleButton">Connect to BLE Device</button><br>
   <button id="disconnectBleButton">Disconnect BLE Device</button></p>
@@ -338,6 +291,52 @@ function getDateTime() {
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+var xStart, yStart;
+var xMove = false;
+var yMove = false;
+var fuzz = 10;
+var servo1OpInProgress = false;
+
+document.querySelector('.dot').addEventListener('touchstart',
+						TStart, {passive: false});
+document.querySelector('.dot').addEventListener('touchend',
+						TStart, {passive: false});
+document.querySelector('.dot').addEventListener('touchmove',
+						TStart, {passive: false});
+function TStart(ev) {
+    ev.preventDefault();
+    console.log(ev.touches, ev.type);
+    if ( ev.type == 'touchstart' ) { // reset our starting point
+	// everything is relative to that
+	xStart = Math.floor(ev.touches[0].clientX);
+	yStart = Math.floor(ev.touches[0].clientY);
+    }
+    else if ( ev.type == 'touchmove' ) {
+	var x = Math.floor(ev.touches[0].clientX) - xStart;
+	var y = yStart - Math.floor(ev.touches[0].clientY);
+	if ( !xMove || !yMove ) {
+	    if ( Math.abs(x) < fuzz ) x = 0;
+	    if ( Math.abs(y) < fuzz ) y = 0;
+	    if ( x > 0 || y > 0 ) {
+		var msg = x.toString() + " " + y.toString();
+		console.log(msg);
+		writeOnServo1Characteristic(msg);
+		if ( Math.abs(x) > fuzz ) xMove = true;
+		if ( Math.abs(y) > fuzz ) yMove = true;
+	    }
+	}
+    }
+    else if ( ev.type == 'touchend' ) {
+	if ( servo1OpInProgress ) {
+	    sleep(500);
+	}
+	console.log("STOP");
+	writeOnServo1Characteristic("STOP");
+	xMove = false;
+	yMove = false;
+    }
 }
 
 </script>
