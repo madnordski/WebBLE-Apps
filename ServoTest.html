@@ -329,7 +329,7 @@ function TStart(ev) {
 	}
     }
     else if ( ev.type == 'touchend' ) {
-	if ( servo1OpInProgress ) {
+	while ( servo1OpInProgress ) {
 	    sleep(500);
 	}
 	console.log("STOP");
