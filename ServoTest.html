@@ -27,7 +27,7 @@
       .redled {
         height: 20px;
         width: 20px;
-        background-color: #bbb;
+        background-color: #b00;
         border-radius: 50%;
         display: inline-block;
 	margin: auto;
@@ -38,6 +38,16 @@
         height: 20px;
         width: 20px;
         background-color: #0b0;
+        border-radius: 50%;
+        display: inline-block;
+	margin: auto;
+	text-align: left;
+        padding: 15px;
+      }
+      .gryled {
+        height: 20px;
+        width: 20px;
+        background-color: #bbb;
         border-radius: 50%;
         display: inline-block;
 	margin: auto;
@@ -93,7 +103,7 @@ const offButton = document.getElementById('offButton');
 const retrievedValue = document.getElementById('valueContainer');
 const bleStateContainer = document.getElementById('bleState');
 const timestampContainer = document.getElementById('timestamp');
-const redLED = document.getElementById('rled').redled;
+const redLED = document.getElementById('rled');
 
 //Define BLE Device Specs -- change these
 var deviceName ='ServoTest';
@@ -109,6 +119,7 @@ var sensorCharacteristicFound;
 
 // led state
 var ledState = "on";
+redLED.className = gryled;
 
 // **** EVENT LISTENERS ***
 
@@ -211,11 +222,11 @@ function writeOnCharacteristic(value){
             .then(() => {
                 console.log("Value written to LEDcharacteristic:", ledState);
 		if ( ledState == "on" ) {
-		    redLED.style="backgroud-color:blue";
+		    redLED.className = redled;
 		    ledState = "off";
 		}
 		else {
-		    redLED.style="backgroud-color:red";
+		    redLED.className = gryled;
 		    ledState = "on";
 		}
             })
