@@ -268,14 +268,14 @@ function writeOnCharacteristic(value){
 
 var servo1OpInProgress = false;
       
-function writeOnServo1Characteristic(value){
-    if ( servo1OpInProgress ) {
-	console.log("In progress and that's okay.");
-	return;
-    }
+async function writeOnServo1Characteristic(value){
+    //while ( servo1OpInProgress ) {
+	//console.log("In progress and that's okay.");
+	//sleep(100);
+    //}
     servo1OpInProgress = true;
     if (bleServer && bleServer.connected) {
-        bleServiceFound.getCharacteristic(servo1Characteristic)
+        await bleServiceFound.getCharacteristic(servo1Characteristic)
             .then(characteristic => {
                 console.log("Found the Servo1 characteristic: ", characteristic.uuid);
                 const data = new Uint8Array(Array.from(value, char => char.charCodeAt(0)));
