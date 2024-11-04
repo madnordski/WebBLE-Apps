@@ -97,6 +97,9 @@
 	    }
 	}
 	else if ( ev.type == 'touchend' ) {
+	    if ( servo1OpInProgress ) {
+		sleep(300);
+	    }
 	    console.log("STOP");
 	    writeOnServo1Characteristic("STOP");
 	    xMove = false;
@@ -267,14 +270,10 @@ function writeOnCharacteristic(value){
 }
 
 var servo1OpInProgress = false;
-      
+
 function writeOnServo1Characteristic(value){
-    while ( servo1OpInProgress ) {
-	console.log("wait...");
-	sleep(100);
-    }
-    servo1OpInProgress = true;
     if (bleServer && bleServer.connected) {
+	servo1OpInProgress = true;
         bleServiceFound.getCharacteristic(servo1Characteristic)
             .then(characteristic => {
                 console.log("Found the Servo1 characteristic: ", characteristic.uuid);
