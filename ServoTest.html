@@ -318,7 +318,7 @@ function TStart(ev) {
 	var y = yStart - Math.floor(ev.touches[0].clientY);
 	if ( Math.abs(x) < fuzz ) x = 0;
 	if ( Math.abs(y) < fuzz ) y = 0;
-	if ( (!yMove && y != 0) || (!xMove && x !0 0) ) {
+	if ( (!yMove && y != 0) || (!xMove && x != 0) ) {
 	    var msg = x.toString() + " " + y.toString();
 	    console.log(msg);
 	    writeOnServo1Characteristic(msg);
