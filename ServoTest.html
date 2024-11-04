@@ -173,7 +173,7 @@ function connectToDevice(){
             console.log('Device Selected:', device.name);
             bleStateContainer.innerHTML = 'Connected to device ' + device.name;
             bleStateContainer.style.color = "#24af37";
-	    grnLed.className = "grnled";
+	    grnLED.className = "grnled";
             device.addEventListener('gattservicedisconnected', onDisconnected);
             return device.gatt.connect();
         })
@@ -210,7 +210,7 @@ function onDisconnected(event){
     console.log('Device Disconnected:', event.target.device.name);
     bleStateContainer.innerHTML = "Device disconnected";
     bleStateContainer.style.color = "#d13a30";
-    grnLed.className = "gryled";
+    grnLED.className = "gryled";
     connectToDevice();
 }
 
