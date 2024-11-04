@@ -76,13 +76,14 @@
 	    yStart = ev.touches[0].clientY;
 	}
 	else if ( ev.type == 'touchmove' ) {
-	    var x = xStart - Math.floor(ev.touches[0].clientX);
+	    var x = Math.floor(ev.touches[0].clientX) - xStart;
 	    var y = yStart - Math.floor(ev.touches[0].clientY);
 	    var msg = x.toString() + " " + y.toString();
 	    console.log(msg);
 	    writeOnServo1Characteristic(msg);
 	}
 	else if ( ev.type == 'touchend' ) {
+	    console.log("STOP");
 	    writeOnServo1Characteristic("STOP");
 	}
     }
