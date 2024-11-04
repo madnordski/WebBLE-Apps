@@ -66,6 +66,7 @@
     var xMove = false;
     var yMove = false;
     var fuzz = 10;
+    var servo1OpInProgress = false;
 
     document.querySelector('.dot').addEventListener('touchstart',
 						    TStart, {passive: false});
@@ -268,8 +269,6 @@ function writeOnCharacteristic(value){
         window.alert("Bluetooth is not connected. Cannot write to characteristic. \n Connect to BLE first!")
     }
 }
-
-var servo1OpInProgress = false;
 
 function writeOnServo1Characteristic(value){
     if (bleServer && bleServer.connected) {
