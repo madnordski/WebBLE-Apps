@@ -62,6 +62,11 @@
     <span class="dot"></span>
     <p>
   <script>
+    var xStart, yStart;
+    var xMove = false;
+    var yMove = false;
+    var fuzz 10;
+
     document.querySelector('.dot').addEventListener('touchstart',
 						    TStart, {passive: false});
     document.querySelector('.dot').addEventListener('touchend',
@@ -71,20 +76,27 @@
     function TStart(ev) {
 	ev.preventDefault();
 	console.log(ev.touches, ev.type);
-	if ( ev.type == 'touchstart' ) { // reset our starting point -- everything is relative to that
+	if ( ev.type == 'touchstart' ) { // reset our starting point
+	                                 // everything is relative to that
 	    xStart = Math.floor(ev.touches[0].clientX);
 	    yStart = Math.floor(ev.touches[0].clientY);
 	}
 	else if ( ev.type == 'touchmove' ) {
 	    var x = Math.floor(ev.touches[0].clientX) - xStart;
 	    var y = yStart - Math.floor(ev.touches[0].clientY);
-	    var msg = x.toString() + " " + y.toString();
-	    console.log(msg);
-	    writeOnServo1Characteristic(msg);
+	    if ( (!xMove && Math.abs(x) > fuzz) || (!yMove && Math.abs(y) > fuzz) ) {
+		var msg = x.toString() + " " + y.toString();
+		console.log(msg);
+		writeOnServo1Characteristic(msg);
+		if ( Math.abs(x) > fuzz ) xMove = true;
+		if ( Math.abs(y) > fuzz ) yMove = true;
+	    }
 	}
 	else if ( ev.type == 'touchend' ) {
 	    console.log("STOP");
 	    writeOnServo1Characteristic("STOP");
+	    xMove = true;
+	    yMove = true;
 	}
     }
   </script>
@@ -250,16 +262,12 @@ function writeOnCharacteristic(value){
     }
 }
 
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 var servo1OpInProgress = false;
       
-async function writeOnServo1Characteristic(value){
-    while ( servo1OpInProgress ) {
+function writeOnServo1Characteristic(value){
+    if ( servo1OpInProgress ) {
 	console.log("In progress and that's okay.");
-	await sleep(100);
+	return;
     }
     servo1OpInProgress = true;
     if (bleServer && bleServer.connected) {
@@ -324,6 +332,10 @@ function getDateTime() {
     
     var datetime = day + "/" + month + "/" + year + " at " + hours + ":" + minutes + ":" + seconds;
     return datetime;
+}
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 </script>
