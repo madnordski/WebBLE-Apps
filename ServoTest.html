@@ -98,7 +98,7 @@
       <td><span class="redled" id="rled"></span></td>
     </tr>
   </table>
-
+  <p align="center" id="servoStatus">Servos Stopped</a></p>
 </body>
 <!-- ' -->
 
@@ -218,7 +218,7 @@ function onDisconnected(event){
 function handleCharacteristicChange(event){
     const newValueReceived = new TextDecoder().decode(event.target.value);
     console.log("Characteristic value changed: ", newValueReceived);
-    //retrievedValue.innerHTML = newValueReceived;
+    servoStatus.innerHTML = newValueReceived;
     //timestampContainer.innerHTML = getDateTime();
 }
 
