@@ -71,12 +71,19 @@
     function TStart(ev) {
 	ev.preventDefault();
 	console.log(ev.touches, ev.type);
-	if ( ev.type == 'touchmove' ) {
-	    var x = Math.floor(ev.touches[0].clientX);
-	    var y = Math.floor(ev.touches[0].clientY);
+	if ( ev.type == 'touchstart' ) { // reset our starting point -- everything is relative to that
+	    xStart = ev.touches[0].clientX;
+	    yStart = ev.touches[0].clientY;
+	}
+	else if ( ev.type == 'touchmove' ) {
+	    var x = x.Start - Math.floor(ev.touches[0].clientX);
+	    var y = y.Start - Math.floor(ev.touches[0].clientY);
 	    var msg = x.toString() + " " + y.toString();
 	    console.log(msg);
 	    writeOnServo1Characteristic(msg);
+	}
+	else if ( ev.type == 'touchend' ) {
+	    writeOnServo1Characteristic("STOP");
 	}
     }
   </script>
@@ -86,7 +93,7 @@
   <p align="center">BLE state: <strong><span id="bleState" style="color:#d13a30;">Disconnected</span></strong></p>
   <!-- probably don't need this table but keep the contents (i.e. spans) -->
   <table align="center">
-    <tr><td><span class="grnled" id="grnled"></span></td>
+    <tr><td><span class="grnled" id="gled"></span></td>
       <td><span class="redled" id="rled"></span></td>
     </tr>
   </table>
@@ -104,6 +111,7 @@ const retrievedValue = document.getElementById('valueContainer');
 const bleStateContainer = document.getElementById('bleState');
 const timestampContainer = document.getElementById('timestamp');
 const redLED = document.getElementById('rled');
+const grnLED = document.getElementById('gled');
 
 //Define BLE Device Specs -- change these
 var deviceName ='ServoTest';
@@ -120,6 +128,7 @@ var sensorCharacteristicFound;
 // led state
 var ledState = "on";
 redLED.className = "gryled";
+grnLED.className = "gryled";
 
 // **** EVENT LISTENERS ***
 
@@ -164,6 +173,7 @@ function connectToDevice(){
             console.log('Device Selected:', device.name);
             bleStateContainer.innerHTML = 'Connected to device ' + device.name;
             bleStateContainer.style.color = "#24af37";
+	    grnLed.className = "grnled";
             device.addEventListener('gattservicedisconnected', onDisconnected);
             return device.gatt.connect();
         })
@@ -200,7 +210,7 @@ function onDisconnected(event){
     console.log('Device Disconnected:', event.target.device.name);
     bleStateContainer.innerHTML = "Device disconnected";
     bleStateContainer.style.color = "#d13a30";
-    
+    grnLed.className = "gryled";
     connectToDevice();
 }
 
@@ -255,7 +265,6 @@ function writeOnServo1Characteristic(value){
 		return characteristic.writeValue(data);
             })
             .then(() => {
-                latestValueSent.innerHTML = value;
                 console.log("Value written to Servo1 characteristic:", value);
             })
             .catch(error => {
