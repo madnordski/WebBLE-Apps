@@ -100,6 +100,7 @@ var servo1Characteristic = '99819a8b-59cc-4174-beee-fcc74b02fc5b';
 var bleServer;
 var bleServiceFound;
 var sensorCharacteristicFound;
+var servo1OpInProgress = false;
 
 // led state
 var ledState = "on";
@@ -297,7 +298,6 @@ var xStart, yStart;
 var xMove = false;
 var yMove = false;
 var fuzz = 10;
-var servo1OpInProgress = false;
 
 document.querySelector('.dot').addEventListener('touchstart',
 						TStart, {passive: false});
@@ -330,7 +330,8 @@ function TStart(ev) {
     }
     else if ( ev.type == 'touchend' ) {
 	while ( servo1OpInProgress ) {
-	    sleep(500);
+	    console.log("wait...");
+	    sleep(1000);
 	}
 	console.log("STOP");
 	writeOnServo1Characteristic("STOP");
