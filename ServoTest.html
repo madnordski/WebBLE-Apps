@@ -194,15 +194,14 @@ function connectToDevice(){
             characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicChange);
             characteristic.startNotifications();
             console.log("Notifications Started.");
-	    return true;
             return characteristic.readValue();
-        //})
+        })
         //.then(value => {
         //    console.log("Read value: ", value);
         //    const decodedValue = new TextDecoder().decode(value);
         //    console.log("Decoded value: ", decodedValue);
         //    retrievedValue.innerHTML = decodedValue;
-        })
+        //})
         .catch(error => {
             console.log('Error: ', error);
         })
