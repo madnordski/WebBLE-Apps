@@ -99,7 +99,7 @@
 	}
 	else if ( ev.type == 'touchend' ) {
 	    if ( servo1OpInProgress ) {
-		sleep(300);
+		sleep(500);
 	    }
 	    console.log("STOP");
 	    writeOnServo1Characteristic("STOP");
