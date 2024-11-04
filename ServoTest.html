@@ -119,7 +119,7 @@ var sensorCharacteristicFound;
 
 // led state
 var ledState = "on";
-redLED.className = gryled;
+redLED.className = "gryled";
 
 // **** EVENT LISTENERS ***
 
@@ -222,11 +222,11 @@ function writeOnCharacteristic(value){
             .then(() => {
                 console.log("Value written to LEDcharacteristic:", ledState);
 		if ( ledState == "on" ) {
-		    redLED.className = redled;
+		    redLED.className = "redled";
 		    ledState = "off";
 		}
 		else {
-		    redLED.className = gryled;
+		    redLED.className = "gryled";
 		    ledState = "on";
 		}
             })
