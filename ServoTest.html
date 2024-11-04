@@ -72,8 +72,8 @@
 	ev.preventDefault();
 	console.log(ev.touches, ev.type);
 	if ( ev.type == 'touchstart' ) { // reset our starting point -- everything is relative to that
-	    xStart = ev.touches[0].clientX;
-	    yStart = ev.touches[0].clientY;
+	    xStart = Math.floor(ev.touches[0].clientX);
+	    yStart = Math.floor(ev.touches[0].clientY);
 	}
 	else if ( ev.type == 'touchmove' ) {
 	    var x = Math.floor(ev.touches[0].clientX) - xStart;
