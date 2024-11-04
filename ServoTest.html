@@ -293,6 +293,7 @@ function disconnectDevice() {
                     console.log("Device Disconnected");
                     bleStateContainer.innerHTML = "Device Disconnected";
                     bleStateContainer.style.color = "#d13a30";
+		    grnLED.className = "gryled";
 		    
                 })
                 .catch(error => {
