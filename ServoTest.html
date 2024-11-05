@@ -224,7 +224,7 @@ function writeOnCharacteristic(value){
     }
 }
 
-function writeOnServo1Characteristic(value){
+async function writeOnServo1Characteristic(value){
     if (bleServer && bleServer.connected) {
 	servo1OpInProgress = true;
         bleServiceFound.getCharacteristic(servo1Characteristic)
@@ -235,9 +235,11 @@ function writeOnServo1Characteristic(value){
             })
             .then(() => {
                 console.log("Value written to Servo1 characteristic:", value);
+		return true;
             })
             .catch(error => {
                 console.error("Error writing to the Servo1 characteristic: ", error);
+		return false;
             })
 	    .finally(() => {
 		servo1OpInProgress = false;
@@ -329,11 +331,11 @@ function TStart(ev) {
     }
     else if ( ev.type == 'touchend' ) {
 	console.log("STOP");
-	console.log(writeOnServo1Characteristic("STOP"));
+	console.log(await writeOnServo1Characteristic("STOP"));
 	delay(500);
-	console.log(writeOnServo1Characteristic("STOP"));
+	console.log(await writeOnServo1Characteristic("STOP"));
 	delay(500);
-	console.log(writeOnServo1Characteristic("STOP"));
+	console.log(await writeOnServo1Characteristic("STOP"));
 	xMove = false;
 	yMove = false;
 	console.log("Stop exit");
