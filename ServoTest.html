@@ -227,7 +227,7 @@ function writeOnCharacteristic(value){
 async function writeOnServo1Characteristic(value){
     if (bleServer && bleServer.connected) {
 	servo1OpInProgress = true;
-        bleServiceFound.getCharacteristic(servo1Characteristic)
+        await bleServiceFound.getCharacteristic(servo1Characteristic)
             .then(characteristic => {
                 console.log("Found the Servo1 characteristic: ", characteristic.uuid);
                 const data = new Uint8Array(Array.from(value, char => char.charCodeAt(0)));
@@ -331,14 +331,11 @@ function TStart(ev) {
     }
     else if ( ev.type == 'touchend' ) {
 	console.log("STOP");
-	var rtn = await writeOnServo1Characteristic("STOP");
-	console.log(rtn);
+	writeOnServo1Characteristic("STOP");
 	delay(500);
-	rtn = await writeOnServo1Characteristic("STOP");
-	console.log(rtn);
+	writeOnServo1Characteristic("STOP");
 	delay(500);
-	rtn = await writeOnServo1Characteristic("STOP");
-	console.log(rtn);
+	writeOnServo1Characteristic("STOP");
 	xMove = false;
 	yMove = false;
 	console.log("Stop exit");
@@ -348,3 +345,4 @@ function TStart(ev) {
 </script>
 
 </html>
+
