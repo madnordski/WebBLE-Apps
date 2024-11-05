@@ -329,11 +329,11 @@ function TStart(ev) {
     }
     else if ( ev.type == 'touchend' ) {
 	console.log("STOP");
-	writeOnServo1Characteristic("STOP");
+	console.log(writeOnServo1Characteristic("STOP"));
 	delay(500);
-	writeOnServo1Characteristic("STOP");
+	console.log(writeOnServo1Characteristic("STOP"));
 	delay(500);
-	writeOnServo1Characteristic("STOP");
+	console.log(writeOnServo1Characteristic("STOP"));
 	xMove = false;
 	yMove = false;
 	console.log("Stop exit");
