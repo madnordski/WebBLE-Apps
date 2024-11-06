@@ -237,7 +237,6 @@ async function writeOnServo1Characteristic(value){
 		});
 	}
 	catch (error) {
-	    console.error(error.name);
 	    if ( error.name === 'NetworkError' ) { // if busy, try again
 		console.log("busy, trying again");
 		await delay(50);
@@ -255,6 +254,7 @@ async function writeOnServo1Characteristic(value){
 
 function disconnectDevice() {
     console.log("Disconnect Device.");
+    sleep(100);
     //if (bleServer && bleServer.connected) {
     writeOnServo1Characteristic("DISCONNECT");
         if (sensorCharacteristicFound) {
@@ -298,6 +298,14 @@ function getDateTime() {
 
 function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+function sleep(milliseconds) {
+    var start = new Date().getTime();
+    while ( true ) {
+	if ((new Date().getTime() - start) > milliseconds){
+	    break;
+	}
+    }
 }
 
 var xStart, yStart;
