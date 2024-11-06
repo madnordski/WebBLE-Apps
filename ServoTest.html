@@ -226,24 +226,27 @@ function writeOnCharacteristic(value){
 
 async function writeOnServo1Characteristic(value){
     if (bleServer && bleServer.connected) {
-	servo1OpInProgress = true;
-        await bleServiceFound.getCharacteristic(servo1Characteristic)
-            .then(characteristic => {
-                console.log("Found the Servo1 characteristic: ", characteristic.uuid);
-                const data = new Uint8Array(Array.from(value, char => char.charCodeAt(0)));
-		return characteristic.writeValue(data);
-            })
-            .then(() => {
-                console.log("Value written to Servo1 characteristic:", value);
-		return true;
-            })
-            .catch(error => {
+	try {
+	    // use try/catch to make sure this completes -- retry
+            await bleServiceFound.getCharacteristic(servo1Characteristic)
+		.then(characteristic => {
+                    console.log("Found the Servo1 characteristic: ", characteristic.uuid);
+                    const data = new Uint8Array(Array.from(value, char => char.charCodeAt(0)));
+		    console.log("Value written to Servo1 characteristic:", value);
+		    return characteristic.writeValue(data);
+		});
+	}
+	catch (error) {
+	    console.error("ERROR: " + error.name);
+	    if ( error.name === 'NetworkError' ) { // if busy, try again
+		console.log("busy, trying again");
+		await delay(500);
+		return writeOnServo1Characteristic(value);
+	    }
+	    else {
                 console.error("Error writing to the Servo1 characteristic: ", error);
-		return false;
-            })
-	    .finally(() => {
-		servo1OpInProgress = false;
-	    });
+            }
+	}
     } else {
         console.error ("Bluetooth is not connected. Cannot write to characteristic.")
         window.alert("Bluetooth is not connected. Cannot write to characteristic. \n Connect to BLE first!")
