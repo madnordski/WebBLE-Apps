@@ -240,7 +240,7 @@ async function writeOnServo1Characteristic(value){
 	    console.error("ERROR: " + error.name);
 	    if ( error.name === 'NetworkError' ) { // if busy, try again
 		console.log("busy, trying again");
-		await delay(500);
+		await delay(50);
 		return writeOnServo1Characteristic(value);
 	    }
 	    else {
@@ -255,7 +255,7 @@ async function writeOnServo1Characteristic(value){
 
 function disconnectDevice() {
     console.log("Disconnect Device.");
-    if (bleServer && bleServer.connected) {
+    //if (bleServer && bleServer.connected) {
         if (sensorCharacteristicFound) {
             sensorCharacteristicFound.stopNotifications()
                 .then(() => {
@@ -275,11 +275,11 @@ function disconnectDevice() {
         } else {
             console.log("No characteristic found to disconnect.");
         }
-    } else {
+    //} else {
         // Throw an error if Bluetooth is not connected
-        console.error("Bluetooth is not connected.");
-        window.alert("Bluetooth is not connected.")
-    }
+        //console.error("Bluetooth is not connected.");
+        //window.alert("Bluetooth is not connected.")
+    //}
 }
 
 function getDateTime() {
