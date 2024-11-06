@@ -237,7 +237,7 @@ async function writeOnServo1Characteristic(value){
 		});
 	}
 	catch (error) {
-	    console.error("ERROR: " + error.name);
+	    console.error(error.name);
 	    if ( error.name === 'NetworkError' ) { // if busy, try again
 		console.log("busy, trying again");
 		await delay(50);
