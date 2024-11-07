@@ -127,10 +127,10 @@ connectButton.addEventListener('click', (event) => {
 });
 
 // Disconnect Button
-disconnectButton.addEventListener('click', disconnectDevice);
+disconnectButton.addEventListener('click', disconnectDevice());
 
 // control button
-controlButton.addEventListener('click', writeOnDisconnect("DIE"));
+controlButton.addEventListener('click', writeOnControl("DIE"));
 
 // SERVO LISTENER GOES HERE
 // Write to the LED Characteristic
@@ -237,7 +237,7 @@ function writeOnCharacteristic(value){
     }
 }
 
-async function writeOnDisconnect(value) {
+async function writeOnControl(value) {
     console.log("control called");
     if ( bleServer && bleServer.connected ) {
 	try {
