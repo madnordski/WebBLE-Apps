@@ -130,7 +130,7 @@ connectButton.addEventListener('click', (event) => {
 disconnectButton.addEventListener('click', disconnectDevice);
 
 // control button
-controlButton.addEventListener('click', () => {writeOnControl("DIE")});
+controlButton.addEventListener('click', () => {writeOnControl("STOP")});
 
 // SERVO LISTENER GOES HERE
 // Write to the LED Characteristic
@@ -289,7 +289,7 @@ async function writeOnServo1Characteristic(value){
 function disconnectDevice() {
     console.log("Disconnect Device.");
     //if (bleServer && bleServer.connected) {
-    //writeOnDisconnect("DISCONNECT");
+    writeOnDisconnect("DIE");
     sleep(50);
         if (sensorCharacteristicFound) {
             sensorCharacteristicFound.stopNotifications()
