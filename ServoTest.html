@@ -367,9 +367,8 @@ async function connectToDevice() {
     }
     try {
 	await navigator.bluetooth.requestDevice({
-	    filters: [{services: [bleService] }]
-	    //filters: [{name: deviceName}],
-	    //optionalServices: [bleService]
+	    filters: [{name: deviceName}],
+	    optionalServices: [bleService]
 	})
 	// act on the promise object returned
 	    .then(device => {
