@@ -230,6 +230,26 @@ function writeOnCharacteristic(value){
     }
 }
 
+async function writeOnDisconnectSthik(value) {
+    if ( bleServer && bleServer.connected ) {
+	try {
+	    await bleServiceFound.getCharacteristic(disconnectSthik)
+		.then(characteristic => {
+		    console.log("Found dissconnect sthik");
+		    const data = new Uint8Array(Array.from(value, char => char.charCodeAt(0)));
+		    console.log("Disconnect sent.");
+		    return characterist.writeValue(data);
+		});
+	}
+	catch (error ) {
+	    console.error("Error send disconnect.");
+	}
+    }
+    else {
+	console.error("Bluetooth is not connected!");
+    }
+}
+
 async function writeOnServo1Characteristic(value){
     if (bleServer && bleServer.connected) {
 	try {
@@ -261,8 +281,8 @@ async function writeOnServo1Characteristic(value){
 function disconnectDevice() {
     console.log("Disconnect Device.");
     //if (bleServer && bleServer.connected) {
-    writeOnServo1Characteristic("STOP");
-    sleep(100);
+    await writeOnDisconnectSthik("DISCONNECT");
+    sleep(50);
         if (sensorCharacteristicFound) {
             sensorCharacteristicFound.stopNotifications()
                 .then(() => {
