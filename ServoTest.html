@@ -357,6 +357,49 @@ function TStart(ev) {
     }
 }
 
+// start things off by connecting to the ESP32 over BLE
+var bluetoothDevice;
+
+async function connectToDevice() {
+    if ( bluetoothDevice && bluetoothDevice.gatt.connected ) {
+	console.log("Already connected.");
+	return;
+    }
+    try {
+	await navigator.bluetooth.requestDevice({
+	    filters: [{name: deviceName}],
+	    optionalServices: [bleService]
+	})
+	// act on the promise object returned
+	    .then(device => {
+		console.log('Got device:', device.name);
+		bleStateContainer.innerHTML = 'Connected to ' + device.name;
+		grnLED.className = 'grnled';
+		device.addEventListener('gattservicedisconnected',
+					onDisconnected);
+		bluetoothDevice = device;
+		return device.gatt.connect();
+	    })
+	    .then(service => {
+		bleServiceFound = service;
+		console.log('Service discovered:' service.uuid);
+		return service.getCharacteristic(sensorCharacteristic);
+	    })
+	    .then(characteristic => {
+		console.log("Characteristic discovered:", characteristic.uuid);
+		sensorCharacteristicFound = characteristic;
+		characteristic.startNotifications();
+		console.log("Notification starts.");
+		return characteristic.readValue();
+	    });
+    }
+    catch (error) {
+	console.error('Connection error:', error);
+    }
+}
+
+window.addEventListener('load', connectToDevice);
+
 </script>
 
 </html>
