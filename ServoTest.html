@@ -239,7 +239,7 @@ async function writeOnDisconnectSthik(value) {
 		    console.log("Found dissconnect sthik");
 		    const data = new Uint8Array(Array.from(value, char => char.charCodeAt(0)));
 		    console.log("Disconnect sent.");
-		    return characterist.writeValue(data);
+		    return characteristic.writeValue(data);
 		});
 	}
 	catch (error ) {
