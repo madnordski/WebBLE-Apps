@@ -236,7 +236,7 @@ function writeOnCharacteristic(value){
     }
 }
 
-async function writeOnDisconnectSthik(value) {
+async function writeOnDisconnect(value) {
     if ( bleServer && bleServer.connected ) {
 	try {
 	    await bleServiceFound.getCharacteristic(disconnectSthik)
@@ -287,7 +287,7 @@ async function writeOnServo1Characteristic(value){
 function disconnectDevice() {
     console.log("Disconnect Device.");
     //if (bleServer && bleServer.connected) {
-    writeOnDisconnectSthik("DISCONNECT");
+    //writeOnDisconnect("DISCONNECT");
     sleep(50);
         if (sensorCharacteristicFound) {
             sensorCharacteristicFound.stopNotifications()
