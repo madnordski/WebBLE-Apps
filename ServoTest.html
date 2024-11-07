@@ -241,7 +241,7 @@ async function writeOnControl(value) {
     console.log("control called with" + value);
     if ( bleServer && bleServer.connected ) {
 	try {
-	    await bleServiceFound.getCharacteristic(disconnectSthik)
+	    await bleServiceFound.getCharacteristic(controlSthik)
 		.then(characteristic => {
 		    console.log("Found control sthik");
 		    const data = new Uint8Array(Array.from(value, char => char.charCodeAt(0)));
