@@ -380,6 +380,11 @@ async function connectToDevice() {
 		bluetoothDevice = device;
 		return device.gatt.connect();
 	    })
+	    .then(gattServer => {
+		bleServer = gattServer;
+		console.log("GATT Server connected.");
+		return bleServer.getPrimaryService(bleService);
+	    })
 	    .then(service => {
 		bleServiceFound = service;
 		console.log('Service discovered:', service.uuid);
