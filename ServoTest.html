@@ -378,7 +378,7 @@ function TStart(ev) {
     else if ( ev.type == 'touchend' ) {
 	console.log("STOP");
 	delay(50);
-	writeOnServo1Characteristic("STOP");
+	writeOnControl("STOP");
 	xMove = false;
 	yMove = false;
 	console.log("Stop exit");
