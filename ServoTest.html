@@ -260,7 +260,7 @@ async function writeOnServo1Characteristic(value){
 
 function disconnectDevice() {
     console.log("Disconnect Device.");
-    sleep(100);
+    //sleep(100);
     //if (bleServer && bleServer.connected) {
     writeOnServo1Characteristic("DISCONNECT");
         if (sensorCharacteristicFound) {
