@@ -104,7 +104,7 @@ var bleService = '19b10000-e8f2-537e-4f6c-d104768a1214';
 var ledCharacteristic = '19b10002-e8f2-537e-4f6c-d104768a1214';
 var sensorCharacteristic = '19b10001-e8f2-537e-4f6c-d104768a1214';
 var servo1Characteristic = '99819a8b-59cc-4174-beee-fcc74b02fc5b';
-var disconnectSthik = '05ca6ae0-6810-4dc0-9f00-424d9b06261b';
+var controlSthik = '05ca6ae0-6810-4dc0-9f00-424d9b06261b';
 
 //Global Variables to Handle Bluetooth
 var bleServer;
@@ -238,19 +238,19 @@ function writeOnCharacteristic(value){
 }
 
 async function writeOnControl(value) {
-    console.log("control called");
+    console.log("control called with" + value);
     if ( bleServer && bleServer.connected ) {
 	try {
 	    await bleServiceFound.getCharacteristic(disconnectSthik)
 		.then(characteristic => {
-		    console.log("Found dissconnect sthik");
+		    console.log("Found control sthik");
 		    const data = new Uint8Array(Array.from(value, char => char.charCodeAt(0)));
-		    console.log("Disconnect sent.");
+		    console.log("Control sent.");
 		    return characteristic.writeValue(data);
 		});
 	}
 	catch (error ) {
-	    console.error("Error sending disconnect.", error);
+	    console.error("Error sending control.", error);
 	}
     }
     else {
@@ -289,7 +289,7 @@ async function writeOnServo1Characteristic(value){
 function disconnectDevice() {
     console.log("Disconnect Device.");
     //if (bleServer && bleServer.connected) {
-    writeOnDisconnect("DIE");
+    writeOnControl("DIE");
     sleep(50);
         if (sensorCharacteristicFound) {
             sensorCharacteristicFound.stopNotifications()
