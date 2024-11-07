@@ -290,7 +290,7 @@ function disconnectDevice() {
     console.log("Disconnect Device.");
     //if (bleServer && bleServer.connected) {
     writeOnControl("DIE");
-    sleep(50);
+    sleep(500);
         if (sensorCharacteristicFound) {
             sensorCharacteristicFound.stopNotifications()
                 .then(() => {
