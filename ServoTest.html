@@ -76,6 +76,11 @@
 <!-- ' -->
 
 <script>
+// we should try to connect when the page is loaded
+// we should already know the name of server
+// since the esp32 doesn't give up the connection, can't we just restore
+//   the connection we had before the page was reloaded?
+
 document.querySelector('.grnled').addEventListener('click', () => writeOnCharacteristic("toggle"));
 
     // DOM Elements
