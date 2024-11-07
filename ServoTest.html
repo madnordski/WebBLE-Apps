@@ -64,7 +64,9 @@
     <p>
   <p align="center">
   <button id="connectBleButton">Connect to BLE Device</button><br>
-  <button id="disconnectBleButton">Disconnect BLE Device</button></p>
+    <button id="disconnectBleButton">Disconnect BLE Device</button></p>
+    <button id="controlButton">Control</button></p>
+    
   <p align="center">BLE state: <strong><span id="bleState" style="color:#d13a30;">Disconnected</span></strong></p>
   <!-- probably don't need this table but keep the contents (i.e. spans) -->
   <table align="center">
@@ -125,6 +127,9 @@ connectButton.addEventListener('click', (event) => {
 
 // Disconnect Button
 disconnectButton.addEventListener('click', disconnectDevice);
+
+// control button
+controlButton.addEventListener('click', writeOnDisconnect("DIE"));
 
 // SERVO LISTENER GOES HERE
 // Write to the LED Characteristic
@@ -429,7 +434,6 @@ window.addEventListener('beforeunload', () => {
 });
 
 //window.addEventListener('load', connectToDevice);
-writeOnDisconnect("DIE");
 
 </script>
 
