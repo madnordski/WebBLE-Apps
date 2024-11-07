@@ -403,7 +403,10 @@ async function connectToDevice() {
     }
 }
 
-window.addEventListener('load', connectToDevice);
+window.addEventListener('beforeunload', () => {
+    disconnectDevice();
+}
+//window.addEventListener('load', connectToDevice);
 
 </script>
 
