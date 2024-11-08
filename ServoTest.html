@@ -129,7 +129,10 @@ connectButton.addEventListener('click', (event) => {
 // Disconnect Button
 disconnectButton.addEventListener('click', (event) => {
     writeOnControl("DIE");
-    disconnectDevice();
+    bleStateContainer.innerHTML = "Device Disconnected";
+    bleStateContainer.style.color = "#d13a30";
+    grnLED.className = "gryled";
+    //disconnectDevice();
 });
 
 // control button
