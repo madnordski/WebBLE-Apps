@@ -54,12 +54,6 @@
 	text-align: left;
         padding: 15px;
       }
-      .grnspn {
-	  color: "#0b0";
-      }
-      .redspn {
-	  color: "#b00";
-      }
       
     </style>
 </head>
@@ -73,7 +67,7 @@
   <button id="connectBleButton">Connect to BLE Device</button><br>
     <button id="disconnectBleButton">Disconnect BLE Device</button></p>
     
-  <p align="center">BLE state: <strong><span id="bleState" class="redspn">Disconnected</span></strong></p>
+  <p align="center">BLE state: <strong><span id="bleState" style="color:#b00;">Disconnected</span></strong></p>
   <!-- probably don't need this table but keep the contents (i.e. spans) -->
   <table align="center">
     <tr><td><span class="grnled" id="gled"></span></td>
@@ -135,7 +129,7 @@ connectButton.addEventListener('click', (event) => {
 disconnectButton.addEventListener('click', (event) => {
     writeOnControl("DIE");
     bleStateContainer.innerHTML = "Device Disconnected";
-    bleStateContainer.className = "redspn";
+    bleStateContainer.color = "#b00";
     grnLED.className = "gryled";
     //disconnectDevice();
 });
@@ -168,7 +162,7 @@ function oldConnectToDevice(){
         .then(device => {
             console.log('Device Selected:', device.name);
             bleStateContainer.innerHTML = 'Connected to device ' + device.name;
-            bleStateContainer.className = "grnspn";
+            bleStateContainer.color = "#0b0";
 	    grnLED.className = "grnled";
             device.addEventListener('gattservicedisconnected', onDisconnected);
             return device.gatt.connect();
@@ -205,7 +199,7 @@ function oldConnectToDevice(){
 function onDisconnected(event){
     console.log('Device Disconnected:', event.target.device.name);
     bleStateContainer.innerHTML = "Device disconnected";
-    bleStateContainer.className = "redspn";
+    bleStateContainer.color = "#b00";
     grnLED.className = "gryled";
     connectToDevice();
 }
@@ -379,7 +373,7 @@ async function connectToDevice() {
 	    .then(device => {
 		console.log('Got device:', device.name);
 		bleStateContainer.innerHTML = 'Connected to ' + device.name;
-		bleStateContainer.className = "grnspn";
+		bleStateContainer.color = "#0b0";
 		grnLED.className = 'grnled';
 		device.addEventListener('gattservicedisconnected',
 					onDisconnected);
