@@ -64,8 +64,7 @@
     <p>
   <p align="center">
   <button id="connectBleButton">Connect to BLE Device</button><br>
-    <button id="disconnectBleButton">Disconnect BLE Device</button>
-    <button id="controlButton">Control</button></p>
+    <button id="disconnectBleButton">Disconnect BLE Device</button></p>
     
   <p align="center">BLE state: <strong><span id="bleState" style="color:#d13a30;">Disconnected</span></strong></p>
   <!-- probably don't need this table but keep the contents (i.e. spans) -->
@@ -89,7 +88,6 @@ document.querySelector('.grnled').addEventListener('click', () => writeOnCharact
     // DOM Elements
 const connectButton = document.getElementById('connectBleButton');
 const disconnectButton = document.getElementById('disconnectBleButton');
-const controlButton = document.getElementById('controlButton');
 const onButton = document.getElementById('onButton');
 const offButton = document.getElementById('offButton');
 const retrievedValue = document.getElementById('valueContainer');
@@ -134,9 +132,6 @@ disconnectButton.addEventListener('click', (event) => {
     grnLED.className = "gryled";
     //disconnectDevice();
 });
-
-// control button
-controlButton.addEventListener('click', () => {writeOnControl("STOP")});
 
 // SERVO LISTENER GOES HERE
 // Write to the LED Characteristic
@@ -290,35 +285,6 @@ async function writeOnServo1Characteristic(value){
         console.error ("Bluetooth is not connected. Cannot write to characteristic.")
         window.alert("Bluetooth is not connected. Cannot write to characteristic. \n Connect to BLE first!")
     }
-}
-
-function disconnectDevice() {
-    console.log("Disconnect Device.");
-    //if (bleServer && bleServer.connected) {
-        if (sensorCharacteristicFound) {
-            sensorCharacteristicFound.stopNotifications()
-                .then(() => {
-                    console.log("Notifications Stopped");
-                    return bleServer.disconnect();
-                })
-                .then(() => {
-                    console.log("Device Disconnected");
-                    bleStateContainer.innerHTML = "Device Disconnected";
-                    bleStateContainer.style.color = "#d13a30";
-		    grnLED.className = "gryled";
-		    
-                })
-                .catch(error => {
-                    console.log("An error occurred:", error);
-                });
-        } else {
-            console.log("No characteristic found to disconnect.");
-        }
-    //} else {
-        // Throw an error if Bluetooth is not connected
-        //console.error("Bluetooth is not connected.");
-        //window.alert("Bluetooth is not connected.")
-    //}
 }
 
 function getDateTime() {
