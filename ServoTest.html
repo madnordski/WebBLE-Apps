@@ -128,7 +128,7 @@ connectButton.addEventListener('click', (event) => {
 disconnectButton.addEventListener('click', (event) => {
     writeOnControl("DIE");
     bleStateContainer.innerHTML = "Device Disconnected";
-    bleStateContainer.style.color = "#d13a30";
+    bleStateContainer.style.color = "#b00";
     grnLED.className = "gryled";
     //disconnectDevice();
 });
@@ -160,7 +160,7 @@ function oldConnectToDevice(){
     // act on the Promise object returned
         .then(device => {
             console.log('Device Selected:', device.name);
-            bleStateContainer.style.color = "#00bb00";
+            bleStateContainer.style.color = "#0b0";
             bleStateContainer.innerHTML = 'Connected to device ' + device.name;
 	    grnLED.className = "grnled";
             device.addEventListener('gattservicedisconnected', onDisconnected);
@@ -198,7 +198,7 @@ function oldConnectToDevice(){
 function onDisconnected(event){
     console.log('Device Disconnected:', event.target.device.name);
     bleStateContainer.innerHTML = "Device disconnected";
-    bleStateContainer.style.color = "#d13a30";
+    bleStateContainer.style.color = "#b00";
     grnLED.className = "gryled";
     connectToDevice();
 }
