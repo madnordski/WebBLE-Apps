@@ -160,8 +160,8 @@ function oldConnectToDevice(){
     // act on the Promise object returned
         .then(device => {
             console.log('Device Selected:', device.name);
-            bleStateContainer.style.color = "#0b0";
             bleStateContainer.innerHTML = 'Connected to device ' + device.name;
+            bleStateContainer.style.color = "green";
 	    grnLED.className = "grnled";
             device.addEventListener('gattservicedisconnected', onDisconnected);
             return device.gatt.connect();
