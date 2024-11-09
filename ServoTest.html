@@ -251,8 +251,15 @@ async function writeOnControl(value) {
 		    return characteristic.writeValue(data);
 		});
 	}
-	catch (error ) {
-	    console.error("Error sending control.", error);
+	catch (error) {
+	    if ( error.name === 'NetworkError' ) { // if busy, try again
+		console.log("busy, trying again");
+		await delay(50);
+		return writeOnControl(value);
+	    }
+	    else {
+                console.error("Error writing to the Servo1 characteristic: ", error);
+            }
 	}
     }
     else {
@@ -273,7 +280,7 @@ async function writeOnServo1Characteristic(value){
 		});
 	}
 	catch (error) {
-	    if ( error.name === 'NetworkError' ) { // if busy, try again
+	    if ( false && error.name === 'NetworkError' ) { // if busy, try again
 		console.log("busy, trying again");
 		await delay(50);
 		return writeOnServo1Characteristic(value);
