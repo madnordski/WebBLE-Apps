@@ -240,7 +240,7 @@ function writeOnCharacteristic(value){
 }
 
 async function writeOnControl(value) {
-    console.log("control called with" + value);
+    console.log("control called with " + value);
     if ( bleServer && bleServer.connected ) {
 	try {
 	    await bleServiceFound.getCharacteristic(controlSthik)
