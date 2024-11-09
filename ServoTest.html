@@ -252,7 +252,8 @@ async function writeOnControl(value) {
 		});
 	}
 	catch (error) {
-	    if ( error.name === 'NetworkError' ) { // if busy, try again
+	    if ( error.name === 'NetworkError'
+	       || error.name === 'NotSupportedError' ) { // if busy, try again
 		console.log("busy, trying again");
 		await delay(50);
 		return writeOnControl(value);
