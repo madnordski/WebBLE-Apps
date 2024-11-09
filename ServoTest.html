@@ -331,6 +331,8 @@ function TStart(ev) {
 	// everything is relative to that
 	xStart = Math.floor(ev.touches[0].clientX);
 	yStart = Math.floor(ev.touches[0].clientY);
+	writeOnServo1Characteristic("START");
+	console.log("START");
     }
     else if ( ev.type == 'touchmove' ) {
 	var x = Math.floor(ev.touches[0].clientX) - xStart;
