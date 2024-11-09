@@ -321,12 +321,9 @@ function sleep(milliseconds) {
     }
 }
 
-let xStart, yStart;
-let xDirection, yDirection;
+let lastDX, lastDY;  
 let lastX, lastY;
-let xMove = false;
-let yMove = false;
-const fuzz = 10;
+const fuzz = 3; // reduces the resolution of the touch area
 
 document.querySelector('.dot').addEventListener('touchstart',
 						TStart, {passive: false});
@@ -339,32 +336,27 @@ function TStart(ev) {
     console.log(ev.touches, ev.type);
     if ( ev.type == 'touchstart' ) { // reset our starting point
 	// everything is relative to that
-	xStart = Math.floor(ev.touches[0].clientX);
-	yStart = Math.floor(ev.touches[0].clientY);
-	lastX = 0;
-	lastY = 0;
+	lastX = Math.floor(ev.touches[0].clientX / fuzz);
+	lastY = Math.floor(ev.touches[0].clientY / fuzz);
 	writeOnControl("START");
 	console.log("START");
     }
     else if ( ev.type == 'touchmove' ) {
-	let x = Math.floor(ev.touches[0].clientX) - xStart;
-	let y = yStart - Math.floor(ev.touches[0].clientY);
-	
-	if ( Math.abs(x) < fuzz ) x = 0;
-	if ( Math.abs(y) < fuzz ) y = 0;
-	dX = Math.abs(x - lastX) == x - lastX ? 1 : -1;
-	dY = Math.abs(y - lastY) == y - lastY ? 1 : -1;
-	
-	if ( (!yMove && y != 0) || (!xMove && x != 0)
-	     || (xDirection && xDirection != dX) || (yDirection && yDirection != dY) ) {
-	    var msg = x.toString() + " " + y.toString();
+	let dX = 0;
+	let dY = 0;
+	let x = Math.floor(ev.touches[0].clientX / fuzz);
+	let y = Math.floor(ev.touches[0].clientY / fuzz);
+
+	if ( x != lastX )
+	    dX = x > lastX ? 1 : -1;
+	if ( y != lastY )
+	    dY = x > lastY ? 1 : -1;
+
+	if ( dX != lastDX || dY != lastDY ) {
+	    var msg = dX.toString() + " " + dY.toString();
 	    writeOnServo1Characteristic(msg);
-	    if ( Math.abs(x) > fuzz ) xMove = true;
-	    if ( Math.abs(y) > fuzz ) yMove = true;
-	    if ( x == 0 ) xMove = false;
-	    if ( y == 0 ) yMove = false;
-	    xDirection = dX;
-	    yDirection = dY;
+	    lastDX = dX;
+	    lastDY = dY;
 	    lastX = x;
 	    lastY = y;
 	    console.log("sent " + msg);
@@ -374,8 +366,6 @@ function TStart(ev) {
 	console.log("STOP");
 	delay(50);
 	writeOnControl("STOP");
-	xMove = false;
-	yMove = false;
 	console.log("Stop exit");
     }
 }
