@@ -274,9 +274,7 @@ async function writeOnServo1Characteristic(value){
 	    // use try/catch to make sure this completes -- retry
             await bleServiceFound.getCharacteristic(servo1Characteristic)
 		.then(characteristic => {
-                    console.log("Found the Servo1 characteristic: ", characteristic.uuid);
                     const data = new Uint8Array(Array.from(value, char => char.charCodeAt(0)));
-		    console.log("Value written to Servo1 characteristic:", value);
 		    return characteristic.writeValue(data);
 		});
 	}
@@ -323,7 +321,7 @@ function sleep(milliseconds) {
 
 let lastDX, lastDY;  
 let lastX, lastY;
-const fuzz = 4; // reduces the resolution of the touch area
+const fuzz = 10; // reduces the resolution of the touch area
 
 document.querySelector('.dot').addEventListener('touchstart',
 						TStart, {passive: false});
