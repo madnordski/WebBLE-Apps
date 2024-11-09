@@ -361,6 +361,8 @@ function TStart(ev) {
 	    writeOnServo1Characteristic(msg);
 	    if ( Math.abs(x) > fuzz ) xMove = true;
 	    if ( Math.abs(y) > fuzz ) yMove = true;
+	    if ( x == 0 ) xMove = false;
+	    if ( y == 0 ) yMove = false;
 	    xDirection = dX;
 	    yDirection = dY;
 	    lastX = x;
