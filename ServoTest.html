@@ -240,14 +240,11 @@ function writeOnCharacteristic(value){
 }
 
 async function writeOnControl(value) {
-    console.log("control called with " + value);
     if ( bleServer && bleServer.connected ) {
 	try {
 	    await bleServiceFound.getCharacteristic(controlSthik)
 		.then(characteristic => {
-		    console.log("Found control sthik");
 		    const data = new Uint8Array(Array.from(value, char => char.charCodeAt(0)));
-		    console.log("Control sent.");
 		    return characteristic.writeValue(data);
 		});
 	}
@@ -279,7 +276,8 @@ async function writeOnServo1Characteristic(value){
 		});
 	}
 	catch (error) {
-	    if ( false && error.name === 'NetworkError' ) { // if busy, try again
+	    if ( false && error.name === 'NetworkError'
+	       || error.name === 'NotSupportedError' ) { // if busy, try again
 		console.log("busy, trying again");
 		await delay(50);
 		return writeOnServo1Characteristic(value);
