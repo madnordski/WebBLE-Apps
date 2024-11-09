@@ -321,10 +321,11 @@ function sleep(milliseconds) {
     }
 }
 
-var xStart, yStart;
-var xMove = false;
-var yMove = false;
-var fuzz = 10;
+let xStart, yStart;
+let xDirection, yDirection;
+let xMove = false;
+let yMove = false;
+const fuzz = 10;
 
 document.querySelector('.dot').addEventListener('touchstart',
 						TStart, {passive: false});
@@ -339,20 +340,29 @@ function TStart(ev) {
 	// everything is relative to that
 	xStart = Math.floor(ev.touches[0].clientX);
 	yStart = Math.floor(ev.touches[0].clientY);
+	xDirection = 0;
+	yDirection = 0;
 	writeOnControl("START");
 	console.log("START");
     }
     else if ( ev.type == 'touchmove' ) {
-	var x = Math.floor(ev.touches[0].clientX) - xStart;
-	var y = yStart - Math.floor(ev.touches[0].clientY);
+	let x = Math.floor(ev.touches[0].clientX) - xStart;
+	let y = yStart - Math.floor(ev.touches[0].clientY);
+	
 	if ( Math.abs(x) < fuzz ) x = 0;
 	if ( Math.abs(y) < fuzz ) y = 0;
-	if ( (!yMove && y != 0) || (!xMove && x != 0) ) {
+	let dX = Math.abs(x) == x ? 1 : -1;
+	let dY = Math.abs(y) == y ? 1 : -1;
+
+	if ( (!yMove && y != 0) || (!xMove && x != 0)
+	     || (xDirection && xDirection != dX) || (yDirection && yDirection != dY) ) {
 	    var msg = x.toString() + " " + y.toString();
 	    console.log(msg);
 	    writeOnServo1Characteristic(msg);
 	    if ( Math.abs(x) > fuzz ) xMove = true;
 	    if ( Math.abs(y) > fuzz ) yMove = true;
+	    xDirection = dX;
+	    yDirection = dY;
 	    console.log("sent " + msg);
 	}
     }
