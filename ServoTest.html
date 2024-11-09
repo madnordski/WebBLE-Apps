@@ -321,7 +321,7 @@ function sleep(milliseconds) {
 
 let lastDX, lastDY;  
 let lastX, lastY;
-const fuzz = 10; // reduces the resolution of the touch area
+const fuzz = 20; // reduces the resolution of the touch area
 
 document.querySelector('.dot').addEventListener('touchstart',
 						TStart, {passive: false});
