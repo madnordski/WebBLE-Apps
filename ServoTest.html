@@ -357,7 +357,6 @@ function TStart(ev) {
 	if ( (!yMove && y != 0) || (!xMove && x != 0)
 	     || (xDirection && xDirection != dX) || (yDirection && yDirection != dY) ) {
 	    var msg = x.toString() + " " + y.toString();
-	    console.log(msg);
 	    writeOnServo1Characteristic(msg);
 	    if ( Math.abs(x) > fuzz ) xMove = true;
 	    if ( Math.abs(y) > fuzz ) yMove = true;
