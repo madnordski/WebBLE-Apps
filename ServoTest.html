@@ -323,6 +323,7 @@ function sleep(milliseconds) {
 
 let xStart, yStart;
 let xDirection, yDirection;
+let lastX, lastY;
 let xMove = false;
 let yMove = false;
 const fuzz = 10;
@@ -340,8 +341,8 @@ function TStart(ev) {
 	// everything is relative to that
 	xStart = Math.floor(ev.touches[0].clientX);
 	yStart = Math.floor(ev.touches[0].clientY);
-	xDirection = 0;
-	yDirection = 0;
+	lastX = 0;
+	lastY = 0;
 	writeOnControl("START");
 	console.log("START");
     }
@@ -351,10 +352,9 @@ function TStart(ev) {
 	
 	if ( Math.abs(x) < fuzz ) x = 0;
 	if ( Math.abs(y) < fuzz ) y = 0;
-	let dX = Math.abs(x) == x ? 1 : -1;
-	let dY = Math.abs(y) == y ? 1 : -1;
-	console.log(dX, dY);
-
+	dX = Math.abs(x - lastX) == x - lastX ? 1 : -1;
+	dY = Math.abs(y - lastY) == y - lastY ? 1 : -1;
+	
 	if ( (!yMove && y != 0) || (!xMove && x != 0)
 	     || (xDirection && xDirection != dX) || (yDirection && yDirection != dY) ) {
 	    var msg = x.toString() + " " + y.toString();
@@ -363,6 +363,8 @@ function TStart(ev) {
 	    if ( Math.abs(y) > fuzz ) yMove = true;
 	    xDirection = dX;
 	    yDirection = dY;
+	    lastX = x;
+	    lastY = y;
 	    console.log("sent " + msg);
 	}
     }
