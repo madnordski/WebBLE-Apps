@@ -221,6 +221,7 @@ redLED.addEventListener('click', () => toggleRedLED());
 
 // use the green LED to connect and disconnect the device
 grnLED.addEventListener('click', (event) => {
+    console.log(event);
     if ( isWebBluetoothEnabled() ) {
 	// connect or disconnect
 	if ( bluetoothDevice && bluetoothDevice.gatt.connected ) {
