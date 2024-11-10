@@ -242,6 +242,7 @@ grnLED.addEventListener('click', (event) => {
 
 function spdChange(value) {
     if ( bluetoothDevice && bluetoothDevice.gatt.connected ) {
+	writeOnControl("SPEED " + value);
 	console.log(value);
 	spdValue.innerHTML = value;
     }
