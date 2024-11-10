@@ -3,18 +3,88 @@
      motors.
      J. King 31 Oct 2024
 
-     This code is based on the work of Rui Santos.
+     This project is being used to help develop the interface for a
+     project that might use servos, dc motors, stepping motors or a
+     combination of these.  While we await arrival of the hardware we
+     need to conduct our physical experiments, we can make progress by
+     tinkering with the user interface.
+
+     We will use an ESP32-C3 to control the motors. Preliminarily an
+     XIAO ESP32-C3 is being used.  The communication between the
+     android interface and the ESP32-C3 will be Bluetooth Low Energy
+     (BLE).  On the phone we will use WebBLE.  This file represents
+     the implementation of the WebBLE interface which runs on Android
+     using a Web Browser.
+
+     NB: The WebBLE security model requires that is script run of
+     https which we accomplish be launching from our GITHUB
+     page. Alternatively, (according to documentation) it can be
+     loaded from the phone it runs on.  However, editing and debuging
+     javascript on a phone is very limited.  Using a browser on our
+     desktop computer we can use the full javascript debugger in
+     Chrome.
+
+To connect the phone to Chrome running our desktop:
+
+1. Connect the phone to the computer over USB.
+
+2. Under developer options on the phone enable USB debuging.
+
+3. If already enabled, disable it, pause and enable it again before
+   proceeding. If you don't have developer options, google how to
+   enable them.
+
+4. Now open the browser on the computer to chrome://inspect/#devices
+   (it will take minutes before a connection opens that shows the web
+   pages open on the phone)
+
+5. While waiting for the phone to show up, a list of targets will
+   appear. Just leave it alone, eventually your phone will show up
+   with an inspect link for the web page you want to debug.
+
+6. Also while waiting, on the phone load the web page you want to
+   debug on your browser.  In this case, it is
+   https://madnordski.github.io/WebBLE-Apps/ServoTest.html. (https is
+   required)
+
+7. Once this is established, try not do anything that will crash the
+   browser because when that happens you'll need to go back to step 1.
+
+8. You can down reload and debug the app running on the phone. As if
+   it was running in your computers browser.
+
+     Parts of this code was based on the work of Rui Santos.
      Find his project details at
      https://RandomNerdTutorials.com/esp32-web-bluetooth/
+
+  Copyright (c) 2024, Joseph J. King, PhD
+
+  Permission is hereby granted, free of charge, for educational
+  purposes. Use of the this software for commercial purposes is
+  strictly prohibited.  The above copyright notice and this permission
+  notice shall be included in all copies or substantial portions of
+  the Software.
+
 -->
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>ServoTest Web BLE App</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ServoTest Web BLE App</title>
+  <!-- Use the width of the phone screen.
+  For this project, scrolling will not be possible so we we will keep
+  the elements to a minimum. -->
+  
+    <meta name="viewport" content="width=device-width,
+				   initial-scale=1">
+    <!-- we created a funky web icon even though android doesn't show it -->
     <link rel="icon" type="image/png" href="lionel.png">
     <style>
+
+      /* The dot is our main interface object -- it controls two
+      motors giving us X, Y movement.  Use it like virtual track ball
+      */
+
       .dot {
         height: 300px;
         width: 300px;
@@ -24,6 +94,10 @@
 	margin: auto;
 	text-align: center;
       }
+
+      /* Mostly just for testing communication, we have a RED LED
+      connected. This dot goes from gray to red when illuminated */
+      
       .redled {
         height: 20px;
         width: 20px;
@@ -34,6 +108,10 @@
         text-align: right;
         padding: 15px;
       }
+
+      /* The GREEN LED indicates connection status.  It's gray when
+      disconnected and green when not. */
+      
       .grnled {
         height: 20px;
         width: 20px;
@@ -44,6 +122,9 @@
 	text-align: left;
         padding: 15px;
       }
+
+      /* We use this class for any LED that should be off */
+      
       .gryled {
         height: 20px;
         width: 20px;
@@ -60,10 +141,16 @@
 <body>
   <h1 align="center">ServoTest</h1>
   <p align="center">
-    <!-- add guide lines -->
+
+    <!-- Add guide lines to the motor control DOT.  This will help us
+    when we want to move just one motor -->
+    
     <span class="dot"><img src="lines.png" valign="center"></span>
-    <p>
+  </p>
   <p align="center">
+
+    <!-- replace with green dot -->
+    
   <button id="connectBleButton">Connect to BLE Device</button><br>
     <button id="disconnectBleButton">Disconnect BLE Device</button></p>
     
@@ -84,7 +171,8 @@
 // since the esp32 doesn't give up the connection, can't we just restore
 //   the connection we had before the page was reloaded?
 
-document.querySelector('.grnled').addEventListener('click', () => writeOnCharacteristic("toggle"));
+  document.querySelector('.redled').addEventListener('click',
+						     () => toggleRedLED());
 
     // DOM Elements
 const connectButton = document.getElementById('connectBleButton');
@@ -133,11 +221,6 @@ disconnectButton.addEventListener('click', (event) => {
     grnLED.className = "gryled";
     //disconnectDevice();
 });
-
-// SERVO LISTENER GOES HERE
-// Write to the LED Characteristic
-//document.querySelector('.redled').addEventListener('click',
-//    () => writeOnCharacteristic("off"));
 
 // **** Function definitions ***
 
@@ -211,7 +294,12 @@ function handleCharacteristicChange(event){
     //timestampContainer.innerHTML = getDateTime();
 }
 
-function writeOnCharacteristic(value){
+/* toggleRedLED
+   Send the command to toggle the Red LED to the ESP32 using BLE Write.
+   NB: toggle takes place after the write and is written next call.
+*/
+
+function toggleRedLED() {
     if (bleServer && bleServer.connected) {
         bleServiceFound.getCharacteristic(ledCharacteristic)
             .then(characteristic => {
