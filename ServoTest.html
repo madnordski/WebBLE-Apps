@@ -137,7 +137,7 @@ To connect the phone to Chrome running our desktop:
       }
 
       td {
-	  padding: 15px;
+	  padding: 7px;
 	  text-align: left;
       }
       
@@ -154,12 +154,6 @@ To connect the phone to Chrome running our desktop:
   </p>
   <p align="center">
 
-    <!-- replace with green dot -->
-    
-  <button id="connectBleButton">Connect to BLE Device</button><br>
-    <button id="disconnectBleButton">Disconnect BLE Device</button></p>
-    
-  <p align="center">BLE state: <strong><span id="bleState" style="color:#b00;">Disconnected</span></strong></p>
   <!-- probably don't need this table but keep the contents (i.e. spans) -->
   <table align="center">
     <tr><td><span class="grnled" id="gled"></span></td>
@@ -178,12 +172,9 @@ To connect the phone to Chrome running our desktop:
 //   the connection we had before the page was reloaded?
 
 // Shorthand for document elements
-const connectButton = document.getElementById('connectBleButton');
-const disconnectButton = document.getElementById('disconnectBleButton');
 const onButton = document.getElementById('onButton');
 const offButton = document.getElementById('offButton');
 const retrievedValue = document.getElementById('valueContainer');
-const bleStateContainer = document.getElementById('bleState');
 const timestampContainer = document.getElementById('timestamp');
 const redLED = document.getElementById('rled');
 const grnLED = document.getElementById('gled');
@@ -228,30 +219,13 @@ grnLED.addEventListener('click', (event) => {
     }
 });
 
-	
-// Connect Button (search for BLE Devices only if BLE is available)
-connectButton.addEventListener('click', (event) => {
-    if (isWebBluetoothEnabled()){
-        connectToDevice();
-    }
-});
-
-// Disconnect Button
-disconnectButton.addEventListener('click', (event) => {
-    writeOnControl("DIE");
-    bleStateContainer.innerHTML = "Device Disconnected";
-    bleStateContainer.style.color = "#b00";
-    grnLED.className = "gryled";
-    //disconnectDevice();
-});
-
 // **** Function definitions ***
 
 // Check if BLE is available in your Browser
 function isWebBluetoothEnabled() {
     if (!navigator.bluetooth) {
         console.log("Web Bluetooth API is not available in this browser!");
-        bleStateContainer.innerHTML = "Web Bluetooth API is not available in this browser!";
+        window.alert("Web Bluetooth API is not available in this browser!");
     }
     console.log('Web Bluetooth API supported in this browser.');
     return true
@@ -267,8 +241,6 @@ function oldConnectToDevice(){
     // act on the Promise object returned
         .then(device => {
             console.log('Device Selected:', device.name);
-            bleStateContainer.innerHTML = 'Connected to device ' + device.name;
-            bleStateContainer.style.color = "#0b0";
 	    grnLED.className = "grnled";
             device.addEventListener('gattservicedisconnected', onDisconnected);
             return device.gatt.connect();
@@ -304,8 +276,6 @@ function oldConnectToDevice(){
 
 function onDisconnected(event){
     console.log('Device Disconnected:', event.target.device.name);
-    bleStateContainer.innerHTML = "Device disconnected";
-    bleStateContainer.style.color = "#b00";
     grnLED.className = "gryled";
     connectToDevice();
 }
@@ -493,8 +463,6 @@ async function connectToDevice() {
 	// act on the promise object returned
 	    .then(device => {
 		console.log('Got device:', device.name);
-		bleStateContainer.innerHTML = 'Connected to ' + device.name;
-		bleStateContainer.style.color = "#0b0";
 		grnLED.className = 'grnled';
 		device.addEventListener('gattservicedisconnected',
 					onDisconnected);
