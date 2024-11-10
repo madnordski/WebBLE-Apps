@@ -241,8 +241,13 @@ grnLED.addEventListener('click', (event) => {
 });
 
 function spdChange(value) {
-    console.log(value);
-    spdValue.innerHTML = value;
+    if ( isWebBluetoothEnabled() ) {
+	console.log(value);
+	spdValue.innerHTML = value;
+    }
+    else {
+	alert("Not connected.");
+    }
 }
 
 // **** Function definitions ***
