@@ -241,7 +241,7 @@ grnLED.addEventListener('click', (event) => {
 });
 
 function spdChange(value) {
-    if ( isWebBluetoothEnabled() ) {
+    if ( bluetoothDevice && bluetoothDevice.gatt.connected ) {
 	console.log(value);
 	spdValue.innerHTML = value;
     }
