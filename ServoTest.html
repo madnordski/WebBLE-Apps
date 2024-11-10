@@ -24,33 +24,40 @@
      desktop computer we can use the full javascript debugger in
      Chrome.
 
-To connect the phone to Chrome running our desktop:
+To connect the Android phone to Chrome running our desktop:
 
 1. Connect the phone to the computer over USB.
 
 2. Under developer options on the phone enable USB debuging.
 
-3. If already enabled, disable it, pause and enable it again before
-   proceeding. If you don't have developer options, google how to
-   enable them.
+3. If USB debugging is already enabled, disable it, pause and enable
+   it again before proceeding. If you don't have developer options,
+   google how to enable them.
 
 4. Now open the browser on the computer to chrome://inspect/#devices
    (it will take minutes before a connection opens that shows the web
-   pages open on the phone)
+   pages open on the phone with a link to inspect)
 
 5. While waiting for the phone to show up, a list of targets will
    appear. Just leave it alone, eventually your phone will show up
-   with an inspect link for the web page you want to debug.
+   in this list with an inspect link for the web page you want to debug.
 
 6. Also while waiting, on the phone load the web page you want to
    debug on your browser.  In this case, it is
    https://madnordski.github.io/WebBLE-Apps/ServoTest.html. (https is
-   required)
+   required, which is why we edit the github file)
 
-7. Once this is established, try not do anything that will crash the
-   browser because when that happens you'll need to go back to step 1.
+7. Eventually (5-10 minutes), a link to INSPECT the web page you're
+   debugging will appear in your computer browser.  Click the inspect
+   link.  You did leave this page and your phone alone this entire
+   time?
 
-8. You can down reload and debug the app running on the phone. As if
+8. Once this is established, try not do anything that will crash or
+   close the browser because when that happens you'll need to go back
+   to step 1.  WebBLE will crash the browser window if reloaded while
+   connected.
+
+9. You can now reload and debug the app running on the phone as if
    it was running in your computers browser.
 
      Parts of this code was based on the work of Rui Santos.
@@ -160,6 +167,13 @@ To connect the phone to Chrome running our desktop:
       <td><span class="redled" id="rled"></span></td>
     </tr>
     <tr><td>Connect</td><td>Red LED</td></tr>
+    <tr><td>
+	<input type="range" min="1" max="10" value=5 id="speed" name="speed">
+      </td>
+      <td>Speed (0-10): <span id="speed_value"></span>
+      </td>
+    </tr>
+    
   </table>
   <p align="center" id="servoStatus">Servos Stopped</a></p>
 </body>
