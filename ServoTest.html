@@ -160,6 +160,7 @@ To connect the phone to Chrome running our desktop:
     <tr><td><span class="grnled" id="gled"></span></td>
       <td><span class="redled" id="rled"></span></td>
     </tr>
+    <tr><td>Connect</td><td>Red LED</td></tr>
   </table>
   <p align="center" id="servoStatus">Servos Stopped</a></p>
 </body>
@@ -171,10 +172,7 @@ To connect the phone to Chrome running our desktop:
 // since the esp32 doesn't give up the connection, can't we just restore
 //   the connection we had before the page was reloaded?
 
-  document.querySelector('.redled').addEventListener('click',
-						     () => toggleRedLED());
-
-    // DOM Elements
+// Shorthand for document elements
 const connectButton = document.getElementById('connectBleButton');
 const disconnectButton = document.getElementById('disconnectBleButton');
 const onButton = document.getElementById('onButton');
@@ -205,6 +203,9 @@ redLED.className = "gryled";
 grnLED.className = "gryled";
 
 // **** EVENT LISTENERS ***
+
+// toggle the Red LED
+redLED.addEventListener('click', () => toggleRedLED());
 
 // Connect Button (search for BLE Devices only if BLE is available)
 connectButton.addEventListener('click', (event) => {
