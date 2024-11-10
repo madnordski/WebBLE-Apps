@@ -164,7 +164,9 @@ To connect the Android phone to Chrome running our desktop:
   <!-- probably don't need this table but keep the contents (i.e. spans) -->
   <table align="center">
     <tr><td>
-	<input type="range" min="1" max="10" value=5 id="speed" name="speed">
+	<input type="range" min="1" max="10" value=5 id="speed"
+	       oninput="spdValue.innerHTML=this.value;"
+	       onchange="spdChange(this.value);">
       </td>
       <td>Speed (0-10): <span id="speed_value"></span>
       </td>
@@ -238,18 +240,10 @@ grnLED.addEventListener('click', (event) => {
     }
 });
 
-// changes to the speed slider
-spdSlider.addEventListener('oninput', (event) => {
-    // what gives -- this is not getting called
-    console.log(event);
-    if ( isWebBluetoothEnabled() ) {
-	// update the text value
-	spdValue.innerHTML = event.target.value;
-    }
-    else {
-	alert("Not connected.");
-    }
-});
+function spdChange(value) {
+    console.log(value);
+    spdValue.innerHTML = value;
+}
 
 // **** Function definitions ***
 
