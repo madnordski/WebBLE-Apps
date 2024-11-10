@@ -237,9 +237,9 @@ grnLED.addEventListener('click', (event) => {
 });
 
 // changes to the speed slider
-spdSlider.addEventListener('onchange', (event) => {
-	// WTF man!!!
-	console.log(event);
+spdSlider.addEventListener('oninput', (event) => {
+    // what gives -- this is not getting called
+    console.log(event);
     if ( isWebBluetoothEnabled() ) {
 	// update the text value
 	spdValue.innerHTML = event.target.value;
