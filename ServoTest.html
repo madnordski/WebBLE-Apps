@@ -192,6 +192,8 @@ const retrievedValue = document.getElementById('valueContainer');
 const timestampContainer = document.getElementById('timestamp');
 const redLED = document.getElementById('rled');
 const grnLED = document.getElementById('gled');
+const spdSlider = document.getElementById('speed');
+const spdValue = document.getElementById('speed_value');
 
 //Define BLE Device Specs -- change these
 var deviceName ='ServoTest';
@@ -230,6 +232,16 @@ grnLED.addEventListener('click', (event) => {
 	    // connect
 	    connectToDevice();
 	}
+    }
+});
+
+// changes to the speed slider
+spdSlider.addEventListener('onchange', (event) => {
+    if ( isWebBluetoothEnabled() ) {
+	spdValue.innerHTML = event.target.value;
+    }
+    else {
+	alert("Not connected.");
     }
 });
 
