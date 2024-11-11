@@ -321,6 +321,7 @@ function onDisconnected(event){
 }
 
 function handleCharacteristicChange(event){
+    console.log("Notified!");
     const newValueReceived = new TextDecoder().decode(event.target.value);
     console.log("Notification: ", newValueReceived);
     servoStatus.innerHTML = newValueReceived;
