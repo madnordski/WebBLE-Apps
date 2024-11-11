@@ -568,12 +568,13 @@ function initialValues() {
 }
 
 /* getServoStatus
-   We poll the status because notify isn't working after a Chrome update.
+   We poll the status because notify stopped working after a Chrome update.
 */
 
 function getServoStatus() {
     if ( bleServer && bleServer.connected ) {
 	if ( sensorCharacteristicFound ) {
+	    console.log(sensorCharacteristicFound);
 	    sensorCharacteristicFound.readValue()
 		.then(v => {
 		    const value = new TextDecoder().decode(v);
