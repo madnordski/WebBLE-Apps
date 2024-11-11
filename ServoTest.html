@@ -520,18 +520,17 @@ async function connectToDevice() {
 		return service.getCharacteristic(sensorCharacteristic);
 	    })
 	    .then(characteristic => {
-		console.log("Characteristic discovered:", characteristic.uuid);
+		//console.log("Characteristic discovered:", characteristic.uuid);
 		sensorCharacteristicFound = characteristic;
 		characteristic.startNotifications();
-		console.log("Notification starts.");
+		//console.log("Notification starts.");
 		return characteristic.readValue();
 	    })
-            //.then(value => {
-		//console.log("Read value: ", value);
-		//const decodedValue = new TextDecoder().decode(value);
-		//console.log("Decoded value: ", decodedValue);
-		//servoStatus.innerHTML = decodedValue;
-            //})
+            .then(value => {
+		const decodedValue = new TextDecoder().decode(value);
+		console.log("Decoded value: ", decodedValue);
+		servoStatus.innerHTML = decodedValue;
+            })
 	    .catch(error => {
 		console.log('Error: ', error);
 	    });
