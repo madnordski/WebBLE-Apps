@@ -296,7 +296,8 @@ function oldConnectToDevice(){
         .then(characteristic => {
             console.log("Characteristic discovered:", characteristic.uuid);
             sensorCharacteristicFound = characteristic;
-            characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicChange);
+            characteristic.addEventListener('characteristicvaluechanged',
+					    handleCharacteristicChange);
             characteristic.startNotifications();
             console.log("Notifications Started.");
             return characteristic.readValue();
@@ -322,7 +323,6 @@ function handleCharacteristicChange(event){
     const newValueReceived = new TextDecoder().decode(event.target.value);
     console.log("Characteristic value changed: ", newValueReceived);
     servoStatus.innerHTML = newValueReceived;
-    //timestampContainer.innerHTML = getDateTime();
 }
 
 /* toggleRedLED
@@ -523,6 +523,9 @@ async function connectToDevice() {
 		characteristic.startNotifications();
 		console.log("Notification starts.");
 		return characteristic.readValue();
+	    })
+	    .catch(error => {
+		console.log('Error: ', error);
 	    });
     }
     catch (error) {
