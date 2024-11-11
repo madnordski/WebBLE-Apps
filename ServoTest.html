@@ -222,6 +222,7 @@ var bleServiceFound;
 var sensorCharacteristicFound;
 var servo1OpInProgress = false;
 var ledState = "on";
+var enableUpdates = false;
 
 // **** EVENT LISTENERS ***
 
@@ -537,6 +538,7 @@ async function connectToDevice() {
 		const decodedValue = new TextDecoder().decode(value);
 		console.log("Decoded value: ", decodedValue);
 		servoStatus.innerHTML = "connected";
+		enableUpdates = true;
             })
 	    .catch(error => {
 		console.log('Error: ', error);
@@ -564,6 +566,7 @@ function initialValues() {
     xspdSlider.value = 5;
     yspdSlider.value = 5;
     servoStatus.innerHTML = "disconnected";
+    enableUpdates = false;
     setInterval(getServoStatus, 1000);
 }
 
@@ -572,7 +575,7 @@ function initialValues() {
 */
 
 function getServoStatus() {
-    if ( bleServer && bleServer.connected ) {
+    if ( enableUpdates && bleServer && bleServer.connected ) {
 	if ( sensorCharacteristicFound ) {
 	    console.log(sensorCharacteristicFound);
 	    sensorCharacteristicFound.readValue()
@@ -587,6 +590,7 @@ function getServoStatus() {
 function disconnectDevice() {
     console.log("Disconnect Device.");
     if (bleServer && bleServer.connected) {
+	enableUpdates = false;
         if (sensorCharacteristicFound) {
             sensorCharacteristicFound.stopNotifications()
                 .then(() => {
