@@ -529,7 +529,7 @@ async function connectToDevice() {
 		console.log("Read value: ", value);
 		const decodedValue = new TextDecoder().decode(value);
 		console.log("Decoded value: ", decodedValue);
-		retrievedValue.innerHTML = decodedValue;
+		servoStatus.innerHTML = decodedValue;
             })
 	    .catch(error => {
 		console.log('Error: ', error);
