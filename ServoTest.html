@@ -462,7 +462,6 @@ function TStart(ev) {
 	lastX = Math.floor(ev.touches[0].clientX / fuzz);
 	lastY = Math.floor(ev.touches[0].clientY / fuzz);
 	writeOnControl("START");
-	getServoStatus();
 	console.log("START");
     }
     else if ( ev.type == 'touchmove' ) {
@@ -484,16 +483,11 @@ function TStart(ev) {
 	    lastX = x;
 	    lastY = y;
 	    console.log("sent " + msg);
-	    getServoStatus();
 	}
     }
     else if ( ev.type == 'touchend' ) {
-	console.log("STOP");
 	delay(50);
 	writeOnControl("STOP");
-	console.log("Stop exit");
-	sleep(500);
-	getServoStatus();
     }
 }
 
@@ -542,7 +536,7 @@ async function connectToDevice() {
             .then(value => {
 		const decodedValue = new TextDecoder().decode(value);
 		console.log("Decoded value: ", decodedValue);
-		servoStatus.innerHTML = decodedValue;
+		servoStatus.innerHTML = "connected";
             })
 	    .catch(error => {
 		console.log('Error: ', error);
@@ -570,7 +564,7 @@ function initialValues() {
     xspdSlider.value = 5;
     yspdSlider.value = 5;
     servoStatus.innerHTML = "disconnected";
-    //setInterval(getServoStatus, 5000);
+    setInterval(getServoStatus, 1000);
 }
 
 function getServoStatus() {
@@ -579,7 +573,6 @@ function getServoStatus() {
 	    sensorCharacteristicFound.readValue()
 		.then(v => {
 		    const value = new TextDecoder().decode(v);
-		    console.log("Servo Status Read: ", value);
 		    servoStatus.innerHTML = value;
 		});
 	}
