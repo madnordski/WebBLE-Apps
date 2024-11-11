@@ -226,17 +226,19 @@ var ledState = "on";
 redLED.className = "gryled";
 grnLED.className = "gryled";
 
+// initial slider states
 xspdValue.innerHTML = "5";
 yspdValue.innerHTML = "5";
+xspdSlider.value = 5;
+yspdSlider.value = 5;
 
 // **** EVENT LISTENERS ***
 
 // toggle the Red LED
-redLED.addEventListener('click', () => toggleRedLED());
+redLED.addEventListener('click', (event) => toggleRedLED());
 
 // use the green LED to connect and disconnect the device
 grnLED.addEventListener('click', (event) => {
-    console.log(event); // log diagnostic
     if ( isWebBluetoothEnabled() ) {
 	// connect or disconnect
 	if ( bluetoothDevice && bluetoothDevice.gatt.connected ) {
