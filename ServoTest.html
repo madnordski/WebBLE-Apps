@@ -577,7 +577,6 @@ function initialValues() {
 function getServoStatus() {
     if ( enableUpdates && bleServer && bleServer.connected ) {
 	if ( sensorCharacteristicFound ) {
-	    console.log(sensorCharacteristicFound);
 	    sensorCharacteristicFound.readValue()
 		.then(v => {
 		    const value = new TextDecoder().decode(v);
