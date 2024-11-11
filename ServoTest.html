@@ -523,6 +523,8 @@ async function connectToDevice() {
 		sleep(100);
 		//console.log("Characteristic discovered:", characteristic.uuid);
 		sensorCharacteristicFound = characteristic;
+		characteristic.addEventListener('characteristvaluechanged',
+						handleCharacteristicChange);
 		characteristic.startNotifications();
 		console.log("Notification starts.");
 		sleep(100);
