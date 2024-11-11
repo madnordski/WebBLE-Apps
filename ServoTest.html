@@ -233,11 +233,6 @@ grnLED.addEventListener('click', (event) => {
     if ( isWebBluetoothEnabled() ) {
 	// connect or disconnect
 	if ( bluetoothDevice && bluetoothDevice.gatt.connected ) {
-	    if (bleServer && bleServer.connected) {
-		if (sensorCharacteristicFound) {
-		    sensorCharacteristicFound.stopNotifications()
-		}
-	    }
 	    // disconnect by resetting the ESP32
 	    writeOnControl("DIE");
 	    sleep(100);
@@ -276,61 +271,10 @@ function isWebBluetoothEnabled() {
     return true
 }
 
-// Connect to BLE Device and Enable Notifications
-function oldConnectToDevice(){
-    console.log('Initializing Bluetooth...');
-    navigator.bluetooth.requestDevice({
-        filters: [{name: deviceName}],
-        optionalServices: [bleService]
-    })
-    // act on the Promise object returned
-        .then(device => {
-            console.log('Device Selected:', device.name);
-	    grnLED.className = "grnled";
-            device.addEventListener('gattservicedisconnected', onDisconnected);
-            return device.gatt.connect();
-        })
-        .then(gattServer =>{
-            bleServer = gattServer;
-            console.log("Connected to GATT Server");
-            return bleServer.getPrimaryService(bleService);
-        })
-        .then(service => {
-            bleServiceFound = service;
-            console.log("Service discovered:", service.uuid);
-            return service.getCharacteristic(sensorCharacteristic);
-        })
-        .then(characteristic => {
-            console.log("Characteristic discovered:", characteristic.uuid);
-            sensorCharacteristicFound = characteristic;
-            characteristic.addEventListener('characteristicvaluechanged',
-					    handleCharacteristicChange);
-            characteristic.startNotifications();
-            console.log("Notifications Started.");
-            return characteristic.readValue();
-        })
-        //.then(value => {
-        //    console.log("Read value: ", value);
-        //    const decodedValue = new TextDecoder().decode(value);
-        //    console.log("Decoded value: ", decodedValue);
-        //    retrievedValue.innerHTML = decodedValue;
-        //})
-        .catch(error => {
-            console.log('Error: ', error);
-        })
-}
-
 function onDisconnected(event){
     console.log('Device Disconnected:', event.target.device.name);
     grnLED.className = "gryled";
     connectToDevice();
-}
-
-function handleShtikChange(event){
-    console.log(event.target);
-    const newValueReceived = new TextDecoder().decode(event.target.value);
-    console.log("Notification: ", newValueReceived);
-    servoStatus.innerHTML = newValueReceived;
 }
 
 /* toggleRedLED
@@ -524,12 +468,6 @@ async function connectToDevice() {
 		return service.getCharacteristic(sensorCharacteristic);
 	    })
 	    .then(characteristic => {
-		sensorCharacteristicFound = characteristic;
-		characteristic.addEventListener('characteristvaluechanged',
-						handleShtikChange);
-		sleep(200);
-		characteristic.startNotifications();
-		console.log("Notification starts.");
 		sleep(100);
 		return characteristic.readValue();
 	    })
@@ -567,6 +505,10 @@ function initialValues() {
     setInterval(getServoStatus, 1000);
 }
 
+/* getServoStatus
+   We poll the status because notify isn't working after a Chrome update.
+*/
+
 function getServoStatus() {
     if ( bleServer && bleServer.connected ) {
 	if ( sensorCharacteristicFound ) {
@@ -582,22 +524,7 @@ function getServoStatus() {
 function disconnectDevice() {
     console.log("Disconnect Device.");
     if (bleServer && bleServer.connected) {
-        if (sensorCharacteristicFound) {
-            sensorCharacteristicFound.stopNotifications()
-                .then(() => {
-                    console.log("Notifications Stopped");
-                    return bleServer.disconnect();
-                })
-                .then(() => {
-                    console.log("Device Disconnected");
-		    
-                })
-                .catch(error => {
-                    console.log("An error occurred:", error);
-                });
-        } else {
-            console.log("No characteristic found to disconnect.");
-        }
+	bleServer.disconnect();
     } else {
         // Throw an error if Bluetooth is not connected
         console.error("Bluetooth is not connected.");
