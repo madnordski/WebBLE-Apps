@@ -524,14 +524,14 @@ async function connectToDevice() {
 		sensorCharacteristicFound = characteristic;
 		characteristic.startNotifications();
 		console.log("Notification starts.");
-		return characteristic.readValue();
+		//return characteristic.readValue();
 	    })
-            .then(value => {
-		console.log("Read value: ", value);
-		const decodedValue = new TextDecoder().decode(value);
-		console.log("Decoded value: ", decodedValue);
-		servoStatus.innerHTML = decodedValue;
-            })
+            //.then(value => {
+		//console.log("Read value: ", value);
+		//const decodedValue = new TextDecoder().decode(value);
+		//console.log("Decoded value: ", decodedValue);
+		//servoStatus.innerHTML = decodedValue;
+            //})
 	    .catch(error => {
 		console.log('Error: ', error);
 	    });
