@@ -504,7 +504,6 @@ async function connectToDevice() {
 	    .then(device => {
 		console.log('Got device:', device.name);
 		grnLED.className = 'grnled';
-		await delay(100);
 		device.addEventListener('gattservicedisconnected',
 					onDisconnected);
 		bluetoothDevice = device;
