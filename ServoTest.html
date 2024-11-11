@@ -220,6 +220,7 @@ var bleServer;
 var bleServiceFound;
 var sensorCharacteristicFound;
 var servo1OpInProgress = false;
+var ledState = "on";
 
 // **** EVENT LISTENERS ***
 
@@ -533,9 +534,9 @@ window.addEventListener('beforeunload', () => {
     disconnectDevice();
 });
 
-window.onLoad = function() {
+window.onload = function() {
     // led state
-    var ledState = "on";
+    ledState = "on";
     redLED.className = "gryled";
     grnLED.className = "gryled";
     
