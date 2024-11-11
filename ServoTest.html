@@ -221,17 +221,6 @@ var bleServiceFound;
 var sensorCharacteristicFound;
 var servo1OpInProgress = false;
 
-// led state
-var ledState = "on";
-redLED.className = "gryled";
-grnLED.className = "gryled";
-
-// initial slider states
-xspdValue.innerHTML = "5";
-yspdValue.innerHTML = "5";
-xspdSlider.value = 5;
-yspdSlider.value = 5;
-
 // **** EVENT LISTENERS ***
 
 // toggle the Red LED
@@ -544,7 +533,18 @@ window.addEventListener('beforeunload', () => {
     disconnectDevice();
 });
 
-//window.addEventListener('load', connectToDevice);
+window.onLoad = function() {
+    // led state
+    var ledState = "on";
+    redLED.className = "gryled";
+    grnLED.className = "gryled";
+    
+    // initial slider states
+    xspdValue.innerHTML = "5";
+    yspdValue.innerHTML = "5";
+    xspdSlider.value = 5;
+    yspdSlider.value = 5;
+}
 
 </script>
 
