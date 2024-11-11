@@ -462,6 +462,7 @@ function TStart(ev) {
 	lastX = Math.floor(ev.touches[0].clientX / fuzz);
 	lastY = Math.floor(ev.touches[0].clientY / fuzz);
 	writeOnControl("START");
+	getServoStatus();
 	console.log("START");
     }
     else if ( ev.type == 'touchmove' ) {
@@ -483,6 +484,7 @@ function TStart(ev) {
 	    lastX = x;
 	    lastY = y;
 	    console.log("sent " + msg);
+	    getServoStatus();
 	}
     }
     else if ( ev.type == 'touchend' ) {
@@ -490,6 +492,7 @@ function TStart(ev) {
 	delay(50);
 	writeOnControl("STOP");
 	console.log("Stop exit");
+	getServoStatus();
     }
 }
 
@@ -565,17 +568,18 @@ function initialValues() {
     yspdValue.innerHTML = "5";
     xspdSlider.value = 5;
     yspdSlider.value = 5;
-    setInterval(pollWorker, 1000);
+    servoStatus.innerHTML = "disconnected";
+    //setInterval(getServoStatus, 5000);
 }
 
-function pollWorker() {
+function getServoStatus() {
     if ( bleServer && bleServer.connected ) {
-	console.log("polling status of servos");
 	if ( sensorCharacteristicFound ) {
 	    sensorCharacteristicFound.readValue()
 		.then(v => {
 		    const value = new TextDecoder().decode(v);
 		    console.log("Servo Status Read: ", value);
+		    servoStatus.innerHTML = value;
 		});
 	}
     }
