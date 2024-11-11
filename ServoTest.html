@@ -235,7 +235,7 @@ grnLED.addEventListener('click', (event) => {
 	if ( bluetoothDevice && bluetoothDevice.gatt.connected ) {
 	    // disconnect by resetting the ESP32
 	    writeOnControl("DIE");
-	    sleep(100);
+	    sleep(500);
 	    disconnectDevice();
 	    initialValues();
 	}
