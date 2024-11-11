@@ -234,7 +234,7 @@ grnLED.addEventListener('click', (event) => {
 	if ( bluetoothDevice && bluetoothDevice.gatt.connected ) {
 	    // disconnect by resetting the ESP32
 	    writeOnControl("DIE");
-	    grnLED.className = "gryled";
+	    initialValues();
 	}
 	else {
 	    // connect
@@ -534,7 +534,8 @@ window.addEventListener('beforeunload', () => {
     disconnectDevice();
 });
 
-window.onload = function() {
+window.onload = initialValues;
+function initialValues() {
     // led state
     ledState = "on";
     redLED.className = "gryled";
