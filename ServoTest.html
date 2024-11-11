@@ -520,12 +520,12 @@ async function connectToDevice() {
 		return service.getCharacteristic(sensorCharacteristic);
 	    })
 	    .then(characteristic => {
-		await delay(100);
+		sleep(100);
 		//console.log("Characteristic discovered:", characteristic.uuid);
 		sensorCharacteristicFound = characteristic;
 		characteristic.startNotifications();
 		console.log("Notification starts.");
-		await delay(100);
+		sleep(100);
 		return characteristic.readValue();
 	    })
             .then(value => {
