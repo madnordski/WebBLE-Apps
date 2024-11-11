@@ -185,7 +185,7 @@ To connect the Android phone to Chrome running our desktop:
     </tr>
     <tr><td>Connect</td><td>Red LED</td></tr>    
   </table>
-  <p align="center" id="servoStatus">Servos Stopped</a></p>
+  <p align="center" id="servo_status">Servos Stopped</a></p>
 </body>
 <!-- ' -->
 
@@ -206,7 +206,7 @@ const xspdSlider = document.getElementById('xspeed');
 const xspdValue = document.getElementById('xspeed_value');
 const yspdSlider = document.getElementById('yspeed');
 const yspdValue = document.getElementById('yspeed_value');
-const servoStatus = document.getElementById('servoStatus');
+const servoStatus = document.getElementById('servo_status');
 
 //Define BLE Device Specs -- change these
 var deviceName ='ServoTest';
@@ -322,7 +322,7 @@ function onDisconnected(event){
 
 function handleCharacteristicChange(event){
     const newValueReceived = new TextDecoder().decode(event.target.value);
-    console.log("Characteristic value changed: ", newValueReceived);
+    console.log("Notification: ", newValueReceived);
     servoStatus.innerHTML = newValueReceived;
 }
 
