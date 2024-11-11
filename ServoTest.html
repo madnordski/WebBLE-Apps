@@ -326,8 +326,8 @@ function onDisconnected(event){
     connectToDevice();
 }
 
-function handleCharacteristicChange(event){
-    console.log("Notified!");
+function handleShtikChange(event){
+    console.log(event.target);
     const newValueReceived = new TextDecoder().decode(event.target.value);
     console.log("Notification: ", newValueReceived);
     servoStatus.innerHTML = newValueReceived;
@@ -528,7 +528,7 @@ async function connectToDevice() {
 	    .then(characteristic => {
 		sensorCharacteristicFound = characteristic;
 		characteristic.addEventListener('characteristvaluechanged',
-						handleCharacteristicChange);
+						handleShtikChange);
 		sleep(200);
 		characteristic.startNotifications();
 		console.log("Notification starts.");
