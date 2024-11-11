@@ -504,6 +504,7 @@ async function connectToDevice() {
 	    .then(device => {
 		console.log('Got device:', device.name);
 		grnLED.className = 'grnled';
+		await delay(100);
 		device.addEventListener('gattservicedisconnected',
 					onDisconnected);
 		bluetoothDevice = device;
@@ -520,10 +521,12 @@ async function connectToDevice() {
 		return service.getCharacteristic(sensorCharacteristic);
 	    })
 	    .then(characteristic => {
+		await delay(100);
 		//console.log("Characteristic discovered:", characteristic.uuid);
 		sensorCharacteristicFound = characteristic;
 		characteristic.startNotifications();
-		//console.log("Notification starts.");
+		console.log("Notification starts.");
+		await delay(100);
 		return characteristic.readValue();
 	    })
             .then(value => {
