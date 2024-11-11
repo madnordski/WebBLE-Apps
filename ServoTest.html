@@ -565,6 +565,18 @@ function initialValues() {
     yspdValue.innerHTML = "5";
     xspdSlider.value = 5;
     yspdSlider.value = 5;
+    setInterval(pollWorker, 1000);
+}
+
+function pollWorker() {
+    if ( bleServer && bleServer.connected ) {
+	console.log("polling status of servos");
+	if ( sensorCharacteristicFound ) {
+	    let v = sensorCharacteristicFound.readValue();
+	    const value = new TextDecoder().decode(v);
+	    console.log("Servo Status Read:", value);
+	}
+    }
 }
 
 function disconnectDevice() {
