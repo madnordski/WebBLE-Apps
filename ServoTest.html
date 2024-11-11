@@ -526,12 +526,10 @@ async function connectToDevice() {
 		return service.getCharacteristic(sensorCharacteristic);
 	    })
 	    .then(characteristic => {
-		sleep(100);
-		//console.log("Characteristic discovered:", characteristic.uuid);
 		sensorCharacteristicFound = characteristic;
 		characteristic.addEventListener('characteristvaluechanged',
 						handleCharacteristicChange);
-		sleep(100);
+		sleep(200);
 		characteristic.startNotifications();
 		console.log("Notification starts.");
 		sleep(100);
