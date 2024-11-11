@@ -235,6 +235,8 @@ grnLED.addEventListener('click', (event) => {
 	if ( bluetoothDevice && bluetoothDevice.gatt.connected ) {
 	    // disconnect by resetting the ESP32
 	    writeOnControl("DIE");
+	    sleep(100);
+	    disconnectDevice();
 	    initialValues();
 	}
 	else {
@@ -561,6 +563,32 @@ function initialValues() {
     xspdSlider.value = 5;
     yspdSlider.value = 5;
 }
+
+    function disconnectDevice() {
+        console.log("Disconnect Device.");
+        if (bleServer && bleServer.connected) {
+            if (sensorCharacteristicFound) {
+                sensorCharacteristicFound.stopNotifications()
+                    .then(() => {
+                        console.log("Notifications Stopped");
+                        return bleServer.disconnect();
+                    })
+                    .then(() => {
+                        console.log("Device Disconnected");
+
+                    })
+                    .catch(error => {
+                        console.log("An error occurred:", error);
+                    });
+            } else {
+                console.log("No characteristic found to disconnect.");
+            }
+        } else {
+            // Throw an error if Bluetooth is not connected
+            console.error("Bluetooth is not connected.");
+            window.alert("Bluetooth is not connected.")
+        }
+    }
 
 </script>
 
