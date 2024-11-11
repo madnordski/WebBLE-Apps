@@ -572,9 +572,11 @@ function pollWorker() {
     if ( bleServer && bleServer.connected ) {
 	console.log("polling status of servos");
 	if ( sensorCharacteristicFound ) {
-	    const v = sensorCharacteristicFound.readValue();
-	    //const value = new TextDecoder().decode(v);
-	    console.log("Servo Status Read: ", v);
+	    sensorCharacteristicFound.readValue()
+		.then(v => {
+		    const value = new TextDecoder().decode(v);
+		    console.log("Servo Status Read: ", value);
+		});
 	}
     }
 }
