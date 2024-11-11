@@ -524,7 +524,7 @@ async function connectToDevice() {
 		sensorCharacteristicFound = characteristic;
 		characteristic.startNotifications();
 		console.log("Notification starts.");
-		//return characteristic.readValue();
+		return characteristic.readValue();
 	    })
             //.then(value => {
 		//console.log("Read value: ", value);
