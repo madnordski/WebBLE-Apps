@@ -24,6 +24,9 @@
      desktop computer we can use the full javascript debugger in
      Chrome.
 
+     For the most part we call BLE Characteristics, Aspects because it
+     sounds better and is easier to type.
+
 To connect the Android phone to Chrome running our desktop:
 
 1. Connect the phone to the computer over USB.
@@ -212,15 +215,15 @@ const servoStatus = document.getElementById('servo_status');
 var deviceName ='ServoTest';
 var bleService = '75f29868-d8a4-452c-a78b-1f698ee6ab2b';
 var ledCharacteristic = '19b10002-e8f2-537e-4f6c-d104768a1214';
-var statusSthik = '1a476625-3aae-4ab4-a1a7-0c9e1f5c97e0';
-var servo1Characteristic = '99819a8b-59cc-4174-beee-fcc74b02fc5b';
-var controlSthik = '05ca6ae0-6810-4dc0-9f00-424d9b06261b';
+var statusAspect = '1a476625-3aae-4ab4-a1a7-0c9e1f5c97e0';
+var servoAspect = '99819a8b-59cc-4174-beee-fcc74b02fc5b';
+var controlAspect = '05ca6ae0-6810-4dc0-9f00-424d9b06261b';
 
 //Global Variables to Handle Bluetooth
 var bleServer;
 var bleServiceFound;
-var activeStatusSthik;
-var servo1OpInProgress = false;
+var activeStatusAspect;
+var servoBusy = false;
 var ledState = "on";
 var enableUpdates = false;
 
@@ -235,8 +238,8 @@ grnLED.addEventListener('click', (event) => {
 	// connect or disconnect
 	if ( bluetoothDevice && bluetoothDevice.gatt.connected ) {
 	    if (bleServer && bleServer.connected) {
-		if (activeStatusSthik) {
-		    activeStatusSthik.stopNotifications()
+		if (activeStatusAspect) {
+		    activeStatusAspect.stopNotifications()
 		}
 	    }
 	    // disconnect by resetting the ESP32
@@ -299,11 +302,11 @@ function oldConnectToDevice(){
         .then(service => {
             bleServiceFound = service;
             console.log("Service discovered:", service.uuid);
-            return service.getCharacteristic(statusSthik);
+            return service.getCharacteristic(statusAspect);
         })
         .then(characteristic => {
             console.log("Characteristic discovered:", characteristic.uuid);
-            activeStatusSthik = characteristic;
+            activeStatusAspect = characteristic;
             characteristic.addEventListener('characteristicvaluechanged',
 					    handleCharacteristicChange);
             characteristic.startNotifications();
@@ -327,7 +330,7 @@ function onDisconnected(event){
     connectToDevice();
 }
 
-function handleShtikChange(event){
+function handleAspectChange(event){
     console.log(event.target);
     const newValueReceived = new TextDecoder().decode(event.target.value);
     console.log("Notification: ", newValueReceived);
@@ -370,7 +373,7 @@ function toggleRedLED() {
 async function writeOnControl(value) {
     if ( bleServer && bleServer.connected ) {
 	try {
-	    await bleServiceFound.getCharacteristic(controlSthik)
+	    await bleServiceFound.getCharacteristic(controlAspect)
 		.then(characteristic => {
 		    const data = new Uint8Array(Array.from(value, char => char.charCodeAt(0)));
 		    return characteristic.writeValue(data);
@@ -384,7 +387,7 @@ async function writeOnControl(value) {
 		return writeOnControl(value);
 	    }
 	    else {
-                console.error("Error writing to the Servo1 characteristic: ", error);
+                console.error("Error writing to the Servo characteristic: ", error);
             }
 	}
     }
@@ -393,11 +396,11 @@ async function writeOnControl(value) {
     }
 }
 
-async function writeOnServo1Characteristic(value){
+async function writeOnServo(value){
     if (bleServer && bleServer.connected) {
 	try {
 	    // use try/catch to make sure this completes -- retry
-            await bleServiceFound.getCharacteristic(servo1Characteristic)
+            await bleServiceFound.getCharacteristic(servoAspect)
 		.then(characteristic => {
                     const data = new Uint8Array(Array.from(value, char => char.charCodeAt(0)));
 		    return characteristic.writeValue(data);
@@ -408,10 +411,10 @@ async function writeOnServo1Characteristic(value){
 	       || error.name === 'NotSupportedError' ) { // if busy, try again
 		console.log("busy, trying again");
 		await delay(50);
-		return writeOnServo1Characteristic(value);
+		return writeOnServo(value);
 	    }
 	    else {
-                console.error("Error writing to the Servo1 characteristic: ", error);
+                console.error("Error writing to the Servo characteristic: ", error);
             }
 	}
     } else {
@@ -478,7 +481,7 @@ function TStart(ev) {
 
 	if ( dX != lastDX || dY != lastDY ) {
 	    var msg = dX.toString() + " " + dY.toString();
-	    writeOnServo1Characteristic(msg);
+	    writeOnServo(msg);
 	    lastDX = dX;
 	    lastDY = dY;
 	    lastX = x;
@@ -522,10 +525,10 @@ async function connectToDevice() {
 	    .then(service => {
 		bleServiceFound = service;
 		console.log('Service discovered:', service.uuid);
-		return service.getCharacteristic(statusSthik);
+		return service.getCharacteristic(statusAspect);
 	    })
 	    .then(characteristic => {
-		activeStatusSthik = characteristic;
+		activeStatusAspect = characteristic;
 		sleep(100);
 		return characteristic.readValue();
 	    })
@@ -571,8 +574,8 @@ function initialValues() {
 
 function getServoStatus() {
     if ( enableUpdates && bleServer && bleServer.connected ) {
-	if ( activeStatusSthik ) {
-	    activeStatusSthik.readValue()
+	if ( activeStatusAspect ) {
+	    activeStatusAspect.readValue()
 		.then(v => {
 		    const value = new TextDecoder().decode(v);
 		    servoStatus.innerHTML = value;
@@ -585,24 +588,6 @@ function disconnectDevice() {
     console.log("Disconnect Device.");
     if (bleServer && bleServer.connected) {
 	enableUpdates = false;
-	/*
-          if (activeStatusSthik) {
-          activeStatusSthik.stopNotifications()
-                .then(() => {
-                    console.log("Notifications Stopped");
-                    return bleServer.disconnect();
-                })
-                .then(() => {
-                    console.log("Device Disconnected");
-		    
-                })
-                .catch(error => {
-                    console.log("An error occurred:", error);
-                });
-        } else {
-            console.log("No characteristic found to disconnect.");
-            }
-	    */
     } else {
         // Throw an error if Bluetooth is not connected
         console.error("Bluetooth is not connected.");
