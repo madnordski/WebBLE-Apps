@@ -240,6 +240,7 @@ grnLED.addEventListener('click', (event) => {
     if ( isWebBluetoothEnabled() ) {
 	// connect or disconnect
 	if ( bluetoothDevice && bluetoothDevice.gatt.connected ) {
+	    // we are connected so disconnect
 	    if (bleServer && bleServer.connected) {
 		if (activeStatusAspect) {
 		    activeStatusAspect.stopNotifications()
@@ -251,11 +252,17 @@ grnLED.addEventListener('click', (event) => {
 	    initialValues();
 	}
 	else {
-	    // connect
+	    // not connected so we connect
 	    connectToDevice();
 	}
     }
 });
+
+// **** Function definitions ***
+
+// Command to the ESP32 to change the servo motor speed.
+// These are 360 degree servos so we get to control speed and
+// direction but not degree position.
 
 function spdChange(axis, value) {
     if ( bluetoothDevice && bluetoothDevice.gatt.connected ) {
@@ -271,34 +278,52 @@ function spdChange(axis, value) {
     }
 }
 
-// **** Function definitions ***
 
-// Check if BLE is available in your Browser
+/* Conditions must be right for WebBLE to work.
+  1. ESP32 running BLE.
+  2. This web page loaded in a Chrome or Chromium browser.
+  3. Typically, the Chrome browser will be running on an Android phone
+  for convenient use. NB: a touch screen is required. The iPhone is
+  not supported.
+  4. The web page must be loaded over https (not just http). The
+  easiest way to us regular folks to do this is by hosting on a GIT
+  hub page.  See Web Hosting options at github.com.
+
+  At the end of day, this function will tell us if all of these
+  conditions are met except one.  You can load this page on a computer
+  without a touch screen, the app will run but you won't be able to
+  move the motors.
+  
+*/
+
 function isWebBluetoothEnabled() {
-    if (!navigator.bluetooth) {
+    if ( !navigator.bluetooth ) {
         console.log("Web Bluetooth API is not available in this browser!");
         window.alert("Web Bluetooth API is not available in this browser!");
     }
-    console.log('Web Bluetooth API supported in this browser.');
+    console.log('The Web Bluetooth API is ready.');
     return true
 }
+
+//****** Callback Handlers ********
+
+/* onDisconnected callback
+   Ideally, this callback would execute when the ESP32 disconnects or
+   looses power.  In practice, however, that doesn't happen.  Not sure
+   it's doing us any good at all.
+*/
 
 function onDisconnected(event){
     console.log('Device Disconnected:', event.target.device.name);
     grnLED.className = "gryled";
-    connectToDevice();
-}
-
-function handleAspectChange(event){
-    console.log(event.target);
-    const newValueReceived = new TextDecoder().decode(event.target.value);
-    console.log("Notification: ", newValueReceived);
-    servoStatus.innerHTML = newValueReceived;
+    connectToDevice();  // this is common practice but why -- it's
+			// going to fail
 }
 
 /* toggleRedLED
    Send the command to toggle the Red LED to the ESP32 using BLE Write.
-   NB: toggle takes place after the write and is written next call.
+   NB: ledState is sent and toggled after the write. So ledState
+   reflects the future state not the present.
 */
 
 function toggleRedLED() {
@@ -322,24 +347,40 @@ function toggleRedLED() {
 		}
             })
             .catch(error => {
-                console.error("Error writing to the LED characteristic: ", error);
+                console.error("Error writing to the Red LED: ", error);
             });
     } else {
-        console.error ("Bluetooth is not connected. Cannot write to characteristic.")
-        window.alert("Bluetooth is not connected. Cannot write to characteristic. \n Connect to BLE first!")
+        console.error ("Red LED control failed!  Please connect Bluetooth.")
+        window.alert("Red LED control failed!\nPlease connect Bluetooth.")
     }
 }
+
+/* writeOnControl
+
+ Send commands and out-of-band control messages to the ESP32 and
+ servos.
+
+ The control aspect is separate from the Servo aspect because the
+ touch interface will queue up a lot of requests for movement and it
+ can take time for the queue to clear. We therefore need an
+ "out-of-band" method for stopping the servos.  The writeOnControl
+ function used here provides this as well as other control functions
+ such as disconnect by reset.
+
+*/
 
 async function writeOnControl(value) {
     if ( bleServer && bleServer.connected ) {
 	try {
 	    await bleServiceFound.getCharacteristic(controlAspect)
 		.then(characteristic => {
-		    const data = new Uint8Array(Array.from(value, char => char.charCodeAt(0)));
+		    const data = new Uint8Array(Array.from(
+			value, char => char.charCodeAt(0)));
 		    return characteristic.writeValue(data);
 		});
 	}
 	catch (error) {
+	    // control messages are top priority so retry on failure
 	    if ( error.name === 'NetworkError'
 	       || error.name === 'NotSupportedError' ) { // if busy, try again
 		console.log("busy, trying again");
@@ -347,15 +388,30 @@ async function writeOnControl(value) {
 		return writeOnControl(value);
 	    }
 	    else {
-                console.error("Error writing to the Servo characteristic: ", error);
+                console.error("writeOnControl: failed with ", error);
             }
 	}
     }
     else {
-	console.error("Bluetooth is not connected!");
+	console.error("ESP32 control failed! Please connect Bluetooth.");
     }
 }
 
+/* writeOnServo
+
+   The servoAspect tells the ESP32 to move the motors and the
+   direction of movement. We expect this function to produce failures
+   because the BLE write queue is easily filled and touch events are
+   quickly generated in large numbers. NB: Look carefully, you'll find
+   that retries after an error are disabled.
+
+   The format of our messages is dX<space>dY. dX is the direction of
+   movement for the X servo and dY is the direction for the Y servo.
+
+   NB: speed is set using writeOnControl.
+   
+*/
+   
 async function writeOnServo(value){
     if (bleServer && bleServer.connected) {
 	try {
@@ -368,7 +424,7 @@ async function writeOnServo(value){
 		});
 	}
 	catch (error) {
-	    if ( false && error.name === 'NetworkError'
+	    if ( error.name === 'NetworkError'
 	       || error.name === 'NotSupportedError' ) { // if busy, try again
 		console.log("busy, trying again");
 		await delay(50);
