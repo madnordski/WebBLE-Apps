@@ -147,7 +147,7 @@ To connect the Android phone to Chrome running on our desktop:
       }
 
       td {
-	  padding: 7px;
+	  padding: 4px;
 	  text-align: center;
       }
       
@@ -164,7 +164,9 @@ To connect the Android phone to Chrome running on our desktop:
   </p>
   <p align="center">
 
-  <!-- probably don't need this table but keep the contents (i.e. spans) -->
+    <!-- keep things tidy and simple
+         Speed settings, connect/disconnect button and LED button -->
+    
   <table align="center">
     <tr><td>
 	<input type="range" min="1" max="10" value=5 id="xspeed"
@@ -188,21 +190,22 @@ To connect the Android phone to Chrome running on our desktop:
     </tr>
     <tr><td>Connect</td><td>Red LED</td></tr>    
   </table>
+  
+  <!-- status line -->
   <p align="center" id="servo_status">Servos Stopped</p>
 </body>
-<!-- ' -->
+<!--  -->
 
 <script>
-// we should try to connect when the page is loaded
-// we should already know the name of server
-// since the esp32 doesn't give up the connection, can't we just restore
-//   the connection we had before the page was reloaded?
+// To connect to WebBLE user interaction is required.
+// This script is dedicated to one server name or the connection
+// choice will be limited to one.
+
+// Disconnecting is accomplished by rebooting the ESP32.  This ensures
+// a complete reset and makes debugging easier by allowing for
+// repeated connects and disconnects.
 
 // Shorthand for document elements
-const onButton = document.getElementById('onButton');
-const offButton = document.getElementById('offButton');
-const retrievedValue = document.getElementById('valueContainer');
-const timestampContainer = document.getElementById('timestamp');
 const redLED = document.getElementById('rled');
 const grnLED = document.getElementById('gled');
 const xspdSlider = document.getElementById('xspeed');
@@ -211,21 +214,21 @@ const yspdSlider = document.getElementById('yspeed');
 const yspdValue = document.getElementById('yspeed_value');
 const servoStatus = document.getElementById('servo_status');
 
-//Define BLE Device Specs -- change these
-var deviceName ='ServoTest';
-var bleService = '75f29868-d8a4-452c-a78b-1f698ee6ab2b';
-var ledCharacteristic = '19b10002-e8f2-537e-4f6c-d104768a1214';
-var statusAspect = '1a476625-3aae-4ab4-a1a7-0c9e1f5c97e0';
-var servoAspect = '99819a8b-59cc-4174-beee-fcc74b02fc5b';
-var controlAspect = '05ca6ae0-6810-4dc0-9f00-424d9b06261b';
+// Unique Id's for our characteristics (aka aspects)
+const deviceName ='ServoTest';
+const bleService = '75f29868-d8a4-452c-a78b-1f698ee6ab2b';
+const ledAspect = '19b10002-e8f2-537e-4f6c-d104768a1214';
+const statusAspect = '1a476625-3aae-4ab4-a1a7-0c9e1f5c97e0';
+const servoAspect = '99819a8b-59cc-4174-beee-fcc74b02fc5b';
+const controlAspect = '05ca6ae0-6810-4dc0-9f00-424d9b06261b';
 
-//Global Variables to Handle Bluetooth
-var bleServer;
-var bleServiceFound;
-var activeStatusAspect;
-var servoBusy = false;
-var ledState = "on";
-var enableUpdates = false;
+// Global Variables to Handle Bluetooth and other states
+let bleServer;
+let bleServiceFound;
+let activeStatusAspect;
+let servoBusy = false;
+let ledState = "on";
+let enableUpdates = false;
 
 // **** EVENT LISTENERS ***
 
@@ -300,14 +303,15 @@ function handleAspectChange(event){
 
 function toggleRedLED() {
     if (bleServer && bleServer.connected) {
-        bleServiceFound.getCharacteristic(ledCharacteristic)
+        bleServiceFound.getCharacteristic(ledAspect)
             .then(characteristic => {
-                console.log("Found the LED characteristic: ", characteristic.uuid);
-                const data = new Uint8Array(Array.from(ledState, char => char.charCodeAt(0)));
+                console.log("Found the LED: ", characteristic.uuid);
+                const data = new Uint8Array(Array.from(
+		    ledState, char => char.charCodeAt(0)));
                 return characteristic.writeValue(data);
             })
             .then(() => {
-                console.log("Value written to LEDcharacteristic:", ledState);
+                console.log("Value written to LED aspect:", ledState);
 		if ( ledState == "on" ) {
 		    redLED.className = "redled";
 		    ledState = "off";
@@ -358,7 +362,8 @@ async function writeOnServo(value){
 	    // use try/catch to make sure this completes -- retry
             await bleServiceFound.getCharacteristic(servoAspect)
 		.then(characteristic => {
-                    const data = new Uint8Array(Array.from(value, char => char.charCodeAt(0)));
+                    const data = new Uint8Array(Array.from(
+			value, char => char.charCodeAt(0)));
 		    return characteristic.writeValue(data);
 		});
 	}
@@ -370,26 +375,13 @@ async function writeOnServo(value){
 		return writeOnServo(value);
 	    }
 	    else {
-                console.error("Error writing to the Servo characteristic: ", error);
+                console.error("Error writing to the Servo: ", error);
             }
 	}
     } else {
-        console.error ("Bluetooth is not connected. Cannot write to characteristic.")
-        window.alert("Bluetooth is not connected. Cannot write to characteristic. \n Connect to BLE first!")
+        console.error ("writeOnServo: Bluetooth not connected!");
+        window.alert("Unable to move Servos! Please connect Bluetooth.");
     }
-}
-
-function getDateTime() {
-    var currentdate = new Date();
-    var day = ("00" + currentdate.getDate()).slice(-2); // Convert day to string and slice
-    var month = ("00" + (currentdate.getMonth() + 1)).slice(-2);
-    var year = currentdate.getFullYear();
-    var hours = ("00" + currentdate.getHours()).slice(-2);
-    var minutes = ("00" + currentdate.getMinutes()).slice(-2);
-    var seconds = ("00" + currentdate.getSeconds()).slice(-2);
-    
-    var datetime = day + "/" + month + "/" + year + " at " + hours + ":" + minutes + ":" + seconds;
-    return datetime;
 }
 
 function delay(ms) {
