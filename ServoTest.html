@@ -425,7 +425,7 @@ async function writeOnServo(value){
 		});
 	}
 	catch (error) {
-	    if ( error.name === 'NetworkError'
+	    if ( false && error.name === 'NetworkError'
 	       || error.name === 'NotSupportedError' ) { // if busy, try again
 		console.log("busy, trying again");
 		await delay(50);
