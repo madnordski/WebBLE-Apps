@@ -526,11 +526,11 @@ async function connectToDevice() {
 	    })
 	    .then(characteristic => {
 		sensorCharacteristicFound = characteristic;
-		characteristic.addEventListener('characteristvaluechanged',
+		//characteristic.addEventListener('characteristvaluechanged',
 						handleShtikChange);
-		sleep(200);
-		characteristic.startNotifications();
-		console.log("Notification starts.");
+		//sleep(200);
+		//characteristic.startNotifications();
+		//console.log("Notification starts.");
 		sleep(100);
 		return characteristic.readValue();
 	    })
