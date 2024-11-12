@@ -229,6 +229,7 @@ let activeStatusAspect;
 let servoBusy = false;
 let ledState = "on";
 let enableUpdates = false;
+let servosActive = false;
 
 // **** EVENT LISTENERS ***
 
@@ -470,9 +471,10 @@ function TStart(ev) {
 	lastX = Math.floor(ev.touches[0].clientX / fuzz);
 	lastY = Math.floor(ev.touches[0].clientY / fuzz);
 	writeOnControl("START");
+	servosActive = true;
 	console.log("START");
     }
-    else if ( ev.type == 'touchmove' ) {
+    else if ( ev.type == 'touchmove' && servosActive ) {
 	let dX = 0;
 	let dY = 0;
 	let x = Math.floor(ev.touches[0].clientX / fuzz);
@@ -496,6 +498,7 @@ function TStart(ev) {
     else if ( ev.type == 'touchend' ) {
 	delay(50);
 	writeOnControl("STOP");
+	servosActive = false;
     }
 }
 
@@ -570,6 +573,7 @@ function initialValues() {
     servoStatus.innerHTML = "disconnected";
     enableUpdates = false;
     setInterval(getServoStatus, 1000);
+    servosActive = false;
 }
 
 /* getServoStatus
