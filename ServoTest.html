@@ -212,14 +212,14 @@ const servoStatus = document.getElementById('servo_status');
 var deviceName ='ServoTest';
 var bleService = '75f29868-d8a4-452c-a78b-1f698ee6ab2b';
 var ledCharacteristic = '19b10002-e8f2-537e-4f6c-d104768a1214';
-var sensorCharacteristic = '1a476625-3aae-4ab4-a1a7-0c9e1f5c97e0';
+var statusSthik = '1a476625-3aae-4ab4-a1a7-0c9e1f5c97e0';
 var servo1Characteristic = '99819a8b-59cc-4174-beee-fcc74b02fc5b';
 var controlSthik = '05ca6ae0-6810-4dc0-9f00-424d9b06261b';
 
 //Global Variables to Handle Bluetooth
 var bleServer;
 var bleServiceFound;
-var sensorCharacteristicFound;
+var activeStatusSthik;
 var servo1OpInProgress = false;
 var ledState = "on";
 var enableUpdates = false;
@@ -235,8 +235,8 @@ grnLED.addEventListener('click', (event) => {
 	// connect or disconnect
 	if ( bluetoothDevice && bluetoothDevice.gatt.connected ) {
 	    if (bleServer && bleServer.connected) {
-		if (sensorCharacteristicFound) {
-		    sensorCharacteristicFound.stopNotifications()
+		if (activeStatusSthik) {
+		    activeStatusSthik.stopNotifications()
 		}
 	    }
 	    // disconnect by resetting the ESP32
@@ -299,11 +299,11 @@ function oldConnectToDevice(){
         .then(service => {
             bleServiceFound = service;
             console.log("Service discovered:", service.uuid);
-            return service.getCharacteristic(sensorCharacteristic);
+            return service.getCharacteristic(statusSthik);
         })
         .then(characteristic => {
             console.log("Characteristic discovered:", characteristic.uuid);
-            sensorCharacteristicFound = characteristic;
+            activeStatusSthik = characteristic;
             characteristic.addEventListener('characteristicvaluechanged',
 					    handleCharacteristicChange);
             characteristic.startNotifications();
@@ -522,15 +522,10 @@ async function connectToDevice() {
 	    .then(service => {
 		bleServiceFound = service;
 		console.log('Service discovered:', service.uuid);
-		return service.getCharacteristic(sensorCharacteristic);
+		return service.getCharacteristic(statusSthik);
 	    })
 	    .then(characteristic => {
-		sensorCharacteristicFound = characteristic;
-		//characteristic.addEventListener('characteristvaluechanged',
-		// handleShtikChange);
-		//sleep(200);
-		//characteristic.startNotifications();
-		//console.log("Notification starts.");
+		activeStatusSthik = characteristic;
 		sleep(100);
 		return characteristic.readValue();
 	    })
@@ -576,8 +571,8 @@ function initialValues() {
 
 function getServoStatus() {
     if ( enableUpdates && bleServer && bleServer.connected ) {
-	if ( sensorCharacteristicFound ) {
-	    sensorCharacteristicFound.readValue()
+	if ( activeStatusSthik ) {
+	    activeStatusSthik.readValue()
 		.then(v => {
 		    const value = new TextDecoder().decode(v);
 		    servoStatus.innerHTML = value;
@@ -590,8 +585,9 @@ function disconnectDevice() {
     console.log("Disconnect Device.");
     if (bleServer && bleServer.connected) {
 	enableUpdates = false;
-        if (sensorCharacteristicFound) {
-            sensorCharacteristicFound.stopNotifications()
+	/*
+          if (activeStatusSthik) {
+          activeStatusSthik.stopNotifications()
                 .then(() => {
                     console.log("Notifications Stopped");
                     return bleServer.disconnect();
@@ -605,7 +601,8 @@ function disconnectDevice() {
                 });
         } else {
             console.log("No characteristic found to disconnect.");
-        }
+            }
+	    */
     } else {
         // Throw an error if Bluetooth is not connected
         console.error("Bluetooth is not connected.");
