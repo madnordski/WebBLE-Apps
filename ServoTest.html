@@ -9,6 +9,9 @@
      need to conduct our physical experiments, we can make progress by
      tinkering with the user interface.
 
+     WebBLE reference:
+         https://developer.chrome.com/docs/capabilities/bluetooth
+
      We will use an ESP32-C3 to control the motors. Preliminarily an
      XIAO ESP32-C3 is being used.  The communication between the
      android interface and the ESP32-C3 will be Bluetooth Low Energy
@@ -378,7 +381,7 @@ async function connectToDevice() {
 	    .then(device => {
 		console.log('Got device:', device.name);
 		grnLED.className = 'grnled';
-		device.addEventListener('gattservicedisconnected',
+		device.addEventListener('gattserverdisconnected',
 					onDisconnected);
 		bluetoothDevice = device;
 		return device.gatt.connect();
