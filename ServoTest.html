@@ -198,7 +198,7 @@ To connect the Android phone to Chrome running on our desktop:
 
 <script>
 // To connect to WebBLE user interaction is required.
-// This script is dedicated to one server name or the connection
+// This script is dedicated to one server name so the connection
 // choice will be limited to one.
 
 // Disconnecting is accomplished by rebooting the ESP32.  This ensures
@@ -223,26 +223,39 @@ const servoAspect = '99819a8b-59cc-4174-beee-fcc74b02fc5b';
 const controlAspect = '05ca6ae0-6810-4dc0-9f00-424d9b06261b';
 
 // Global Variables to Handle Bluetooth and other states
+let bluetoothDevice;
 let bleServer;
 let bleServiceFound;
 let activeStatusAspect;
 let servoBusy = false;
 let ledState = "on";
 let enableUpdates = false;
+
+// used by touchHandler
 let servosActive = false;
+let lastDX, lastDY;
+let lastX, lastY;
+const fuzz = 20; // reduces the resolution of the touch area
 
 // **** EVENT LISTENERS ***
+
+// unload event
+window.addEventListener('beforeunload', () => {
+    disconnectDevice();
+});
 
 // toggle the Red LED
 redLED.addEventListener('click', (event) => toggleRedLED());
 
-// use the green LED to connect and disconnect the device
+// use the green LED button to connect and disconnect the device
+// the esp32 turns the green led on when connected  
 grnLED.addEventListener('click', (event) => {
     if ( isWebBluetoothEnabled() ) {
 	// connect or disconnect
 	if ( bluetoothDevice && bluetoothDevice.gatt.connected ) {
 	    // we are connected so disconnect
 	    if (bleServer && bleServer.connected) {
+		// we never actually started "notifications" so why?
 		if (activeStatusAspect) {
 		    activeStatusAspect.stopNotifications()
 		}
@@ -259,11 +272,25 @@ grnLED.addEventListener('click', (event) => {
     }
 });
 
+// establish the touchHandler events
+document.querySelector('.dot').addEventListener('touchstart',
+						touchHandler, {passive: false});
+document.querySelector('.dot').addEventListener('touchend',
+						touchHandler, {passive: false});
+document.querySelector('.dot').addEventListener('touchmove',
+						touchHandler, {passive: false});
+
 // **** Function definitions ***
 
-// Command to the ESP32 to change the servo motor speed.
-// These are 360 degree servos so we get to control speed and
-// direction but not degree position.
+/* spdChange
+
+   This is called to support the slider events used to change motor
+   speed.
+   
+   Command the ESP32 to change the servo motor speed.
+   These are 360 degree servos so we get to control speed and
+   direction but not degree position.
+*/
 
 function spdChange(axis, value) {
     if ( bluetoothDevice && bluetoothDevice.gatt.connected ) {
@@ -279,16 +306,19 @@ function spdChange(axis, value) {
     }
 }
 
+/* isWebBluetoothEnabled
 
-/* Conditions must be right for WebBLE to work.
-  1. ESP32 running BLE.
+  Conditions must be right for WebBLE to work. This function checks on
+  most of those conditions.
+  
+  1. ESP32 running our BLE script ServerTest.ino.
   2. This web page loaded in a Chrome or Chromium browser.
   3. Typically, the Chrome browser will be running on an Android phone
-  for convenient use. NB: a touch screen is required. The iPhone is
+  for convenient use. NB: a touch screen is required and the iPhone is
   not supported.
   4. The web page must be loaded over https (not just http). The
-  easiest way to us regular folks to do this is by hosting on a GIT
-  hub page.  See Web Hosting options at github.com.
+  easiest way for us regular folks to do this is by hosting it on a GIT
+  hub page.  See Web Hosting options at pages.github.com.
 
   At the end of day, this function will tell us if all of these
   conditions are met except one.  You can load this page on a computer
@@ -302,7 +332,7 @@ function isWebBluetoothEnabled() {
         console.log("Web Bluetooth API is not available in this browser!");
         window.alert("Web Bluetooth API is not available in this browser!");
     }
-    console.log('The Web Bluetooth API is ready.');
+    console.log("The Web Bluetooth API is ready.");
     return true
 }
 
@@ -311,7 +341,7 @@ function isWebBluetoothEnabled() {
 /* onDisconnected callback
    Ideally, this callback would execute when the ESP32 disconnects or
    looses power.  In practice, however, that doesn't happen.  Not sure
-   it's doing us any good at all.
+   it's doing us any good at all.  Let's see if we can make this happen???
 */
 
 function onDisconnected(event){
@@ -321,8 +351,73 @@ function onDisconnected(event){
 			// going to fail
 }
 
+/* connectToDevice
+
+   Establishing a BLE Web connection to the ESP32 is dependent on a
+   number of requirements enumerated above in isWebBluetoothEnabled
+   for this file.  In addition, WebBLE requires the connection to be
+   initiated by a user interaction. Once triggered, the user interface
+   procedure is handled by the navigator.bluetooth subsystem. The user
+   selects from a list of nodes but we limit the nodes to the one
+   specified in deviceName. It would be nicer if we could just
+   automatically connect but I guess we would need a Java App for that
+   so let's just enjoy the fact we just hack out some javascript instead.
+*/
+
+async function connectToDevice() {
+    if ( bluetoothDevice && bluetoothDevice.gatt.connected ) {
+	console.log("Already connected.");
+	return;
+    }
+    try {
+	await navigator.bluetooth.requestDevice({
+	    filters: [{name: deviceName}],
+	    optionalServices: [bleService]
+	})
+	// act on the promise object returned
+	    .then(device => {
+		console.log('Got device:', device.name);
+		grnLED.className = 'grnled';
+		device.addEventListener('gattservicedisconnected',
+					onDisconnected);
+		bluetoothDevice = device;
+		return device.gatt.connect();
+	    })
+	    .then(gattServer => {
+		bleServer = gattServer;
+		console.log("GATT Server connected.");
+		return bleServer.getPrimaryService(bleService);
+	    })
+	    .then(service => {
+		bleServiceFound = service;
+		console.log('Service discovered:', service.uuid);
+		return service.getCharacteristic(statusAspect);
+	    })
+	    .then(characteristic => {
+		activeStatusAspect = characteristic;
+		sleep(100);
+		return characteristic.readValue();
+	    })
+            .then(value => {
+		const decodedValue = new TextDecoder().decode(value);
+		console.log("Decoded value: ", decodedValue);
+		servoStatus.innerHTML = "connected";
+		enableUpdates = true;
+            })
+	    .catch(error => {
+		console.log('Error: ', error);
+	    });
+    }
+    catch (error) {
+	console.error('Connection error:', error);
+    }
+}
+
 /* toggleRedLED
-   Send the command to toggle the Red LED to the ESP32 using BLE Write.
+   Send the command to toggle the Red LED to the ESP32 using BLE
+   Write. We use this to test communication between the phone and the
+   ESP32.
+   
    NB: ledState is sent and toggled after the write. So ledState
    reflects the future state not the present.
 */
@@ -408,8 +503,9 @@ async function writeOnControl(value) {
    responsive to STOP with retries disabled and ignoring these
    failures tends to work out as the user adapts to the movement IRL.
 
-   The format of our messages is dX<space>dY. dX is the direction of
-   movement for the X servo and dY is the direction for the Y servo.
+   The format of our messages is dX<space>dY. dX is the direction (-1
+   or 1) of movement for the X servo and dY is the direction for the Y
+   servo.
 
    NB: speed is set using writeOnControl.
    
@@ -427,7 +523,7 @@ async function writeOnServo(value){
 		});
 	}
 	catch (error) {
-	    // we have retries disable here, making it more responsive
+	    // we have retries disable hered, making it more responsive
 	    // to STOP commands
 	    if ( false && error.name === 'NetworkError'
 	       || error.name === 'NotSupportedError' ) { // if busy, try again
@@ -446,21 +542,6 @@ async function writeOnServo(value){
 }
 
 
-// **** TIME FUNCTIONS ****
-function delay(ms) {
-    // can be used within a Promise
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-function sleep(milliseconds) {
-    // use outside of Promise methods
-    var start = new Date().getTime();
-    while ( true ) {
-	if ((new Date().getTime() - start) > milliseconds){
-	    break;
-	}
-    }
-}
-
 /* touchHandler
 
    This function handles the events generated by the touchpad
@@ -472,38 +553,48 @@ function sleep(milliseconds) {
    from movement, all we need here is the direction. In touchstart we
    save the starting point so that we can get a direction from the
    very first move. We send the start command to the ESP32 using the
-   controlAspect because we want to be sure it through.
+   controlAspect because we want to be sure it gets through.
 
    For touchmove, we determine the direction of movement and send it
    to the ESP32. Importantly, we only send it when it changes. This
    keeps us from flooding the BLE channel thereby increasing
    reliability.  So dX and dY are compared with lastDX and lastDY each
-   time. 
-   
+   time. Yes this means that we get more accurate movement when the
+   user moves her finger just to get things going.  Move and hold is
+   the most effective way to move the servos.
+
+   For touchend, we send "STOP" to the esp32 to stop the servos and
+   deactivate servo operation with the servosActive flag.  Not sure we
+   need the 50 mS delay before writing.
+
+   NB: the servos start moving when a touchmove event is
+   triggered. They keep moving until a touchend move is triggered.
+   This means that a user only needs to move on the touch area to
+   indicate direction -- continued movement along the same axis does
+   nothing. The servos will respond if the touch reverses along an
+   axis. Otherwise, touch, hold and release results in servo movement
+   from the touch to the release.
+
+   Finally, there's an interaction with these touch events and the
+   default browser touch actions such as scroll and page reload. We
+   try to disable the defaults within our touch area but weirdness
+   remains possible.
 */
 
-let lastDX, lastDY;  
-let lastX, lastY;
-const fuzz = 20; // reduces the resolution of the touch area
-
-document.querySelector('.dot').addEventListener('touchstart',
-						touchHandler, {passive: false});
-document.querySelector('.dot').addEventListener('touchend',
-						touchHandler, {passive: false});
-document.querySelector('.dot').addEventListener('touchmove',
-						touchHandler, {passive: false});
 function touchHandler(ev) {
-    ev.preventDefault();
+    ev.preventDefault();      // supposed to turn off default actions
     console.log(ev.touches, ev.type);
-    if ( ev.type == 'touchstart' ) { // reset our starting point
-	// everything is relative to that
+    if ( ev.type == 'touchstart' ) { // get a starting point and
+				     // activate servos
 	lastX = Math.floor(ev.touches[0].clientX / fuzz);
 	lastY = Math.floor(ev.touches[0].clientY / fuzz);
 	writeOnControl("START");
 	servosActive = true;
 	console.log("START");
     }
-    else if ( ev.type == 'touchmove' && servosActive ) {
+    else if ( ev.type == 'touchmove' && servosActive ) { // tell the
+							 // esp32 to
+							 // move servos
 	let dX = 0;
 	let dY = 0;
 	let x = Math.floor(ev.touches[0].clientX / fuzz);
@@ -524,68 +615,12 @@ function touchHandler(ev) {
 	    console.log("sent " + msg);
 	}
     }
-    else if ( ev.type == 'touchend' ) {
-	delay(50);
+    else if ( ev.type == 'touchend' ) { // stop all movement asap
+	delay(50);                      // maybe we can do without this???
 	writeOnControl("STOP");
 	servosActive = false;
     }
 }
-
-// start things off by connecting to the ESP32 over BLE
-var bluetoothDevice;
-
-async function connectToDevice() {
-    if ( bluetoothDevice && bluetoothDevice.gatt.connected ) {
-	console.log("Already connected.");
-	return;
-    }
-    try {
-	await navigator.bluetooth.requestDevice({
-	    filters: [{name: deviceName}],
-	    optionalServices: [bleService]
-	})
-	// act on the promise object returned
-	    .then(device => {
-		console.log('Got device:', device.name);
-		grnLED.className = 'grnled';
-		device.addEventListener('gattservicedisconnected',
-					onDisconnected);
-		bluetoothDevice = device;
-		return device.gatt.connect();
-	    })
-	    .then(gattServer => {
-		bleServer = gattServer;
-		console.log("GATT Server connected.");
-		return bleServer.getPrimaryService(bleService);
-	    })
-	    .then(service => {
-		bleServiceFound = service;
-		console.log('Service discovered:', service.uuid);
-		return service.getCharacteristic(statusAspect);
-	    })
-	    .then(characteristic => {
-		activeStatusAspect = characteristic;
-		sleep(100);
-		return characteristic.readValue();
-	    })
-            .then(value => {
-		const decodedValue = new TextDecoder().decode(value);
-		console.log("Decoded value: ", decodedValue);
-		servoStatus.innerHTML = "connected";
-		enableUpdates = true;
-            })
-	    .catch(error => {
-		console.log('Error: ', error);
-	    });
-    }
-    catch (error) {
-	console.error('Connection error:', error);
-    }
-}
-
-window.addEventListener('beforeunload', () => {
-    disconnectDevice();
-});
 
 window.onload = initialValues;
 function initialValues() {
@@ -629,6 +664,21 @@ function disconnectDevice() {
         // Throw an error if Bluetooth is not connected
         console.error("Bluetooth is not connected.");
         window.alert("Bluetooth is not connected.")
+    }
+}
+
+// **** TIME FUNCTIONS ****
+function delay(ms) {
+    // can be used within a Promise
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+function sleep(milliseconds) {
+    // use outside of Promise methods
+    var start = new Date().getTime();
+    while ( true ) {
+	if ((new Date().getTime() - start) > milliseconds){
+	    break;
+	}
     }
 }
 
