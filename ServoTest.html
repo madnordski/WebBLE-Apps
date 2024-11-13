@@ -347,10 +347,15 @@ function isWebBluetoothEnabled() {
    it's doing us any good at all.  Let's see if we can make this happen???
 */
 
-function onDisconnected(event){
+function onDisconnected(event) {
     console.log('Device Disconnected');
-    grnLED.className = "gryled";
-    connectToDevice();  // this is common practice but why -- it's
+    if ( bluetoothDevice ) {
+	consol.log("trying reconnect...");
+	sleep(1000);
+	return bluetoothDevice.gatt.connect();
+    }
+    initialValues();
+    //connectToDevice();  // this is common practice but why -- it's
 			// going to fail
 }
 
@@ -586,7 +591,7 @@ async function writeOnServo(value){
 
 function touchHandler(ev) {
     ev.preventDefault();      // supposed to turn off default actions
-    console.log(ev.touches, ev.type);
+    //console.log(ev.touches, ev.type);
     if ( ev.type == 'touchstart' ) { // get a starting point and
 				     // activate servos
 	lastX = Math.floor(ev.touches[0].clientX / fuzz);
@@ -619,7 +624,7 @@ function touchHandler(ev) {
 	}
     }
     else if ( ev.type == 'touchend' ) { // stop all movement asap
-	delay(50);                      // maybe we can do without this???
+	//delay(50);                      // maybe we can do without this???
 	writeOnControl("STOP");
 	servosActive = false;
     }
