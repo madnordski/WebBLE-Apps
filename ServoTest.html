@@ -348,7 +348,7 @@ function isWebBluetoothEnabled() {
 */
 
 function onDisconnected(event){
-    console.log('Device Disconnected:', event.target.device.name);
+    console.log('Device Disconnected');
     grnLED.className = "gryled";
     connectToDevice();  // this is common practice but why -- it's
 			// going to fail
