@@ -350,7 +350,7 @@ function isWebBluetoothEnabled() {
 function onDisconnected(event) {
     console.log('Device Disconnected');
     if ( bluetoothDevice ) {
-	consol.log("trying reconnect...");
+	console.log("trying reconnect...");
 	sleep(1000);
 	return bluetoothDevice.gatt.connect();
     }
