@@ -349,12 +349,13 @@ function isWebBluetoothEnabled() {
 
 function onDisconnected(event) {
     console.log('Device Disconnected');
+    location.reload(); // reset both ends
     //if ( bluetoothDevice ) {
 //	console.log("trying reconnect ...");
 //	sleep(100);
 //	return bluetoothDevice.gatt.connect();
   //  }
-    initialValues();
+    //initialValues();
     //connectToDevice();  // this is common practice but why -- it's
 			// going to fail
 }
