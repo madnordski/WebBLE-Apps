@@ -342,22 +342,15 @@ function isWebBluetoothEnabled() {
 //****** Callback Handlers ********
 
 /* onDisconnected callback
-   Ideally, this callback would execute when the ESP32 disconnects or
-   looses power.  In practice, however, that doesn't happen.  Not sure
-   it's doing us any good at all.  Let's see if we can make this happen???
+     
+   There was a bug in the RNT script that prevented this from
+   firing. We disconnect by telling the ESP32 to reboot.  Then we
+   reload this page on our end.  After that, we're ready to go again.
 */
 
 function onDisconnected(event) {
     console.log('Device Disconnected');
     location.reload(); // reset both ends
-    //if ( bluetoothDevice ) {
-//	console.log("trying reconnect ...");
-//	sleep(100);
-//	return bluetoothDevice.gatt.connect();
-  //  }
-    //initialValues();
-    //connectToDevice();  // this is common practice but why -- it's
-			// going to fail
 }
 
 /* connectToDevice
