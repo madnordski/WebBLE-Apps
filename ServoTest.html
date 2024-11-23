@@ -363,7 +363,8 @@ function onDisconnected(event) {
    selects from a list of nodes but we limit the nodes to the one
    specified in deviceName. It would be nicer if we could just
    automatically connect but I guess we would need a Java App for that
-   so let's just enjoy the fact we just hack out some javascript instead.
+   so let's just enjoy the fact we can just hack out some javascript
+   instead.
 */
 
 async function connectToDevice() {
@@ -562,8 +563,8 @@ async function writeOnServo(value){
    keeps us from flooding the BLE channel thereby increasing
    reliability.  So dX and dY are compared with lastDX and lastDY each
    time. Yes this means that we get more accurate movement when the
-   user moves her finger just to get things going.  Move and hold is
-   the most effective way to move the servos.
+   user moves her finger just to get things going.  Touch, move and
+   hold is the most effective way to move the servos.
 
    For touchend, we send "STOP" to the esp32 to stop the servos and
    deactivate servo operation with the servosActive flag.  Not sure we
@@ -624,7 +625,20 @@ function touchHandler(ev) {
     }
 }
 
+/* when the page loads, run the initialValues() function
+ */
+
 window.onload = initialValues;
+
+/* initialValues
+
+   This function is called from when the page is loaded and at other
+   times.
+   It resets critical values to our starting values.
+
+   Importantly, it also starts polling the ESP32 for status updates.
+*/
+
 function initialValues() {
     // led state
     ledState = "on";
@@ -638,12 +652,21 @@ function initialValues() {
     yspdSlider.value = 5;
     servoStatus.innerHTML = "disconnected";
     enableUpdates = false;
+
+    // we check the status of servos every second
     setInterval(getServoStatus, 1000);
     servosActive = false;
 }
 
 /* getServoStatus
-   We poll the status because notify stopped working after a Chrome update.
+   
+   We poll the status because notify stopped working after a Chrome
+   update. Initially, notifications worked but something changed.  The
+   problem was on the WebBLE side because other bluetouth apps could
+   see the notificaitons.
+
+   This funciton just does a read on the status aspect which is still
+   available as a notification.
 */
 
 function getServoStatus() {
@@ -657,6 +680,15 @@ function getServoStatus() {
 	}
     }
 }
+
+/* disconnectDevice
+
+   Is this every called?  It's supposed to get called when the
+   beforeunload event is triggered by javascript.
+
+   Might this be useful when the user reloads or closes the page?
+   
+*/
 
 function disconnectDevice() {
     console.log("Disconnect Device.");
