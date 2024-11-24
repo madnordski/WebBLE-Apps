@@ -683,17 +683,18 @@ function getServoStatus() {
 
 /* disconnectDevice
 
-   Is this every called?  It's supposed to get called when the
-   beforeunload event is triggered by javascript.
-
-   Might this be useful when the user reloads or closes the page?
+   This gets called when the user reloads the page for any reason. The
+   reload resets key variables so we should probably disconnect from
+   the ESP32.
    
 */
 
 function disconnectDevice() {
     console.log("Disconnect Device.");
     if (bleServer && bleServer.connected) {
-	enableUpdates = false;
+	writeOnControl("DIE");
+	//sleep(100);
+	//initialValues();
     } else {
         // Throw an error if Bluetooth is not connected
         console.error("Bluetooth is not connected.");
