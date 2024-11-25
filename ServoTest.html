@@ -407,7 +407,7 @@ async function connectToDevice() {
 		activeStatusAspect = characteristic;
 		characteristic.startNotifications();
 		characteristic.addEventListener("characteristicvaluechanged",
-						handleIndication);
+						handleStatusUpdate);
 		sleep(100);
 		return characteristic.readValue();
 	    })
@@ -662,48 +662,29 @@ function initialValues() {
     yspdSlider.value = 5;
     servoStatus.innerHTML = "disconnected";
     enableUpdates = false;
-
-    // we check the status of servos every second
-    // this reads a notification variable
-    //setInterval(getServoStatus, 1000);
     servosActive = false;
 }
 
-/* handleIndication
+/* handleStatusUpdate
 
-   Responds to changes of the ESP32 status aspect.
+   Responds to changes of the ESP32 status aspect. When the ESP32
+   triggers this BLE indication to give us a status update, we must
+   acknowledge it. If not, the ESP32 will assume we went away and
+   reboot.
 
+   On the ESP32 side we send a status when the status changes or once
+   a second if there is no change. So, yes Virgina, we did overload
+   the status aspect by also making it a heartbeat (or ping pong)
+   proof of life.
 */
 
-function handleIndication(event) {
+function handleStatusUpdate(event) {
     const value = new Uint8Array(event.target.value.buffer);
     const valueStr = new TextDecoder().decode(value);
     servoStatus.innerHTML = valueStr;
-    console.log("indications are ", valueStr);
+    //console.log("indications are ", valueStr);
+    // send acknowledgement to the ESP32 so it knows we're still here
     writeOnControl("ACK");
-}
-
-/* getServoStatus
-   
-   We poll the status because notify stopped working after a Chrome
-   update. Initially, notifications worked but something changed.  The
-   problem was on the WebBLE side because other bluetouth apps could
-   see the notificaitons.
-
-   This funciton just does a read on the status aspect which is still
-   available as a notification.
-*/
-
-function getServoStatus() {
-    if ( enableUpdates && bleServer && bleServer.connected ) {
-	if ( activeStatusAspect ) {
-	    activeStatusAspect.readValue()
-		.then(v => {
-		    const value = new TextDecoder().decode(v);
-		    servoStatus.innerHTML = value;
-		});
-	}
-    }
 }
 
 /* disconnectDevice
