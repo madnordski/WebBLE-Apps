@@ -692,7 +692,7 @@ function getServoStatus() {
 function disconnectDevice() {
     console.log("Disconnect Device.");
     if (bleServer && bleServer.connected) {
-	writeOnControl("DIE");
+	await writeOnControl("DIE");
 	//sleep(100);
 	//initialValues();
     } else {
