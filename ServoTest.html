@@ -243,6 +243,13 @@ const fuzz = 40; // reduces the resolution of the touch area
 // **** EVENT LISTENERS ***
 
 // unload event
+//  This resets the esp32 when the page is refreshed but
+//  if the page is closed, it does not get called.
+//  This puts us in a bad state because with the ESP32 connected to the
+//  phone we can't connect to it. Basically, this script can't connect
+//  if we're connected and there's no clear way to connect this script
+//  to an existing connection.
+
 window.addEventListener('beforeunload', () => {
     disconnectDevice();
 });
@@ -693,8 +700,7 @@ function disconnectDevice() {
     console.log("Disconnect Device.");
     if (bleServer && bleServer.connected) {
 	writeOnControl("DIE");
-	//sleep(100);
-	//initialValues();
+	bleServer.disconnect();
     } else {
         // Throw an error if Bluetooth is not connected
         console.error("Bluetooth is not connected.");
