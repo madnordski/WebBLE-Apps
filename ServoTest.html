@@ -405,6 +405,9 @@ async function connectToDevice() {
 	    })
 	    .then(characteristic => {
 		activeStatusAspect = characteristic;
+		await characteristic.startNotifications();
+		characteristic.addEventListener("characteristicvaluechanged",
+						handleIndication);
 		sleep(100);
 		return characteristic.readValue();
 	    })
@@ -661,8 +664,22 @@ function initialValues() {
     enableUpdates = false;
 
     // we check the status of servos every second
-    setInterval(getServoStatus, 1000);
+    // this reads a notification variable
+    //setInterval(getServoStatus, 1000);
     servosActive = false;
+}
+
+/* handleIndication
+
+   Responds to changes of the ESP32 status aspect.
+
+*/
+
+function handleIndication(event) {
+    const value = new Uint8Array(event.target.value.buffer);
+    const strValue = new TextDecoder().decode(value);
+    servoStatus.innerHTML = valueStr;
+    console.log("indications are ", valueStr);
 }
 
 /* getServoStatus
