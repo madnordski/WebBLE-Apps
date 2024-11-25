@@ -405,7 +405,7 @@ async function connectToDevice() {
 	    })
 	    .then(characteristic => {
 		activeStatusAspect = characteristic;
-		await characteristic.startNotifications();
+		characteristic.startNotifications();
 		characteristic.addEventListener("characteristicvaluechanged",
 						handleIndication);
 		sleep(100);
