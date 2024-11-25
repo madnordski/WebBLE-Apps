@@ -700,7 +700,6 @@ function disconnectDevice() {
     console.log("Disconnect Device.");
     if (bleServer && bleServer.connected) {
 	writeOnControl("DIE");
-	bleServer.disconnect();
     } else {
         // Throw an error if Bluetooth is not connected
         console.error("Bluetooth is not connected.");
