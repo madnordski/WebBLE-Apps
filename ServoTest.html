@@ -680,6 +680,7 @@ function handleIndication(event) {
     const valueStr = new TextDecoder().decode(value);
     servoStatus.innerHTML = valueStr;
     console.log("indications are ", valueStr);
+    writeOnControl("ACK");
 }
 
 /* getServoStatus
