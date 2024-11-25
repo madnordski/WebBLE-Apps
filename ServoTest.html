@@ -677,7 +677,7 @@ function initialValues() {
 
 function handleIndication(event) {
     const value = new Uint8Array(event.target.value.buffer);
-    const strValue = new TextDecoder().decode(value);
+    const valueStr = new TextDecoder().decode(value);
     servoStatus.innerHTML = valueStr;
     console.log("indications are ", valueStr);
 }
