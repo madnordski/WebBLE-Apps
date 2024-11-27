@@ -622,8 +622,9 @@ function touchHandler(ev) {
 
 	lastX = x;
 	lastY = y;
-
-	if ( !(dX == 0 && dY == 0) ) {
+	console.log("Move " + x + " " + y);
+	
+	if ( dX != 0 || dY != 0 ) {
 	    // no need to send or remember zeros
 	    if ( dX != lastDX || dY != lastDY ) {
 		var msg = dX.toString() + " " + dY.toString();
