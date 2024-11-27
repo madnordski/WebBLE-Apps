@@ -601,6 +601,8 @@ function touchHandler(ev) {
 				     // activate servos
 	lastX = Math.floor(ev.touches[0].clientX / fuzz);
 	lastY = Math.floor(ev.touches[0].clientY / fuzz);
+	lastDx = 0;
+	lastDy = 0;
 	writeOnControl("START");
 	servosActive = true;
 	console.log("START");
