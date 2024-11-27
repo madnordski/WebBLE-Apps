@@ -620,6 +620,11 @@ function touchHandler(ev) {
 	if ( y != lastY )
 	    dY = y > lastY ? 1 : -1;
 
+	lastX = x;
+	lastY = y;
+	lastDX = dX;
+	lastDY = dY;
+
 	console.log("M " + x + " " + y
 		    + " D " + dX + " " + dY
 		    + " L " + lastX + " " + lastY);
@@ -629,10 +634,6 @@ function touchHandler(ev) {
 	    if ( dX != lastDX || dY != lastDY ) {
 		var msg = dX.toString() + " " + dY.toString();
 		writeOnServo(msg);
-		lastDX = dX;
-		lastDY = dY;
-		lastX = x;
-		lastY = y;
 		console.log("sent " + msg);
 	    }
 	}
