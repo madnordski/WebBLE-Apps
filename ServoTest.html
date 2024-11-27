@@ -622,8 +622,6 @@ function touchHandler(ev) {
 
 	lastX = x;
 	lastY = y;
-	lastDX = dX;
-	lastDY = dY;
 
 	console.log("M " + x + " " + y
 		    + " D " + dX + " " + dY
@@ -636,6 +634,8 @@ function touchHandler(ev) {
 		writeOnServo(msg);
 		console.log("sent " + msg);
 	    }
+	    lastDX = dX;
+	    lastDY = dY;
 	}
     }
     else if ( ev.type == 'touchend' ) { // stop all movement asap
