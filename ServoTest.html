@@ -614,6 +614,8 @@ function touchHandler(ev) {
 	let dY = 0;
 	let x = Math.floor(ev.touches[0].clientX / fuzz);
 	let y = Math.floor(ev.touches[0].clientY / fuzz);
+	lastX = x;
+	lastY = y;
 
 	if ( x != lastX )
 	    dX = x > lastX ? 1 : -1;
@@ -627,8 +629,6 @@ function touchHandler(ev) {
 		writeOnServo(msg);
 		lastDX = dX;
 		lastDY = dY;
-		lastX = x;
-		lastY = y;
 		console.log("sent " + msg);
 	    }
 	}
