@@ -311,7 +311,7 @@ document.querySelector('.dot').addEventListener('touchmove',
 function spdChange(axis, value) {
     if ( bluetoothDevice && bluetoothDevice.gatt.connected ) {
 	writeOnControl("SPEED " + axis + " " + value);
-	console.log(value);
+	//console.log(value);
 	if ( axis == 0 )
 	    xspdValue.innerHTML = value;
 	else
@@ -392,7 +392,7 @@ async function connectToDevice() {
 	})
 	// act on the promise object returned
 	    .then(device => {
-		console.log('Got device:', device.name);
+		//console.log("Selected ", device.name);
 		grnLED.className = 'grnled';
 		device.addEventListener('gattserverdisconnected',
 					onDisconnected);
@@ -401,12 +401,12 @@ async function connectToDevice() {
 	    })
 	    .then(gattServer => {
 		bleServer = gattServer;
-		console.log("GATT Server connected.");
+		console.log("GATT Service found.");
 		return bleServer.getPrimaryService(bleService);
 	    })
 	    .then(service => {
 		bleServiceFound = service;
-		console.log('Service discovered:', service.uuid);
+		console.log('Service uuid:', service.uuid);
 		return service.getCharacteristic(statusAspect);
 	    })
 	    .then(characteristic => {
@@ -414,21 +414,21 @@ async function connectToDevice() {
 		characteristic.startNotifications();
 		characteristic.addEventListener("characteristicvaluechanged",
 						handleStatusUpdate);
-		sleep(100);
+		sleep(100); // without this we get an error
 		return characteristic.readValue();
 	    })
             .then(value => {
 		const decodedValue = new TextDecoder().decode(value);
-		console.log("Decoded value: ", decodedValue);
+		//console.log("Initial value: ", decodedValue);
 		servoStatus.innerHTML = "connected";
 		enableUpdates = true;
             })
 	    .catch(error => {
-		console.log('Error: ', error);
+		console.log("Error during requestDevice(): ", error);
 	    });
     }
     catch (error) {
-	console.error('Connection error:', error);
+	console.log("Error in connectToDevice(): ", error);
     }
 }
 
@@ -445,13 +445,13 @@ function toggleRedLED() {
     if (bleServer && bleServer.connected) {
         bleServiceFound.getCharacteristic(ledAspect)
             .then(characteristic => {
-                console.log("Found the LED: ", characteristic.uuid);
+                //console.log("LED uuid: ", characteristic.uuid);
                 const data = new Uint8Array(Array.from(
 		    ledState, char => char.charCodeAt(0)));
                 return characteristic.writeValue(data);
             })
             .then(() => {
-                console.log("Value written to LED aspect:", ledState);
+                //console.log("Value written to LED aspect:", ledState);
 		if ( ledState == "on" ) {
 		    redLED.className = "redled";
 		    ledState = "off";
@@ -498,7 +498,7 @@ async function writeOnControl(value) {
 	    // control messages are top priority so retry on failure
 	    if ( error.name === 'NetworkError'
 	       || error.name === 'NotSupportedError' ) { // if busy, try again
-		console.log("busy, trying again");
+		//console.log("busy, trying again");
 		await delay(50);
 		return writeOnControl(value);
 	    }
@@ -546,7 +546,7 @@ async function writeOnServo(value){
 	    // to STOP commands
 	    if ( error.name === 'NetworkError'
 	       || error.name === 'NotSupportedError' ) { // if busy, try again
-		console.log("busy, trying again");
+		//console.log("busy, trying again");
 		await delay(50);
 		return writeOnServo(value);
 	    }
@@ -611,7 +611,7 @@ function touchHandler(ev) {
 	lastDY = 0;
 	writeOnControl("START");
 	servosActive = true;
-	console.log("START");
+	//console.log("START");
     }
     else if ( ev.type == 'touchmove' && servosActive ) { // tell the
 							 // esp32 to
@@ -634,7 +634,7 @@ function touchHandler(ev) {
 	    if ( dX != lastDX || dY != lastDY ) {
 		var msg = dX.toString() + " " + dY.toString();
 		writeOnServo(msg);
-		console.log("sent " + msg);
+		//console.log("sent " + msg);
 	    }
 	    lastDX = dX;
 	    lastDY = dY;
@@ -708,7 +708,7 @@ function handleStatusUpdate(event) {
 */
 
 function disconnectDevice() {
-    console.log("Disconnect Device.");
+    //console.log("Disconnect Device.");
     if (bleServer && bleServer.connected) {
 	writeOnControl("DIE");
     } else {
