@@ -104,7 +104,7 @@ To connect the Android phone to Chrome running on our desktop:
     .dot {
       top: 50px;
       left: 10px;
-      position: absolute;
+      position: fixed;
       height: 250px;
       width: 250px;
       background-color: #bbb;
@@ -169,9 +169,9 @@ To connect the Android phone to Chrome running on our desktop:
     <!-- Add guide lines to the motor control DOT.  This will help us
     when we want to move just one motor -->
     
-    <span class="dot"></span>
+    <span class="dot" id="DOT"></span>
   </p>
-  <p align="center">
+  <p align="center" style.top="500px">
 
     <!-- keep things tidy and simple
          Speed settings, connect/disconnect button and LED button -->
@@ -687,6 +687,7 @@ function initialValues() {
     servoStatus.innerHTML = "disconnected";
     enableUpdates = false;
     servosActive = false;
+    joyStick.left = Math.round(window.innerWidth / 2) + "px";
 }
 
 /* handleStatusUpdate
