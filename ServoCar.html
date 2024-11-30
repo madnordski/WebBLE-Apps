@@ -102,14 +102,11 @@ To connect the Android phone to Chrome running on our desktop:
       */
 
     .dot {
-      top: 70px;
-      left: 40px;
-      position: fixed;
       height: 250px;
       width: 250px;
       background-color: #bbb;
       border-radius: 50%;
-      /* display: inline-block; */
+      display: inline-block;
       margin: auto;
       text-align: center;
     }
@@ -160,11 +157,6 @@ To connect the Android phone to Chrome running on our desktop:
 	  text-align: center;
       }
 
-      .down-page {
-	  position: absolute;
-	  top: 320px;
-      }
-      
     </style>
 </head>
 <body>
@@ -176,7 +168,6 @@ To connect the Android phone to Chrome running on our desktop:
     
     <span class="dot" id="DOT"></span>
   </p>
-  <div class="down-page">
   <p align="center">
 
     <!-- keep things tidy and simple
@@ -208,7 +199,6 @@ To connect the Android phone to Chrome running on our desktop:
   </p>
   <!-- status line -->
   <p align="center" id="servo_status">Servos Stopped</p>
-  </div>
 </body>
 <!--  -->
 
@@ -695,7 +685,10 @@ function initialValues() {
     servoStatus.innerHTML = "disconnected";
     enableUpdates = false;
     servosActive = false;
-    joyStick.style.left = (Math.round(window.innerWidth / 2) - 125) + "px";
+    const bBox = joyStick.getBoundingClientRect();
+    console.log("client left: ", bBox.left)
+    console.log("client top: ", bBox.top)
+    // joyStick.style.left = (Math.round(window.innerWidth / 2) - 125) + "px";
     //joyStick.style.top = (joyStick.style.top + 250) + "px";
 }
 
