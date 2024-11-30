@@ -634,8 +634,8 @@ function touchHandler(ev) {
 	    //console.log(ev.touches[0])
 	    
 	    // we'll just say x = left and y = right
-	    xSpeed = x - 5;
-	    ySpeed = 10 - y - 5;  // y is inverted
+	    xSpeed = (x - 5) * 2;
+	    ySpeed = (10 - y - 5) * 2;  // y is inverted
 	    if ( xSpeed != lastX || ySpeed != lastY ) {
 		var msg = xSpeed.toString() + " " + ySpeed.toString();
 		//writeOnServo(msg);
