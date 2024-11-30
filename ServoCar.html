@@ -621,8 +621,8 @@ function touchHandler(ev) {
     else if ( ev.type == 'touchmove' && servosActive ) { // tell the
 							 // esp32 to
 							 // move servos
-	let x = Math.floor(ev.touches[0].clientX / fuzz);
-	let y = Math.floor(ev.touches[0].clientY / fuzz);
+	let x = Math.ceil(ev.touches[0].clientX / fuzz);
+	let y = Math.ceil(ev.touches[0].clientY / fuzz);
 	let xSpeed = 0;
 	let ySpeed = 0;
 	
