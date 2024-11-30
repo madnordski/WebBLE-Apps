@@ -626,7 +626,7 @@ function touchHandler(ev) {
 							 // move servos
 	let x = Math.floor(ev.touches[0].clientX - dotOriginX);
 	let y = Math.floor(ev.touches[0].clientY - dotOriginY);
-	if ( x > 0 && x < 250 && y > 0 && y < 250 ) {
+	if ( x >= 0 && x < 250 && y >= 0 && y < 250 ) {
 	    let xSpeed = 0;
 	    let ySpeed = 0;
 	    x = Math.round(x / fuzz);
