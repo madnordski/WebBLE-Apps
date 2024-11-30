@@ -642,17 +642,17 @@ function touchHandler(ev) {
 	    let xSpeed = speed;
 	    let ySpeed = speed;
 	    let adj = wheelAdj;
-	    if ( Math.sign(speed) != Math.sign(wheelAdj) )
+	    if ( Math.sign(speed) == Math.sign(wheelAdj) )
 		adj = wheelAdj * -1;
 
 	    // adjust the left or right wheel
 	    // if wheelAdj is zero, both have the same speed
 	    if ( wheelAdj > 0 ) {             // go right
 		xSpeed = speed;
-		ySpeed = speed - wheelAdj;
+		ySpeed = speed - adj;
 	    }
 	    else if ( wheelAdj < 0 ) {        // go left (speed negative ???)
-		xSpeed = speed - wheelAdj;
+		xSpeed = speed - adj;
 		ySpeed = speed;
 	    }
 	    else {                            // go straight
