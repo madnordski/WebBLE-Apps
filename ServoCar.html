@@ -623,7 +623,9 @@ function touchHandler(ev) {
 							 // move servos
 	let x = Math.floor(ev.touches[0].clientX / fuzz);
 	let y = Math.floor(ev.touches[0].clientY / fuzz);
-
+	let xSpeed = 0;
+	let ySpeed = 0;
+	
 	// Y axis is speed of the car and Y is inverted
 	let carSpeed = 10 - y;
 	if ( carSpeed > 10 ) carSpeed = 10;
