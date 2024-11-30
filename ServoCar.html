@@ -635,7 +635,7 @@ function touchHandler(ev) {
 	    
 	    // X determines right or left and Y determines speed
 	    wheelAdj = (x - 5) * 2;
-	    speed = 10 - ((y - 5) * 2);  // y is inverted
+	    speed = (5 - y) * 2;  // y is inverted
 	    console.log("speed: ", speed);
 	    console.log("wAdj: ", wheelAdj);
 	    
