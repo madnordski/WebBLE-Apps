@@ -240,6 +240,8 @@ let activeStatusAspect;
 let servoBusy = false;
 let ledState = "on";
 let enableUpdates = false;
+let dotOriginX = 0;
+let dotOriginY = 0;
 
 // used by touchHandler
 let servosActive = false;
@@ -622,33 +624,37 @@ function touchHandler(ev) {
     else if ( ev.type == 'touchmove' && servosActive ) { // tell the
 							 // esp32 to
 							 // move servos
-	let x = Math.ceil(ev.touches[0].clientX / fuzz);
-	let y = Math.ceil(ev.touches[0].clientY / fuzz);
-	let xSpeed = 0;
-	let ySpeed = 0;
-	console.log(ev.touches[0])
-	
-	// Y axis is speed of the car and Y is inverted
-	let carSpeed = 10 - y;
-	if ( carSpeed > 10 ) carSpeed = 10;
-	if ( carSpeed < 0 ) carSpeed = 0;
-
-	// we'll just say x = left and y = right
-	if ( x < 5 ) {
-	    xSpeed = carSpeed - (4 - x);
-	}
-	else {
-	    ySpeed = carSpeed - (x - 5);
-	}
-	
-	if ( xSpeed != lastX || ySpeed != lastY ) {
-	    var msg = xSpeed.toString() + " " + ySpeed.toString();
+	let x = Math.floor(ev.touches[0].clientX - dotOriginX);
+	let y = Math.floor(ev.touches[0].clientY - dotOriginY);
+	if ( x > 0 && x < 250 && y > 0 && y < 250 ) {
+	    let xSpeed = 0;
+	    let ySpeed = 0;
+	    x = Math.round(x / fuzz);
+	    y = Math.round(y / fuzz);
+	    //console.log(ev.touches[0])
+	    
+	    // Y axis is speed of the car and Y is inverted
+	    let carSpeed = 10 - y;
+	    if ( carSpeed > 10 ) carSpeed = 10;
+	    if ( carSpeed < 0 ) carSpeed = 0;
+	    
+	    // we'll just say x = left and y = right
+	    if ( x < 5 ) {
+		xSpeed = carSpeed - (4 - x);
+	    }
+	    else {
+		ySpeed = carSpeed - (x - 5);
+	    }
+	    
+	    if ( xSpeed != lastX || ySpeed != lastY ) {
+		var msg = xSpeed.toString() + " " + ySpeed.toString();
 		//writeOnServo(msg);
-	    console.log("sent " + msg);
-	    console.log("X=" + x, "Y=" + y);
-	}
-	lastX = xSpeed;
-	lastY = ySpeed;
+		console.log("sent " + msg);
+		console.log("X=" + x, "Y=" + y);
+	    }
+	    lastX = xSpeed;
+	    lastY = ySpeed;
+	}// out of bounds ignored
     }
     else if ( ev.type == 'touchend' ) { // stop all movement asap
 	//delay(50);                      // maybe we can do without this???
@@ -686,8 +692,10 @@ function initialValues() {
     enableUpdates = false;
     servosActive = false;
     const bBox = joyStick.getBoundingClientRect();
-    console.log("client left: ", bBox.left)
-    console.log("client top: ", bBox.top)
+    dotOriginX = bBox.left;
+    dotOriginY = bBox.top;
+    console.log("client left: ", dotOriginX)
+    console.log("client top: ", dotOriginY)
     // joyStick.style.left = (Math.round(window.innerWidth / 2) - 125) + "px";
     //joyStick.style.top = (joyStick.style.top + 250) + "px";
 }
