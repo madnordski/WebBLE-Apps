@@ -642,7 +642,7 @@ function touchHandler(ev) {
 	    let xSpeed = speed;
 	    let ySpeed = speed;
 	    let adj = wheelAdj;
-	    if ( Math.sign(speed) == Math.sign(wheelAdj) )
+	    if ( Math.sign(speed) != Math.sign(wheelAdj) )
 		adj = wheelAdj * -1;
 
 	    // adjust the left or right wheel
