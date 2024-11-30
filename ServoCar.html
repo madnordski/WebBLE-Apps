@@ -633,19 +633,9 @@ function touchHandler(ev) {
 	    y = Math.round(y / fuzz);
 	    //console.log(ev.touches[0])
 	    
-	    // Y axis is speed of the car and Y is inverted
-	    let carSpeed = 10 - y;
-	    if ( carSpeed > 10 ) carSpeed = 10;
-	    if ( carSpeed < 0 ) carSpeed = 0;
-	    
 	    // we'll just say x = left and y = right
-	    if ( x < 5 ) {
-		xSpeed = carSpeed - (4 - x);
-	    }
-	    else {
-		ySpeed = carSpeed - (y - 5);
-	    }
-	    
+	    xSpeed = x - 5;
+	    ySpeed = 10 - y - 5;  // y is inverted
 	    if ( xSpeed != lastX || ySpeed != lastY ) {
 		var msg = xSpeed.toString() + " " + ySpeed.toString();
 		//writeOnServo(msg);
