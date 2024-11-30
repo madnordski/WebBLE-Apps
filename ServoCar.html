@@ -627,8 +627,6 @@ function touchHandler(ev) {
 	let x = Math.floor(ev.touches[0].clientX - dotOriginX);
 	let y = Math.floor(ev.touches[0].clientY - dotOriginY);
 	if ( x >= 0 && x < 250 && y >= 0 && y < 250 ) {
-	    let xSpeed = 0;
-	    let ySpeed = 0;
 	    let speed = 0;
 	    let wheelAdj = 0;
 	    x = Math.round(x / fuzz);
@@ -638,13 +636,20 @@ function touchHandler(ev) {
 	    // X determines right or left and Y determines speed
 	    wheelAdj = (x - 5) * 2;
 	    speed = (10 - y - 5) * 2;  // y is inverted
+	    let xSpeed = speed;
+	    let ySpeed = speed;
+	    let adj = wheelAdj;
+	    if ( Math.sign(speed) == Math.sign(wheelAdj) )
+		adj = wheelAdj * -1;
+
+	    // adjust the left or right wheel
 	    // if wheelAdj is zero, both have the same speed
 	    if ( wheelAdj > 0 ) {             // go right
 		xSpeed = speed;
 		ySpeed = speed - wheelAdj;
 	    }
-	    else if ( wheelAdj < 0 ) {        // go left
-		xSpeed = speed + wheelAdj;
+	    else if ( wheelAdj < 0 ) {        // go left (speed negative ???)
+		xSpeed = speed - wheelAdj;
 		ySpeed = speed;
 	    }
 	    else {                            // go straight
@@ -655,7 +660,7 @@ function touchHandler(ev) {
 		var msg = xSpeed.toString() + " " + ySpeed.toString();
 		//writeOnServo(msg);
 		console.log("sent " + msg);
-		console.log("X=" + x, "Y=" + y);
+		//console.log("X=" + x, "Y=" + y);
 	    }
 	    lastX = xSpeed;
 	    lastY = ySpeed;
