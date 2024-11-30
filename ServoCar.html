@@ -166,7 +166,7 @@ To connect the Android phone to Chrome running on our desktop:
     <!-- Add guide lines to the motor control DOT.  This will help us
     when we want to move just one motor -->
     
-    <span class="dot" id="DOT"></span>
+    <span class="dot" id="DOT"><img src="lines.png" valign="center"</span>
   </p>
   <p align="center">
 
@@ -643,7 +643,7 @@ function touchHandler(ev) {
 		xSpeed = carSpeed - (4 - x);
 	    }
 	    else {
-		ySpeed = carSpeed - (x - 5);
+		ySpeed = carSpeed - (y - 5);
 	    }
 	    
 	    if ( xSpeed != lastX || ySpeed != lastY ) {
