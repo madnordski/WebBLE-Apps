@@ -225,7 +225,7 @@ const servoStatus = document.getElementById('servo_status');
 const joyStick = document.getElementById('DOT');
 
 // Unique Id's for our characteristics (aka aspects)
-const deviceName ='ServoTest';
+const deviceName ='ServoCar';
 const bleService = '75f29868-d8a4-452c-a78b-1f698ee6ab2b';
 const ledAspect = '19b10002-e8f2-537e-4f6c-d104768a1214';
 const statusAspect = '1a476625-3aae-4ab4-a1a7-0c9e1f5c97e0';
@@ -626,7 +626,7 @@ function touchHandler(ev) {
 							 // move servos
 	let x = Math.floor(ev.touches[0].clientX - dotOriginX);
 	let y = Math.floor(ev.touches[0].clientY - dotOriginY);
-	if ( x >= 0 && x < 250 && y >= 0 && y < 250 ) {
+	if ( x >= 0 && x < 250 && y >= 0 && y < 250 ) { // clipping
 	    let speed = 0;
 	    let wheelAdj = 0;
 	    x = Math.round(x / fuzz);
@@ -672,6 +672,7 @@ function touchHandler(ev) {
 	//delay(50);                      // maybe we can do without this???
 	writeOnControl("STOP");
 	servosActive = false;
+	console.log("STOP");
     }
 }
 
