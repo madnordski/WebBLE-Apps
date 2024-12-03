@@ -634,8 +634,8 @@ function touchHandler(ev) {
 	    //console.log(ev.touches[0])
 	    
 	    // X determines right or left and Y determines speed
-	    wheelAdj = (x - 5) * 2;
-	    speed = (5 - y) * 2;  // y is inverted
+	    wheelAdj = (x - 5);  // make x less sensitive by using half scale
+	    speed = (5 - y) * 2;  // y is inverted, full scale -10 to 10
 	    //console.log("speed: ", speed);
 	    //console.log("wAdj: ", wheelAdj);
 	    
