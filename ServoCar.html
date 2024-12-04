@@ -170,7 +170,7 @@ To connect the Android phone to Chrome running on our desktop:
     </style>
 </head>
 <body>
-  <div class="centerdot"></div>
+  <div class="centerdot" id="centerDot"></div>
   
   <h1 align="center">ServoCar</h1>
   <p align="center">
@@ -670,8 +670,11 @@ function initialValues() {
     const bBox = joyStick.getBoundingClientRect();
     dotOriginX = bBox.left;
     dotOriginY = bBox.top;
-    console.log("client left: ", dotOriginX)
-    console.log("client top: ", dotOriginY)
+    console.log("client left: ", dotOriginX);
+    console.log("client top: ", dotOriginY);
+    document.getElementById('centerDot').top = dotOriginY;
+    document.getElementById('centerDot').left = dotOriginX;
+    
     // joyStick.style.left = (Math.round(window.innerWidth / 2) - 125) + "px";
     //joyStick.style.top = (joyStick.style.top + 250) + "px";
 }
