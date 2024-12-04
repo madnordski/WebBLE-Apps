@@ -669,8 +669,8 @@ function initialValues() {
     servoStatus.innerHTML = "disconnected";
     enableUpdates = false;
     servosActive = false;
-    //const bBox = joyStick.getBoundingClientRect();
-    const bBox = document.getElementById('joyimage').getBoundingClientRect();
+    const bBox = joyStick.getBoundingClientRect();
+    //const bBox = document.getElementById('joyimage').getBoundingClientRect();
     dotOriginX = bBox.left;
     dotOriginY = bBox.top;
     console.log("client left: ", dotOriginX);
