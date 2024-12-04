@@ -117,6 +117,7 @@ To connect the Android phone to Chrome running on our desktop:
 	width: 25px;
 	top: 10px;
 	left: 10px;
+	display: inline-block;
 	border-radius: 50% 50%;
 	background-color: #b00;
 	position: fixed;
@@ -171,7 +172,7 @@ To connect the Android phone to Chrome running on our desktop:
     </style>
 </head>
 <body>
-  <div class="centerdot" id="center_dot"></div>
+  <p><div class="centerdot" id="center_dot"></div></p>
   
     <h1 align="center">ServoCar</h1>
   <p align="center">
@@ -680,8 +681,8 @@ function getJoystickLocation() {
     console.log("client left: ", dotOriginX);
     console.log("client top: ", dotOriginY);
     // the test dot is not working
-    document.getElementById('center_dot').left = dotOriginX + "px";
-    document.getElementById('center_dot').top = dotOriginY + "px";
+    document.getElementById('center_dot').style.left = dotOriginX + "px";
+    document.getElementById('center_dot').style.top = dotOriginY + "px";
 }
 
 /* handleStatusUpdate
