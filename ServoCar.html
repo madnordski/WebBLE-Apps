@@ -105,12 +105,22 @@ To connect the Android phone to Chrome running on our desktop:
       height: 250px;
       width: 250px;
       background-color: #bbb;
-      border-radius: 50%;
+      border-radius: 50% 50%;
       display: inline-block;
       margin: auto;
       text-align: center;
     }
 
+    /* for debugging */
+    .centerdot {
+	height: 50px;
+	width: 50px;
+	top: 100px;
+	left: 100px;
+	border-radius: 50% 50%;
+	background-color: #b00;
+    }
+    
       /* Mostly just for testing communication, we have a RED LED
       connected. This dot goes from gray to red when illuminated */
       
@@ -160,6 +170,8 @@ To connect the Android phone to Chrome running on our desktop:
     </style>
 </head>
 <body>
+  <span class="centerdot"></span>
+  
   <h1 align="center">ServoCar</h1>
   <p align="center">
 
