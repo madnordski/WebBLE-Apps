@@ -669,6 +669,7 @@ function initialValues() {
     servoStatus.innerHTML = "disconnected";
     enableUpdates = false;
     servosActive = false;
+    getJoyStickLocation();
 }
 
 function getJoystickLocation() {
@@ -678,6 +679,7 @@ function getJoystickLocation() {
     dotOriginY = bBox.top;
     console.log("client left: ", dotOriginX);
     console.log("client top: ", dotOriginY);
+    // the test dot is not working
     document.getElementById('centerDot').left = dotOriginX + "px";
     document.getElementById('centerDot').top = dotOriginY + "px";
 }
