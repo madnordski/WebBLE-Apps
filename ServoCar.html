@@ -105,7 +105,7 @@ To connect the Android phone to Chrome running on our desktop:
       height: 250px;
       width: 250px;
       background-color: #bbb;
-      border-radius: 50%;
+      border-radius: 50% 50%;
       display: inline-block;
       margin: auto;
       text-align: center;
@@ -121,6 +121,7 @@ To connect the Android phone to Chrome running on our desktop:
 	border-radius: 50% 50%;
 	background-color: #b00;
 	position: fixed;
+	z-index: 6;
     }
     
       /* Mostly just for testing communication, we have a RED LED
@@ -649,7 +650,6 @@ function touchHandler(ev) {
  */
 
 window.onload = initialValues;
-//document.addEventListener("DOMContentLoaded", getJoystickLocation);
 
 /* initialValues
 
@@ -670,9 +670,6 @@ function initialValues() {
     servoStatus.innerHTML = "disconnected";
     enableUpdates = false;
     servosActive = false;
-    const bBox = joyStick.getBoundingClientRect();
-    console.log("bb.left=", bBox.left);
-    console.log("bb.top=", bBox.top);
     getJoystickLocation();
 }
 
