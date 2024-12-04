@@ -674,8 +674,8 @@ function initialValues() {
 function getJoystickLocation() {
     const bBox = document.getElementById('DOT').getBoundingClientRect();
     //const bBox = document.getElementById('joyimage').getBoundingClientRect();
-    dotOriginX = bBox.left + window.pageXOffset;
-    dotOriginY = bBox.top + window.pageYOffset;
+    dotOriginX = bBox.left;
+    dotOriginY = bBox.top;
     console.log("client left: ", dotOriginX);
     console.log("client top: ", dotOriginY);
     document.getElementById('centerDot').left = dotOriginX + "px";
