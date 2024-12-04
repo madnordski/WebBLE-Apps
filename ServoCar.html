@@ -179,8 +179,8 @@ To connect the Android phone to Chrome running on our desktop:
     <!-- Add guide lines to the motor control DOT.  This will help us
     when we want to move just one motor -->
     
-    <span class="dot" id="DOT"><img id="joyimage" src="joystick2.png"
-    width=250 valign="center"</span>
+    <span class="dot" id="DOT"><img src="joystick2.png" width=250
+    valign="center"</span>
   </p>
   <p align="center">
 
@@ -673,14 +673,12 @@ function initialValues() {
 }
 
 function getJoystickLocation() {
-    // be sure to get a fresh instance, what does that matter???
-    //const bBox = document.getElementById('DOT').getBoundingClientRect();
     const bBox = joyStick.getBoundingClientRect();
     dotOriginX = bBox.left;
     dotOriginY = bBox.top;
     console.log("client left: ", dotOriginX);
     console.log("client top: ", dotOriginY);
-    // the test dot is not working
+    // this test dot must dissappear behind the image or the coords are bad
     document.getElementById('center_dot').style.left = 125 + dotOriginX + "px";
     document.getElementById('center_dot').style.top = dotOriginY - 125 + "px";
 }
