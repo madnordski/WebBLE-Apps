@@ -171,26 +171,9 @@ To connect the Android phone to Chrome running on our desktop:
   <p align="center">
 
     <!-- keep things tidy and simple
-         Speed settings, connect/disconnect button and LED button -->
+                          connect/disconnect button and LED button -->
     
   <table align="center">
-    <tr><td>
-	<input type="range" min="1" max="10" value=5 id="xspeed"
-	       oninput="xspdValue.innerHTML=this.value;"
-	       onchange="spdChange(0, this.value);">
-      </td>
-      <td>X-axis Speed: <span id="xspeed_value"></span>
-      </td>
-    </tr>
-    <tr><td>
-	<input type="range" min="1" max="10" value=5 id="yspeed"
-	       oninput="yspdValue.innerHTML=this.value;"
-	       onchange="spdChange(1, this.value);">
-      </td>
-      <td>Y-axis Speed: <span id="yspeed_value"></span>
-      </td>
-    </tr>
-    
     <tr><td><span class="grnled" id="gled"></span></td>
       <td><span class="redled" id="rled"></span></td>
     </tr>
@@ -217,10 +200,6 @@ To connect the Android phone to Chrome running on our desktop:
 // Shorthand for document elements
 const redLED = document.getElementById('rled');
 const grnLED = document.getElementById('gled');
-const xspdSlider = document.getElementById('xspeed');
-const xspdValue = document.getElementById('xspeed_value');
-const yspdSlider = document.getElementById('yspeed');
-const yspdValue = document.getElementById('yspeed_value');
 const servoStatus = document.getElementById('servo_status');
 const joyStick = document.getElementById('DOT');
 
@@ -300,30 +279,6 @@ document.querySelector('.dot').addEventListener('touchmove',
 						touchHandler, {passive: false});
 
 // **** Function definitions ***
-
-/* spdChange
-
-   This is called to support the slider events used to change motor
-   speed.
-   
-   Command the ESP32 to change the servo motor speed.
-   These are 360 degree servos so we get to control speed and
-   direction but not degree position.
-*/
-
-function spdChange(axis, value) {
-    if ( bluetoothDevice && bluetoothDevice.gatt.connected ) {
-	writeOnControl("SPEED " + axis + " " + value);
-	//console.log(value);
-	if ( axis == 0 )
-	    xspdValue.innerHTML = value;
-	else
-	    yspdValue.innerHTML = value;
-    }
-    else {
-	alert("Not connected.");
-    }
-}
 
 /* isWebBluetoothEnabled
 
