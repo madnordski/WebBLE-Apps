@@ -240,6 +240,7 @@ let ledState = "on";
 let enableUpdates = false;
 let dotOriginX = 0;
 let dotOriginY = 0;
+let recordBtnValue = 'RECORD';
 
 // used by touchHandler
 let servosActive = false;
@@ -263,7 +264,12 @@ window.addEventListener('beforeunload', () => {
 
 // record toggle
 recordToggle.addEventListener('click', (event) => {
-    recordToggle.value = 'PAUSE';
+    if ( recordToggle.value == 'RECORD' ) {
+	recordToggle.value = 'STOP';
+    }
+    else {
+	recordToggle.value = 'RECORD'
+    }
 });
 			   
 // toggle the Red LED
@@ -680,6 +686,7 @@ function initialValues() {
     enableUpdates = false;
     servosActive = false;
     getJoystickLocation();
+    recordBtnValue = "RECORD";
 }
 
 function getJoystickLocation() {
