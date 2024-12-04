@@ -673,7 +673,9 @@ function initialValues() {
 }
 
 function getJoystickLocation() {
-    const bBox = document.getElementById('DOT').getBoundingClientRect();
+    // be sure to get a fresh instance, what does that matter???
+    //const bBox = document.getElementById('DOT').getBoundingClientRect();
+    const bBox = joyStick.getBoundingClientRect();
     dotOriginX = bBox.left;
     dotOriginY = bBox.top;
     console.log("client left: ", dotOriginX);
