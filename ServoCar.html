@@ -105,7 +105,7 @@ To connect the Android phone to Chrome running on our desktop:
       height: 250px;
       width: 250px;
       background-color: #bbb;
-      /* border-radius: 50% 50%; */
+      border-radius: 50% 50%;
       display: inline-block;
       margin: auto;
       text-align: center;
@@ -671,8 +671,8 @@ function initialValues() {
     servosActive = false;
     const bBox = joyStick.getBoundingClientRect();
     //const bBox = document.getElementById('joyimage').getBoundingClientRect();
-    dotOriginX = bBox.left;
-    dotOriginY = bBox.top;
+    dotOriginX = bBox.left + window.pageXOffset;
+    dotOriginY = bBox.top + window.pageYOffset;
     console.log("client left: ", dotOriginX);
     console.log("client top: ", dotOriginY);
     document.getElementById('centerDot').top = dotOriginY + "px";
