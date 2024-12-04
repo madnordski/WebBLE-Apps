@@ -192,7 +192,9 @@ To connect the Android phone to Chrome running on our desktop:
     <tr><td><span class="grnled" id="gled"></span></td>
       <td><span class="redled" id="rled"></span></td>
     </tr>
-    <tr><td>Connect</td><td>Red LED</td></tr>    
+    <tr><td>Connect</td><td>Red LED</td></tr>
+    <tr><td><input type="button" value="RECORD" id="recordtoggle"></td>
+    <tr><td><input type="button" value="PLAY" id="playbtn"></td></tr>
   </table>
   </p>
   <!-- status line -->
@@ -217,6 +219,8 @@ const redLED = document.getElementById('rled');
 const grnLED = document.getElementById('gled');
 const servoStatus = document.getElementById('servo_status');
 const joyStick = document.getElementById('DOT');
+const recordToggle = document.getElementById('recordbtn');
+const playButton = document.getElementById('playbtn');
 
 // Unique Id's for our characteristics (aka aspects)
 const deviceName ='ServoCar';
@@ -257,6 +261,11 @@ window.addEventListener('beforeunload', () => {
     disconnectDevice();
 });
 
+// play toggle
+playToggle.addEventListner('click', (event) => {
+    playToggle.value = 'PAUSE';
+});
+			   
 // toggle the Red LED
 redLED.addEventListener('click', (event) => toggleRedLED());
 
