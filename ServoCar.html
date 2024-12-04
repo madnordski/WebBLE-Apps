@@ -109,6 +109,7 @@ To connect the Android phone to Chrome running on our desktop:
       display: inline-block;
       margin: auto;
       text-align: center;
+      z-index: 1;
     }
 
     /* for debugging */
@@ -120,7 +121,8 @@ To connect the Android phone to Chrome running on our desktop:
 	display: inline-block;
 	border-radius: 50% 50%;
 	background-color: #b00;
-	position: absolute;
+	position: fixed;
+	z-index: 2;
     }
     
       /* Mostly just for testing communication, we have a RED LED
