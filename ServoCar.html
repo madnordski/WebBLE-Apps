@@ -670,6 +670,9 @@ function initialValues() {
     servoStatus.innerHTML = "disconnected";
     enableUpdates = false;
     servosActive = false;
+    const bBox = joyStick.getBoundingClientRect();
+    console.log("bb.left=", bBox.left);
+    console.log("bb.top=", bBox.top);
 }
 
 function getJoystickLocation() {
