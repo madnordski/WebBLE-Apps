@@ -670,19 +670,17 @@ function initialValues() {
     servoStatus.innerHTML = "disconnected";
     enableUpdates = false;
     servosActive = false;
-    getJoystickLocation();
 }
 
 function getJoystickLocation() {
     const bBox = document.getElementById('DOT').getBoundingClientRect();
-    //const bBox = document.getElementById('joyimage').getBoundingClientRect();
     dotOriginX = bBox.left;
     dotOriginY = bBox.top;
     console.log("client left: ", dotOriginX);
     console.log("client top: ", dotOriginY);
     // the test dot is not working
-    document.getElementById('center_dot').style.left = dotOriginX + "px";
-    document.getElementById('center_dot').style.top = dotOriginY + "px";
+    document.getElementById('center_dot').style.left = 125 + dotOriginX + "px";
+    document.getElementById('center_dot').style.top = dotOriginY - 125 + "px";
 }
 
 /* handleStatusUpdate
