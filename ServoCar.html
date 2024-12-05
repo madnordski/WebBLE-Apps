@@ -185,8 +185,8 @@ To connect the Android phone to Chrome running on our desktop:
     <!-- Add guide lines to the motor control DOT.  This will help us
     when we want to move just one motor -->
     
-    <span class="dot" style="{z-index: 0;}" id="DOT"></span> <!-- <img src="joystick2.png" width=250
-    valign="center"></span> -->
+    <span class="dot" id="DOT"><img src="joystick2.png" width=250
+    valign="center"></span>
   </p>
   <p align="center">
 
@@ -692,14 +692,6 @@ function initialValues() {
     servosActive = false;
     getJoystickLocation();
     recordBtnValue = "RECORD";
-
-    // testing
-    const cd = document.getElementById('center_dot');
-    console.log("z-index of center dot: ",
-		window.getComputedStyle(cd).zIndex);
-    const d = document.getElementById('DOT');
-    console.log("z-index of dot: ",
-		window.getComputedStyle(d).zIndex);
 }
 
 function getJoystickLocation() {
@@ -709,7 +701,7 @@ function getJoystickLocation() {
     console.log("client left: ", dotOriginX);
     console.log("client top: ", dotOriginY);
     // this test dot must dissappear behind the image or the coords are bad
-    document.getElementById('center_dot').style.left = 50 + dotOriginX + "px";
+    document.getElementById('center_dot').style.left = 125 + dotOriginX + "px";
     document.getElementById('center_dot').style.top = dotOriginY - 125 + "px";
 }
 
