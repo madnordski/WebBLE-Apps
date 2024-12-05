@@ -98,7 +98,7 @@ To connect the Android phone to Chrome running on our desktop:
     <style>
 
     /* for debugging */
-    .centerdot {
+    #center_dot {
       height: 25px;
       width: 25px;
       top: 10px;
@@ -106,8 +106,9 @@ To connect the Android phone to Chrome running on our desktop:
       display: inline-block;
       border-radius: 50% 50%;
       background-color: #b00;
-      position: fixed;
-      z-index: 6;
+      position: absolute;
+      display: none;
+      pointer-events: none;
     }
     
     /* Mostly just for testing communication, we have a RED LED
@@ -159,8 +160,7 @@ To connect the Android phone to Chrome running on our desktop:
     </style>
 </head>
 <body>
-  <!-- just for testing -- if you see this dot, something is wrong!!! -->
-  <div class="centerdot" id="center_dot"></div>
+  <!-- centerdot is for testing - if you see this dot, something is wrong!!! -->
   
   <h1 align="center">ServoCar</h1>
   <p align="center">
@@ -169,6 +169,7 @@ To connect the Android phone to Chrome running on our desktop:
     
     <!-- This is the main interface -- a touchpad-joystick -->
     <img src="joystick2.png" width=250 id='DOT'>
+    <div id="center_dot"></div>
   </p>
   <p align="center">
 
@@ -674,14 +675,16 @@ function initialValues() {
 }
 
 function getJoystickLocation() {
+    conts dot = document.getElementById('center_dot');
     const bBox = joyStick.getBoundingClientRect();
     dotOriginX = bBox.left;
     dotOriginY = bBox.top;
     console.log("client left: ", dotOriginX);
     console.log("client top: ", dotOriginY);
     // this test dot must dissappear behind the image or the coords are bad
-    document.getElementById('center_dot').style.left = 125 + dotOriginX + "px";
-    document.getElementById('center_dot').style.top = dotOriginY - 125 + "px";
+    dot.style.left = 125 + dotOriginX + "px";
+    dot.style.top = dotOriginY - 125 + "px";
+    dot.style.display = 'block';
 }
 
 /* handleStatusUpdate
