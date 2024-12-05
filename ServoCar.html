@@ -97,79 +97,64 @@ To connect the Android phone to Chrome running on our desktop:
     <link rel="icon" type="image/png" href="lionel.png">
     <style>
 
-      /* The dot is our main interface object -- it controls two
-      motors giving us X, Y movement.  Use it like virtual track ball
-      */
-
-    .dot {
-      height: 250px;
-      width: 250px;
-      background-color: #fff;
+    /* for debugging */
+    .centerdot {
+      height: 25px;
+      width: 25px;
+      top: 10px;
+      left: 10px;
+      display: inline-block;
       border-radius: 50% 50%;
+      background-color: #b00;
+      position: fixed;
+      z-index: 6;
+    }
+    
+    /* Mostly just for testing communication, we have a RED LED
+      connected. This dot goes from gray to red when illuminated */
+      
+    .redled {
+      height: 20px;
+      width: 20px;
+      background-color: #b00;
+      border-radius: 50%;
       display: inline-block;
       margin: auto;
       text-align: center;
-      z-index: 1;
+      padding: 15px;
     }
 
-    /* for debugging */
-    .centerdot {
-	height: 25px;
-	width: 25px;
-	top: 10px;
-	left: 10px;
-	display: inline-block;
-	border-radius: 50% 50%;
-	background-color: #b00;
-	position: fixed;
-	z-index: 6;
+    /* The GREEN LED indicates connection status.  It's gray when
+       disconnected and green when not. */
+      
+    .grnled {
+      height: 20px;
+      width: 20px;
+      background-color: #0b0;
+      border-radius: 50%;
+      display: inline-block;
+      margin: auto;
+      text-align: center;
+      padding: 15px;
     }
-    
-      /* Mostly just for testing communication, we have a RED LED
-      connected. This dot goes from gray to red when illuminated */
-      
-      .redled {
-        height: 20px;
-        width: 20px;
-        background-color: #b00;
-        border-radius: 50%;
-        display: inline-block;
-	margin: auto;
-        text-align: center;
-        padding: 15px;
-      }
 
-      /* The GREEN LED indicates connection status.  It's gray when
-      disconnected and green when not. */
+    /* We use this class for any LED that should be off */
       
-      .grnled {
-        height: 20px;
-        width: 20px;
-        background-color: #0b0;
-        border-radius: 50%;
-        display: inline-block;
-	margin: auto;
-	text-align: center;
-        padding: 15px;
-      }
+    .gryled {
+      height: 20px;
+      width: 20px;
+      background-color: #bbb;
+      border-radius: 50%;
+      display: inline-block;
+      margin: auto;
+      text-align: center;
+      padding: 15px;
+    }
 
-      /* We use this class for any LED that should be off */
-      
-      .gryled {
-        height: 20px;
-        width: 20px;
-        background-color: #bbb;
-        border-radius: 50%;
-        display: inline-block;
-	margin: auto;
-	text-align: center;
-        padding: 15px;
-      }
-
-      td {
-	  padding: 4px;
-	  text-align: center;
-      }
+    td {
+      padding: 4px;
+      text-align: center;
+    }
       
     </style>
 </head>
@@ -181,9 +166,8 @@ To connect the Android phone to Chrome running on our desktop:
     <!-- Add guide lines to the motor control DOT.  This will help us
     when we want to move just one motor -->
     
-    <!-- <span class="dot" id="DOT"> -->
-    <img src="joystick2.png" width=250 id='DOT' style='{z-index: 1;}'>
-    <!-- valign="center"></span> -->
+    <!-- This is the main interface -- a touchpad-joystick -->
+    <img src="joystick2.png" width=250 id='DOT'>
   </p>
   <p align="center">
 
