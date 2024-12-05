@@ -108,7 +108,7 @@ To connect the Android phone to Chrome running on our desktop:
       position: fixed;
       display: none;
       pointer-events: none;
-      z-index: 99999;
+      z-index: 999;
     }
 
     /* Mostly just for testing communication, we have a RED LED
@@ -166,7 +166,7 @@ To connect the Android phone to Chrome running on our desktop:
     
     <!-- This is the main interface -- a touchpad-joystick -->
     <img src="joystick2.gif" width=250 id='DOT'>
-    <div id="center_dot">*</div> <!-- for testing, if you see it that's bad -->
+    <div id="center_dot"></div> <!-- for testing, if you see it that's bad -->
   </p>
   <p align="center">
 
@@ -679,8 +679,8 @@ function getJoystickLocation() {
     console.log("client left: ", dotOriginX);
     console.log("client top: ", dotOriginY);
     // this test dot must dissappear behind the image or the coords are bad
-    dot.style.left = 125 + dotOriginX + "px";
-    dot.style.top = dotOriginY - 125 + "px";
+    dot.style.left = 12 + dotOriginX + "px";
+    dot.style.top = dotOriginY - 12 + "px";
     dot.style.display = 'block';
 }
 
