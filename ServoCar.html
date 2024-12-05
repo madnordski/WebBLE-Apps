@@ -706,8 +706,8 @@ function getJoystickLocation() {
     const bBox = joyStick.getBoundingClientRect();
     dotOriginX = bBox.left;
     dotOriginY = bBox.top;
-    console.log("client left: ", dotOriginX);
-    console.log("client top: ", dotOriginY);
+    console.log("client left: ", dotOriginX + 200);
+    console.log("client top: ", dotOriginY - 200);
     // this test dot must dissappear behind the image or the coords are bad
     document.getElementById('center_dot').style.left = 125 + dotOriginX + "px";
     document.getElementById('center_dot').style.top = dotOriginY - 125 + "px";
