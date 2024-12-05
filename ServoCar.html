@@ -675,7 +675,7 @@ function initialValues() {
 }
 
 function getJoystickLocation() {
-    conts dot = document.getElementById('center_dot');
+    const dot = document.getElementById('center_dot');
     const bBox = joyStick.getBoundingClientRect();
     dotOriginX = bBox.left;
     dotOriginY = bBox.top;
