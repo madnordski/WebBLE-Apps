@@ -680,8 +680,8 @@ function getJoystickLocation() {
     console.log("client left: ", dotOriginX);
     console.log("client top: ", dotOriginY);
     // this test dot must dissappear behind the image or the coords are bad
-    document.getElementByClassName('centerdot').style.left = 0 + dotOriginX + "px";
-    document.getElementByClassName('centerdot').style.top = dotOriginY - 0 + "px";
+    document.getElementsByClassName('centerdot')[0].style.left = 0 + dotOriginX + "px";
+    document.getElementsByClassName('centerdot')[0].style.top = dotOriginY - 0 + "px";
 }
 
 /* handleStatusUpdate
