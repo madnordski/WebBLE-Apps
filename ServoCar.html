@@ -692,6 +692,14 @@ function initialValues() {
     servosActive = false;
     getJoystickLocation();
     recordBtnValue = "RECORD";
+
+    // testing
+    const cd = document.getElementById('center_dot');
+    console.log("z-index of center dot: ",
+		window.getComputedStyle(cd).zIndex);
+    const d = document.getElementById('DOT');
+    console.log("z-index of dot: ",
+		window.getComputedStyle(d).zIndex);
 }
 
 function getJoystickLocation() {
