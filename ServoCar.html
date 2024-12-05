@@ -185,8 +185,9 @@ To connect the Android phone to Chrome running on our desktop:
     <!-- Add guide lines to the motor control DOT.  This will help us
     when we want to move just one motor -->
     
-    <span class="dot" id="DOT"><img src="joystick2.png" width=250
-    valign="center"></span>
+    <!-- <span class="dot" id="DOT"> -->
+    <img src="joystick2.png" width=250 id='DOT'>
+    <!-- valign="center"></span> -->
   </p>
   <p align="center">
 
@@ -306,12 +307,21 @@ grnLED.addEventListener('click', (event) => {
 });
 
 // establish the touchHandler events
+/*
 document.querySelector('.dot').addEventListener('touchstart',
 						touchHandler, {passive: false});
 document.querySelector('.dot').addEventListener('touchend',
 						touchHandler, {passive: false});
 document.querySelector('.dot').addEventListener('touchmove',
 						touchHandler, {passive: false});
+*/
+joyStick.addEventListener('touchstart',
+						touchHandler, {passive: false});
+joyStick.addEventListener('touchend',
+						touchHandler, {passive: false});
+joyStick.addEventListener('touchmove',
+						touchHandler, {passive: false});
+
 
 // **** Function definitions ***
 
@@ -701,8 +711,8 @@ function getJoystickLocation() {
     console.log("client left: ", dotOriginX);
     console.log("client top: ", dotOriginY);
     // this test dot must dissappear behind the image or the coords are bad
-    document.getElementById('center_dot').style.left = dotOriginX + "px";
-    document.getElementById('center_dot').style.top = dotOriginY + "px";
+    document.getElementById('center_dot').style.left = 0 + dotOriginX + "px";
+    document.getElementById('center_dot').style.top = dotOriginY - 0 + "px";
 }
 
 /* handleStatusUpdate
