@@ -159,9 +159,10 @@ To connect the Android phone to Chrome running on our desktop:
     </style>
 </head>
 <body>
-    <p><span class="centerdot" id="center_dot"></span></p>
+  <!-- just for testing -- if you see this dot, something is wrong!!! -->
+  <p><span class="centerdot" id="center_dot"></span></p>
   
-    <h1 align="center">ServoCar</h1>
+  <h1 align="center">ServoCar</h1>
   <p align="center">
     <!-- Add guide lines to the motor control DOT.  This will help us
     when we want to move just one motor -->
@@ -287,21 +288,9 @@ grnLED.addEventListener('click', (event) => {
 });
 
 // establish the touchHandler events
-/*
-document.querySelector('.dot').addEventListener('touchstart',
-						touchHandler, {passive: false});
-document.querySelector('.dot').addEventListener('touchend',
-						touchHandler, {passive: false});
-document.querySelector('.dot').addEventListener('touchmove',
-						touchHandler, {passive: false});
-*/
-joyStick.addEventListener('touchstart',
-						touchHandler, {passive: false});
-joyStick.addEventListener('touchend',
-						touchHandler, {passive: false});
-joyStick.addEventListener('touchmove',
-						touchHandler, {passive: false});
-
+joyStick.addEventListener('touchstart', touchHandler, {passive: false});
+joyStick.addEventListener('touchend', touchHandler, {passive: false});
+joyStick.addEventListener('touchmove', touchHandler, {passive: false});
 
 // **** Function definitions ***
 
