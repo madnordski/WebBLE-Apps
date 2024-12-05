@@ -683,7 +683,8 @@ function getJoystickLocation() {
     dotOriginY = bBox.top;
     console.log("client left: ", dotOriginX);
     console.log("client top: ", dotOriginY);
-    // this test dot must dissappear behind the image or the coords are bad
+    // this test dot must appear in the center of the touch area
+    // if not, we have a coordinate problem
     dot.style.left = 110 + dotOriginX + "px";
     dot.style.top = dotOriginY + 110 + "px";
     dot.style.display = 'block';
