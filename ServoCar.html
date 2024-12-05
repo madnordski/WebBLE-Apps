@@ -109,17 +109,13 @@ To connect the Android phone to Chrome running on our desktop:
       position: absolute;
       display: none;
       pointer-events: none;
-      /* mix-blend-mode: difference; */
-      z-index: 9999; /* Extremely high to ensure it’s on top */
+      mix-blend-mode: difference;
       will-change: transform;
     }
 
     .image {
-      position: absolute;
       width: 250px;
       height: auto;
-      z-index: 1;
-      isolation: isolate; /* Creates a new stacking context */
     }
     
     /* Mostly just for testing communication, we have a RED LED
