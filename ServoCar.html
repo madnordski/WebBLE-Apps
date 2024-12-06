@@ -726,6 +726,7 @@ function handleStatusUpdate(event) {
     const value = new Uint8Array(event.target.value.buffer);
     const valueStr = new TextDecoder().decode(value);
     servoStatus.innerHTML = valueStr;
+    if ( valueStr == 'Playback Ended' ) playToggle.value = 'PLAY';
     //console.log("indications are ", valueStr);
     // send acknowledgement to the ESP32 so it knows we're still here
     writeOnControl("ACK");
