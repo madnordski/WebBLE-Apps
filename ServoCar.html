@@ -256,9 +256,13 @@ window.addEventListener('beforeunload', () => {
 recordToggle.addEventListener('click', (event) => {
     if ( recordToggle.value == 'RECORD' ) {
 	recordToggle.value = 'STOP';
+	writeOnControl("REC_BEGIN");
+	console.log("recording begins");
     }
     else {
 	recordToggle.value = 'RECORD'
+	writeOnControl("REC_END");
+	console.log("recording ends.");
     }
 });
 			   
