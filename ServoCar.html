@@ -268,7 +268,7 @@ recordToggle.addEventListener('click', (event) => {
 });
 
 // play toggle
-playToggle.addEventListner('click', (event) => {
+playToggle.addEventListener('click', (event) => {
     if ( playToggle.value == 'PLAY' ) {
 	playToggle.value = 'CANCEL';
 	writeOnControl("REC_PLAY");
