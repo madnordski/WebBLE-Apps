@@ -256,29 +256,39 @@ window.addEventListener('beforeunload', () => {
 
 // record toggle
 recordToggle.addEventListener('click', (event) => {
-    if ( recordToggle.value == 'RECORD' ) {
-	recordToggle.value = 'STOP';
-	writeOnControl("REC_BEGIN");
-	console.log("recording begins");
+    if ( bluetoothDevice && bluetoothDevice.gatt.connected ) {
+	if ( recordToggle.value == 'RECORD' ) {
+	    recordToggle.value = 'STOP';
+	    writeOnControl("REC_BEGIN");
+	    console.log("recording begins");
+	}
+	else {
+	    recordToggle.value = 'RECORD'
+	    writeOnControl("REC_END");
+	    console.log("recording ends");
+	}
     }
     else {
-	recordToggle.value = 'RECORD'
-	writeOnControl("REC_END");
-	console.log("recording ends");
+	console.log("Bluetooth not connected.");
     }
 });
 
 // play toggle
 playToggle.addEventListener('click', (event) => {
-    if ( playToggle.value == 'PLAY' ) {
-	playToggle.value = 'CANCEL';
-	writeOnControl("REC_PLAY");
-	console.log("playback begins");
+    if ( bluetoothDevice && bluetoothDevice.gatt.connected ) {
+	if ( playToggle.value == 'PLAY' ) {
+	    playToggle.value = 'CANCEL';
+	    writeOnControl("REC_PLAY");
+	    console.log("playback begins");
+	}
+	else {
+	    playToggle.value = "PLAY";
+	    writeOnControl("STOP");
+	    console.log("playback canceled");
+	}
     }
     else {
-	playToggle.value = "PLAY";
-	writeOnControl("STOP");
-	console.log("playback canceled");
+	console.log("Bluetooth not connected.");
     }
 });
 
