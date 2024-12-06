@@ -184,7 +184,7 @@ To connect the Android phone to Chrome running on our desktop:
     </tr>
     <tr><td>Connect</td><td>Red LED</td></tr>
     <tr><td><input type="button" value="RECORD" id="recordtoggle"></td>
-        <td><input type="button" value="PLAY" id="playbtn"></td></tr>
+        <td><input type="button" value="PLAY" id="playtoggle"></td></tr>
   </table>
   </p>
   <!-- status line -->
@@ -210,7 +210,7 @@ const grnLED = document.getElementById('gled');
 const servoStatus = document.getElementById('servo_status');
 const joyStick = document.getElementById('DOT');
 const recordToggle = document.getElementById('recordtoggle');
-const playButton = document.getElementById('playbtn');
+const playToggle = document.getElementById('playtoggle');
 
 // Unique Id's for our characteristics (aka aspects)
 const deviceName ='ServoCar';
@@ -231,6 +231,7 @@ let enableUpdates = false;
 let dotOriginX = 0;
 let dotOriginY = 0;
 let recordBtnValue = 'RECORD';
+let playBtnValue = 'PLAY';
 
 // used by touchHandler
 let servosActive = false;
@@ -262,10 +263,24 @@ recordToggle.addEventListener('click', (event) => {
     else {
 	recordToggle.value = 'RECORD'
 	writeOnControl("REC_END");
-	console.log("recording ends.");
+	console.log("recording ends");
     }
 });
-			   
+
+// play toggle
+playToggle.addEventListner('click', (event) => {
+    if ( playToggle.value == 'PLAY' ) {
+	playToggle.value = 'CANCEL';
+	writeOnControl("REC_PLAY");
+	console.log("playback begins");
+    }
+    else {
+	playToggle.value = "PLAY";
+	writeOnControl("STOP");
+	console.log("playback canceled");
+    }
+});
+
 // toggle the Red LED
 redLED.addEventListener('click', (event) => toggleRedLED());
 
