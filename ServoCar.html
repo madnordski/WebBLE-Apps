@@ -97,7 +97,8 @@ To connect the Android phone to Chrome running on our desktop:
     <link rel="icon" type="image/png" href="lionel.png">
     <style>
 
-    /* for debugging */
+      /* the center dot is used to verify our coordinates
+         it also indicates the touch joystick is live by turning red */
     #center_dot {
       height: 30px;
       width: 30px;
@@ -166,12 +167,12 @@ To connect the Android phone to Chrome running on our desktop:
 <body>
   <h1 align="center">ServoCar</h1>
   <p align="center">
-    <!-- Add guide lines to the motor control DOT.  This will help us
-    when we want to move just one motor -->
+    <!-- The image is our joystick for moving motors -->
     
     <!-- This is the main interface -- a touchpad-joystick -->
     <img src="joystick2.gif" id='DOT' class="image">
-    <div id="center_dot"></div> <!-- verify coord - must be the image center -->
+    <div id="center_dot"></div>
+    <!-- verify coord - center_dot must be the image center -->
   </p>
   <p align="center">
 
@@ -187,7 +188,7 @@ To connect the Android phone to Chrome running on our desktop:
         <td><input type="button" value="PLAY" id="playtoggle"></td></tr>
   </table>
   </p>
-  <!-- status line -->
+  <!-- status line gets updates from the ESP32 -->
   <p align="center" id="servo_status">Servos Stopped</p>
 </body>
 <!--  -->
@@ -238,23 +239,27 @@ let playBtnValue = 'PLAY';
 let servosActive = false;
 let lastDX, lastDY;
 let lastX, lastY;
-const fuzz = 25; // 300/30 (0 to 10) reduce the resolution of the touch area
+const fuzz = 25; // 250/25 (0 to 10) reduce the resolution of the touch area
 
 // **** EVENT LISTENERS ***
 
-// unload event
+// beforeunload event
+// VERY IMPORTANT ( aka NB ):
 //  This resets the esp32 when the page is refreshed but
 //  if the page is closed, it does not get called.
-//  This puts us in a bad state because with the ESP32 connected to the
-//  phone we can't connect to it. Basically, this script can't connect
-//  if we're connected and there's no clear way to connect this script
-//  to an existing connection.
+//  This could put us in a bad state. The ESP32 thinks it's connected to the
+//  phone so we can't connect to it again.
+//  We solved this by using a heartbeat indication from the ESP32 to
+//  which this script must respond.  If not, the ESP32 resets and is
+//  therefore ready for a new connection.
 
 window.addEventListener('beforeunload', () => {
     disconnectDevice();
 });
 
 // record toggle
+//  This tells the ESP32 to start recording our moves.
+
 recordToggle.addEventListener('click', (event) => {
     if ( bluetoothDevice && bluetoothDevice.gatt.connected ) {
 	if ( recordToggle.value == 'RECORD' ) {
@@ -274,6 +279,8 @@ recordToggle.addEventListener('click', (event) => {
 });
 
 // play toggle
+//  This tells the ESP32 to play the recorded moves.
+
 playToggle.addEventListener('click', (event) => {
     if ( bluetoothDevice && bluetoothDevice.gatt.connected ) {
 	if ( playToggle.value == 'PLAY' ) {
@@ -325,7 +332,7 @@ joyStick.addEventListener('touchstart', touchHandler, {passive: false});
 joyStick.addEventListener('touchend', touchHandler, {passive: false});
 joyStick.addEventListener('touchmove', touchHandler, {passive: false});
 
-// **** Function definitions ***
+// **** Functions ***
 
 /* isWebBluetoothEnabled
 
@@ -364,6 +371,7 @@ function isWebBluetoothEnabled() {
    There was a bug in the RNT script that prevented this from
    firing. We disconnect by telling the ESP32 to reboot.  Then we
    reload this page on our end.  After that, we're ready to go again.
+   NB: this really helped when debugging by eliminating crashes.
 */
 
 function onDisconnected(event) {
@@ -524,15 +532,13 @@ async function writeOnControl(value) {
    direction of movement. We expect this function to produce failures
    because the BLE write queue is easily filled and touch events are
    quickly generated in large numbers. NB: Look carefully, you'll find
-   that retries after an error are disabled. The ESP32 is more
-   responsive to STOP with retries disabled and ignoring these
-   failures tends to work out as the user adapts to the movement IRL.
+   that it retries after an expected error.
 
-   The format of our messages is dX<space>dY. dX is the direction (-1
-   or 1) of movement for the X servo and dY is the direction for the Y
-   servo.
+   The format of our messages to the ESP32 is s1<space>s2, where s
+   represents speed and direction.  The 1 refers to servo1 and 2 to
+   servo2.
 
-   NB: speed is set using writeOnControl.
+   NB: a full stop requires using writeOnControl.
    
 */
    
@@ -548,8 +554,8 @@ async function writeOnServo(value){
 		});
 	}
 	catch (error) {
-	    // we have retries disable here, making it more responsive
-	    // to STOP commands
+	    // retry the errors we observed when sending move commands
+	    // in rapid succession
 	    if ( error.name === 'NetworkError'
 	       || error.name === 'NotSupportedError' ) { // if busy, try again
 		//console.log("busy, trying again");
@@ -626,17 +632,22 @@ function touchHandler(ev) {
     }
     else if ( ev.type == 'touchmove' && servosActive ) { // tell the
 							 // esp32 to
-							 // move servos
+							 // move
+	                                                 // servos
+	// NB: dotOrigin is the center of touch area (aka joystick)
+	
 	let x = Math.floor(ev.touches[0].clientX - dotOriginX);
 	let y = Math.floor(ev.touches[0].clientY - dotOriginY);
 	if ( x >= 0 && x < 250 && y >= 0 && y < 250 ) { // clipping
 	    let speed = 0;
 	    let wheelAdj = 0;
-	    x = Math.round(x / fuzz);
+	    x = Math.round(x / fuzz);  // scale values (0 to 10)
 	    y = Math.round(y / fuzz);
 	    //console.log(ev.touches[0])
 	    
 	    // X determines right or left and Y determines speed
+	    // convert 0 to 10 to -5 to 5 for x (less sensitive turning)
+	    // convert 0 to 10 to -10 to 10 for y (increase speed increment)
 	    wheelAdj = (x - 5);  // make x less sensitive by using half scale
 	    speed = (5 - y) * 2;  // y is inverted, full scale -10 to 10
 	    //console.log("speed: ", speed);
@@ -644,7 +655,9 @@ function touchHandler(ev) {
 	    
 	    let xSpeed = speed;
 	    let ySpeed = speed;
-	    let adj = wheelAdj;
+	    let adj = wheelAdj; // slowing down one wheel makes it turn
+
+	    // flip the sign for 2 of 4 quadrants (upleft, lowright)
 	    if ( Math.sign(speed) != Math.sign(wheelAdj) )
 		adj = wheelAdj * -1;
 
@@ -654,7 +667,7 @@ function touchHandler(ev) {
 		xSpeed = speed;
 		ySpeed = speed - adj;
 	    }
-	    else if ( wheelAdj < 0 ) {        // go left (speed negative ???)
+	    else if ( wheelAdj < 0 ) {        // go left
 		xSpeed = speed - adj;
 		ySpeed = speed;
 	    }
@@ -672,7 +685,6 @@ function touchHandler(ev) {
 	}// out of bounds ignored
     }
     else if ( ev.type == 'touchend' ) { // stop all movement asap
-	//delay(50);                      // maybe we can do without this???
 	writeOnControl("STOP");
 	servosActive = false;
 	console.log("STOP");
@@ -732,6 +744,9 @@ function getJoystickLocation() {
    a second if there is no change. So, yes Virgina, we did overload
    the status aspect by also making it a heartbeat (or ping pong)
    proof of life.
+
+   The Playback Ended status results in putting the PLAY button label
+   back to play.
 */
 
 function handleStatusUpdate(event) {
@@ -755,7 +770,7 @@ function handleStatusUpdate(event) {
 function disconnectDevice() {
     //console.log("Disconnect Device.");
     if (bleServer && bleServer.connected) {
-	writeOnControl("DIE");
+	writeOnControl("DIE");   // this reboots the ESP32
     } else {
         // Throw an error if Bluetooth is not connected
         console.error("Bluetooth is not connected.");
