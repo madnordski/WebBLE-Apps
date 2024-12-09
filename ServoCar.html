@@ -410,7 +410,6 @@ async function connectToDevice() {
 	    .then(device => {
 		//console.log("Selected ", device.name);
 		grnLED.className = 'grnled';
-		dot.style.backgroundColor = '#b00';
 		device.addEventListener('gattserverdisconnected',
 					onDisconnected);
 		bluetoothDevice = device;
@@ -631,6 +630,7 @@ function touchHandler(ev) {
 	lastY = 0;
 	writeOnControl("START");
 	servosActive = true;
+    	dot.style.backgroundColor = '#b00';
 	console.log("START");
     }
     else if ( ev.type == 'touchmove' && servosActive ) { // tell the
@@ -690,6 +690,7 @@ function touchHandler(ev) {
     else if ( ev.type == 'touchend' ) { // stop all movement asap
 	writeOnControl("STOP");
 	servosActive = false;
+	dot.style.backgroundColor = '#b00';
 	console.log("STOP");
     }
 }
