@@ -94,12 +94,15 @@ To connect the Android phone to Chrome running on our desktop:
   For this project, scrolling will not be possible so we we will keep
   the elements to a minimum. -->
   
-    <meta name="viewport" content="width=device-width,
-				   initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0,
+				 maximum-scale=1.0, user-scalable=no">
     <!-- we created a funky web icon even though android doesn't show it -->
     <link rel="icon" type="image/png" href="lionel.png">
     <style>
 
+    html, body {
+      overscroll-behavior-y: none; /* prevent accidental page reload */
+    }
       /* the center dot is used to verify our coordinates
          it also indicates the touch joystick is live by turning red */
     #center_dot {
