@@ -542,7 +542,7 @@ async function writeOnServo(value){
 	catch (error) {
 	    // we have retries disable here, making it more responsive
 	    // to STOP commands
-	    if ( error.name === 'NetworkError'
+	    if ( false && error.name === 'NetworkError'
 	       || error.name === 'NotSupportedError' ) { // if busy, try again
 		//console.log("busy, trying again");
 		await delay(50);
