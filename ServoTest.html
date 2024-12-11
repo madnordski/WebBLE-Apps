@@ -235,7 +235,6 @@ let bluetoothDevice;
 let bleServer;
 let bleServiceFound;
 let activeStatusAspect;
-let servoBusy = false;
 let ledState = "on";
 let enableUpdates = false;
 
@@ -565,7 +564,7 @@ async function writeOnServo(value){
 const servoQueue = [];
 const servoQueueDepth = 100;  // we start ignoring touch events when
 			      // this gets exceeded
-let queueBusy = false;
+let servoBusy = false;
 
 /* processServoQueue
 
@@ -577,8 +576,8 @@ let queueBusy = false;
 
 async function processServoQueue() {
     if ( servoQueue.length == 0 ) return;
-    if ( queueBusy ) return;
-    queueBusy = true;
+    if ( servoBusy ) return;
+    servoBusy = true;
     
     try {
 	const item = servoQueue[0]; // peek and write
@@ -594,7 +593,7 @@ async function processServoQueue() {
 	}
     }
     finally {
-	servoQueueBusy = false;
+	servoBusy = false;
 	processServoQueue();
     }
 }
