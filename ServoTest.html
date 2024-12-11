@@ -680,7 +680,7 @@ function touchHandler(ev) {
 	    if ( dX != lastDX || dY != lastDY ) {
 		var msg = dX.toString() + " " + dY.toString();
 		queueServoMove(msg);
-		console.log("sent " + msg);
+		//console.log("sent " + msg);
 	    }
 	    lastDX = dX;
 	    lastDY = dY;
