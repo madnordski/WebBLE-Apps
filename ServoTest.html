@@ -547,7 +547,7 @@ async function writeOnServo(value){
 		// console.warn("busy, trying again");
 		// await delay(50);
 		//return writeOnServo(value);
-		return error; // maybe we need to throw
+		throw error;
 	    }
 	    else {
                 console.error("Failed writing to the Servo: ", error);
@@ -582,7 +582,7 @@ async function processServoQueue() {
     
     try {
 	const item = servoQueue[0]; // peek and write
-	//console.log("Send: ", item);
+	console.log("Send: ", item);
 	await writeOnServo(item);
 	servoQueue.shift();
     }
