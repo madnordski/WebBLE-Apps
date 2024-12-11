@@ -31,7 +31,7 @@
      Chrome.
 
      For the most part, we call BLE Characteristics, Aspects because it
-     sounds better and is easier to type.
+     is easier to type.
 
 To connect the Android phone to Chrome running on our desktop:
 
@@ -44,8 +44,9 @@ To connect the Android phone to Chrome running on our desktop:
    google how to enable them.
 
 4. Now open the browser on the computer to chrome://inspect/#devices
-   (it will take minutes before a connection opens that shows the web
-   pages open on the phone with a link to inspect - seriously, make tea)
+   (it can take 4 minutes or more before a connection opens that shows
+   the web pages open on the phone with a link to inspect - seriously,
+   make tea)
 
 5. While waiting for the phone to show up, a list of targets will
    appear. Just leave it alone, eventually your phone will show up
@@ -242,7 +243,7 @@ let enableUpdates = false;
 let servosActive = false;
 let lastDX, lastDY;
 let lastX, lastY;
-const fuzz = 40; // reduces the resolution of the touch area
+const fuzz = 40; // reduces the resolution of the touch area to 10 x 10
 
 // **** EVENT LISTENERS ***
 
@@ -676,7 +677,7 @@ function touchHandler(ev) {
 	    // no need to send or remember zeros
 	    if ( dX != lastDX || dY != lastDY ) {
 		var msg = dX.toString() + " " + dY.toString();
-		queuServoMove(msg);
+		queueServoMove(msg);
 		//console.log("sent " + msg);
 	    }
 	    lastDX = dX;
