@@ -515,10 +515,16 @@ async function writeOnControl(value) {
    The servoAspect tells the ESP32 to move the motors and the
    direction of movement. We expect this function to produce failures
    because the BLE write queue is easily filled and touch events are
-   quickly generated in large numbers. NB: Look carefully, you'll find
-   that retries after an error are disabled. The ESP32 is more
-   responsive to STOP with retries disabled and ignoring these
-   failures tends to work out as the user adapts to the movement IRL.
+   quickly generated in large numbers.  Therefore, we implemented a
+   queue for the messages.  When this function fails, the failed
+   message stays at the front the queue so it will be tried again.
+   The function processServoQueue() is responsible for emptying the
+   queue.  NB: it's possible we would be more responsive to STOP if we
+   don't retry move messages.  We would, of course, miss some
+   movements.
+
+   When we get a stop, we could drain the queue but in that case a
+   mutex would be probably wise if not essential.
 
    The format of our messages is dX<space>dY. dX is the direction (-1
    or 1) of movement for the X servo and dY is the direction for the Y
@@ -565,26 +571,32 @@ let servoBusy = false;
 
 /* processServoQueue
 
-   The touch event simply enqueues BLE writes to a queue.  This
-   function empties the queue.  NB: when a BLE busy error occurs,
-   there is no chance for the writes to occur in the wrong order.
+   We queue move requests to the ESP32 to keep them in order when we
+   need to retry a failed request using writeOnServo(). This function
+   implements the queue and items are only removed from the queue when
+   the send is successful.
+   
+   The touchmove event simply enqueues BLE writes to a queue using
+   queueServoMove.  This function will call itself as needed to empty
+   the queue.
    
 */
 
 async function processServoQueue() {
     //console.log("queue length: ", servoQueue.length);
     if ( servoQueue.length == 0 ) return;
-    if ( servoBusy ) return;
+    if ( servoBusy ) return; // not atomic so there's still a chance
+			     // we fail
     servoBusy = true;
     
     try {
-	const item = servoQueue[0]; // peek and write
-	console.log("Send: ", item);
-	await writeOnServo(item);
+	const msg = servoQueue[0]; // peek and write
+	//console.log("Send: ", msg);
+	await writeOnServo(msg);
 	servoQueue.shift();
     }
     catch (error) {
-	console.warn("servoQueue error: ", error);
+	//console.warn("servoQueue error: ", error);
 	if ( error.name != 'NetworkError'
 	     && error.name != 'NotSupportedError' ) {
 	    console.error("Move discarded!!!");
@@ -598,9 +610,15 @@ async function processServoQueue() {
 	processServoQueue(); // keep going no matter what
     }
 }
-		 
-function queueServoMove(data) {
-    servoQueue.push(data);
+
+/* queueServoMove
+
+   Add a message to the servo move queue and nudge it into action.
+
+*/
+
+function queueServoMove(msg) {
+    servoQueue.push(msg);
     processServoQueue();
 }
 
