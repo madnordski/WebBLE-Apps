@@ -497,7 +497,7 @@ async function writeOnControl(value) {
 	    if ( error.name === 'NetworkError'
 	       || error.name === 'NotSupportedError' ) { // if busy, try again
 		//console.log("busy, trying again");
-		await delay(50);
+		await delay(20);
 		return writeOnControl(value);
 	    }
 	    else {
@@ -542,20 +542,65 @@ async function writeOnServo(value){
 	catch (error) {
 	    // we have retries disable here, making it more responsive
 	    // to STOP commands
-	    if ( false && error.name === 'NetworkError'
+	    if ( error.name === 'NetworkError'
 	       || error.name === 'NotSupportedError' ) { // if busy, try again
 		//console.log("busy, trying again");
-		await delay(50);
-		return writeOnServo(value);
+		// await delay(50);
+		console.error("Error: Busy Error", error);
+		//return writeOnServo(value);
 	    }
 	    else {
-                console.warn("Error writing to the Servo: ", error);
+                console.error("Failed writing to the Servo: ", error);
             }
 	}
     } else {
         console.error ("writeOnServo: Bluetooth not connected!");
         window.alert("Unable to move Servos! Please connect Bluetooth.");
     }
+}
+
+/////////////////// let's try queuing requests to retain order
+
+const servoQueue = [];
+const servoQueueDepth = 100;  // we start ignoring touch events when
+			      // this gets exceeded
+let queueBusy = false;
+
+/* processServoQueue
+
+   The touch event simply enqueues BLE writes to a queue.  This
+   function empties the queue.  NB: when a BLE busy error occurs,
+   there is no chance for the writes to occur in the wrong order.
+   
+*/
+
+async function processServoQueue() {
+    if ( servoQueue.length == 0 ) return;
+    if ( queueBusy ) return;
+    queueBusy = true;
+    
+    try {
+	const item = servoQueue[0]; // peek and write
+	await writeOnServo(item);
+	servoQueue.shift();
+    }
+    catch (error) {
+	console.error("servoQueue error: ", error);
+	if ( ! error.message.includes("Busy Error") ) {
+	    // keep the failed item at the front of the queue
+	    // otherwise it gets discarded
+	    writeQueue.shift();
+	}
+    }
+    finally {
+	servoQueueBusy = false;
+	processServoQueue();
+    }
+}
+		 
+function queueServoMove(data) {
+    servoQueue.push({data});
+    processServoQueue();
 }
 
 
@@ -631,7 +676,7 @@ function touchHandler(ev) {
 	    // no need to send or remember zeros
 	    if ( dX != lastDX || dY != lastDY ) {
 		var msg = dX.toString() + " " + dY.toString();
-		writeOnServo(msg);
+		queuServoMove(msg);
 		//console.log("sent " + msg);
 	    }
 	    lastDX = dX;
