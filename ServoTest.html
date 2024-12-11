@@ -544,9 +544,10 @@ async function writeOnServo(value){
 	    // to STOP commands
 	    if ( error.name === 'NetworkError'
 	       || error.name === 'NotSupportedError' ) { // if busy, try again
-		console.warn("busy, trying again");
+		// console.warn("busy, trying again");
 		// await delay(50);
 		//return writeOnServo(value);
+		return error; // maybe we need to throw
 	    }
 	    else {
                 console.error("Failed writing to the Servo: ", error);
@@ -574,14 +575,14 @@ let servoBusy = false;
 */
 
 async function processServoQueue() {
-    console.log("queue length: ", servoQueue.length);
+    //console.log("queue length: ", servoQueue.length);
     if ( servoQueue.length == 0 ) return;
     if ( servoBusy ) return;
     servoBusy = true;
     
     try {
 	const item = servoQueue[0]; // peek and write
-	console.log("Send: ", item);
+	//console.log("Send: ", item);
 	await writeOnServo(item);
 	servoQueue.shift();
     }
