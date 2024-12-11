@@ -575,12 +575,14 @@ let servoBusy = false;
 */
 
 async function processServoQueue() {
+    console.log("queue length: ", servoQueue.length);
     if ( servoQueue.length == 0 ) return;
     if ( servoBusy ) return;
     servoBusy = true;
     
     try {
 	const item = servoQueue[0]; // peek and write
+	console.log("Send: ", item);
 	await writeOnServo(item);
 	servoQueue.shift();
     }
@@ -677,7 +679,7 @@ function touchHandler(ev) {
 	    if ( dX != lastDX || dY != lastDY ) {
 		var msg = dX.toString() + " " + dY.toString();
 		queueServoMove(msg);
-		//console.log("sent " + msg);
+		console.log("sent " + msg);
 	    }
 	    lastDX = dX;
 	    lastDY = dY;
