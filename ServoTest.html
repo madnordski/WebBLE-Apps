@@ -587,7 +587,7 @@ async function processServoQueue() {
 	servoQueue.shift();
     }
     catch (error) {
-	console.log("servoQueue error: ", error);
+	console.warn("servoQueue error: ", error);
 	if ( error.name != 'NetworkError'
 	     && error.name != 'NotSupportedError' ) {
 	    // keep the failed item at the front of the queue
