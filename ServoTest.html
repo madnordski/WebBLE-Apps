@@ -544,9 +544,8 @@ async function writeOnServo(value){
 	    // to STOP commands
 	    if ( error.name === 'NetworkError'
 	       || error.name === 'NotSupportedError' ) { // if busy, try again
-		//console.log("busy, trying again");
+		console.log("busy, trying again");
 		// await delay(50);
-		console.error("Error: Busy Error", error);
 		//return writeOnServo(value);
 	    }
 	    else {
@@ -588,7 +587,8 @@ async function processServoQueue() {
     }
     catch (error) {
 	console.error("servoQueue error: ", error);
-	if ( ! error.message.includes("Busy Error") ) {
+	if ( error.name != 'NetworkError'
+	     && error.name != 'NotSupportedError' ) {
 	    // keep the failed item at the front of the queue
 	    // otherwise it gets discarded
 	    writeQueue.shift();
