@@ -601,7 +601,7 @@ async function processServoQueue() {
 }
 		 
 function queueServoMove(data) {
-    servoQueue.push({data});
+    servoQueue.push(data);
     processServoQueue();
 }
 
