@@ -68,6 +68,15 @@ BLE2901 *statusD2901 = NULL;
 BLE2901 *controlD2901 = NULL;
 BLE2901 *ledD2901 = NULL;
 
+// The connection interval in BLE interval units is 1.25 ms/unit.
+// We experimented with these to see if it mattered -- it didn't.
+// Fewest number of Op Already in Progress errors was at 50ms but this
+// didn't repeat.  Suspect WebBLE ignores this setting.
+int minInterval100 = 80;  // 100ms
+int minInterval75  = 60;  //  75ms
+int minInterval50  = 40;  //  50ms
+int minInterval30  = 24;  //  30ms
+
 // state variables
 bool deviceConnected = false;
 bool oldDeviceConnected = false;
@@ -448,7 +457,8 @@ void setup() {
   pAdvertising->setScanResponse(false);
 
   // this leaves the connection interval up to the client
-  pAdvertising->setMinPreferred(0x0);
+  pAdvertising->setMinPreferred(minInterval50); // 50 ms resulted in fewer
+						// errors but it didn't repeat
 
   // make it happen
   BLEDevice::startAdvertising();
