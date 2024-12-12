@@ -557,6 +557,7 @@ async function writeOnServo(value){
             }
 	}
     } else {
+	// we probably never get here (touchstart/writeOnControl gets this)
         console.error ("writeOnServo: Bluetooth not connected!");
         window.alert("Unable to move Servos! Please connect Bluetooth.");
     }
