@@ -24,7 +24,8 @@ For ServoTest and ServoCar be sure to read the comments in these
 files. There are more than a couple of hard-won lessons in
 there. ServoTest.html is meant to be used with ServoTest.ino and
 ServoCar.html is meant to be used with ServoCar.ino running on an
-ESP32. We have only ever run these scripts using an ESP32-C3.
+ESP32. We have only ever run these scripts using the XIAO_ESP32-C3 and
+XIAO_ESP32-S3.
 
 Finally, be aware that WebBLE_RNT_Example is as was published by RNT
 in the fall of 2024 and there is a bug in the file on their website
