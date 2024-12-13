@@ -294,6 +294,42 @@ document.querySelector('.dot').addEventListener('touchend',
 document.querySelector('.dot').addEventListener('touchmove',
 						touchHandler, {passive: false});
 
+//****** Callback Handlers ********
+
+/* onDisconnected callback
+     
+   There was a bug in the RNT script that prevented this from
+   firing. We disconnect by telling the ESP32 to reboot.  Then we
+   reload this page on our end.  After that, we're ready to go again.
+*/
+
+function onDisconnected(event) {
+    console.log('Device Disconnected');
+    location.reload(); // reset both ends
+}
+
+/* handleStatusUpdate
+
+   Responds to changes of the ESP32 status aspect. When the ESP32
+   triggers this BLE indication to give us a status update, we must
+   acknowledge it. If not, the ESP32 will assume we went away and
+   reboot.
+
+   On the ESP32 side we send a status when the status changes or once
+   a second if there is no change. So, yes Virgina, we did overload
+   the status aspect by also making it a heartbeat (or ping pong)
+   proof of life.
+*/
+
+function handleStatusUpdate(event) {
+    const value = new Uint8Array(event.target.value.buffer);
+    const valueStr = new TextDecoder().decode(value);
+    servoStatus.innerHTML = valueStr;
+    //console.log("indications are ", valueStr);
+    // send acknowledgement to the ESP32 so it knows we're still here
+    writeOnControl("ACK");
+}
+
 // **** Function definitions ***
 
 /* spdChange
@@ -348,20 +384,6 @@ function isWebBluetoothEnabled() {
     }
     console.log("The Web Bluetooth API is ready.");
     return true
-}
-
-//****** Callback Handlers ********
-
-/* onDisconnected callback
-     
-   There was a bug in the RNT script that prevented this from
-   firing. We disconnect by telling the ESP32 to reboot.  Then we
-   reload this page on our end.  After that, we're ready to go again.
-*/
-
-function onDisconnected(event) {
-    console.log('Device Disconnected');
-    location.reload(); // reset both ends
 }
 
 /* connectToDevice
@@ -563,6 +585,8 @@ async function writeOnServo(value){
     }
 }
 
+/********************** Touch & Servo Queue Section ************************/
+
 /////////////////// let's try queuing requests to retain order
 
 const servoQueue = [];
@@ -710,6 +734,8 @@ function touchHandler(ev) {
     }
 }
 
+/************************ Page Load & Initial Values ********************
+
 /* when the page loads, run the initialValues() function
  */
 
@@ -740,27 +766,6 @@ function initialValues() {
     servosActive = false;
 }
 
-/* handleStatusUpdate
-
-   Responds to changes of the ESP32 status aspect. When the ESP32
-   triggers this BLE indication to give us a status update, we must
-   acknowledge it. If not, the ESP32 will assume we went away and
-   reboot.
-
-   On the ESP32 side we send a status when the status changes or once
-   a second if there is no change. So, yes Virgina, we did overload
-   the status aspect by also making it a heartbeat (or ping pong)
-   proof of life.
-*/
-
-function handleStatusUpdate(event) {
-    const value = new Uint8Array(event.target.value.buffer);
-    const valueStr = new TextDecoder().decode(value);
-    servoStatus.innerHTML = valueStr;
-    //console.log("indications are ", valueStr);
-    // send acknowledgement to the ESP32 so it knows we're still here
-    writeOnControl("ACK");
-}
 
 /* disconnectDevice
 
@@ -773,7 +778,7 @@ function handleStatusUpdate(event) {
 function disconnectDevice() {
     //console.log("Disconnect Device.");
     if (bleServer && bleServer.connected) {
-	writeOnControl("DIE");
+	writeOnControl("DIE");  // tell the esp32 to restart
     } else {
         // Throw an error if Bluetooth is not connected
         console.error("Bluetooth is not connected.");
