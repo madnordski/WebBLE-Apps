@@ -242,7 +242,7 @@ let enableUpdates = false;
 let servosActive = false;
 let lastDX, lastDY;
 let lastX, lastY;
-const fuzz = 40; // reduces the resolution of the touch area to 10 x 10
+const fuzz = 40; // reduces the resolution of the touch area
 
 // **** EVENT LISTENERS ***
 
@@ -572,7 +572,8 @@ async function writeOnServo(value){
 	    // to STOP commands
 	    if ( error.name === 'NetworkError'
 	       || error.name === 'NotSupportedError' ) { // if busy, try again
-		throw error;  // toss it back to the queue
+		//throw error;  // toss it back to the queue
+		console.warn("writeOnServo busy!");
 	    }
 	    else {
                 console.error("Failed writing to the Servo: ", error);
@@ -720,7 +721,8 @@ function touchHandler(ev) {
 	    // no need to send or remember zeros
 	    if ( dX != lastDX || dY != lastDY ) {
 		var msg = dX.toString() + " " + dY.toString();
-		queueServoMove(msg);
+		//queueServoMove(msg);
+		writeOnServo(msg);
 		//console.log("sent " + msg);
 	    }
 	    lastDX = dX;
