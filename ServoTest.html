@@ -693,8 +693,8 @@ function touchHandler(ev) {
     //console.log(ev.touches, ev.type);
     if ( ev.type == 'touchstart' ) { // get a starting point and
 				     // activate servos
-	lastX = Math.floor(ev.touches[0].clientX / fuzz);
-	lastY = Math.floor(ev.touches[0].clientY / fuzz);
+	lastX = 0; // Math.floor(ev.touches[0].clientX / fuzz);
+	lastY = 0; // Math.floor(ev.touches[0].clientY / fuzz);
 	lastDX = 0;
 	lastDY = 0;
 	writeOnControl("START");
