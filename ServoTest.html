@@ -695,8 +695,6 @@ function touchHandler(ev) {
 				     // activate servos
 	lastX = 0; // Math.floor(ev.touches[0].clientX / fuzz);
 	lastY = 0; // Math.floor(ev.touches[0].clientY / fuzz);
-	lastDX = 0;
-	lastDY = 0;
 	writeOnControl("START");
 	servosActive = true;
 	//console.log("START");
@@ -704,11 +702,11 @@ function touchHandler(ev) {
     else if ( ev.type == 'touchmove' && servosActive ) { // tell the
 							 // esp32 to
 							 // move servos
-	let dX = 0;
-	let dY = 0;
 	let x = Math.floor(ev.touches[0].clientX / fuzz);
 	let y = Math.floor(ev.touches[0].clientY / fuzz);
-
+	let dX = 0;
+	let dY = 0;
+	
 	console.log("x lastX y lastY ", x, lastX, y, lastY);
 	if ( x != lastX )
 	    dX = x > lastX ? 1 : -1;
@@ -720,15 +718,10 @@ function touchHandler(ev) {
 
 	console.log("dX dY ", dX, dY);
 	if ( dX != 0 || dY != 0 ) {
-	    // no need to send or remember zeros
-	    if ( dX != lastDX || dY != lastDY ) {
-		var msg = dX.toString() + " " + dY.toString();
-		//queueServoMove(msg);
-		writeOnServo(msg);
-		console.log("sent " + msg);
-	    }
-	    lastDX = dX;
-	    lastDY = dY;
+	    var msg = dX.toString() + " " + dY.toString();
+	    //queueServoMove(msg);
+	    writeOnServo(msg);
+	    console.log("sent " + msg);
 	}
     }
     else if ( ev.type == 'touchend' ) { // stop all movement asap
