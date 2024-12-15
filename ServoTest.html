@@ -695,6 +695,8 @@ function touchHandler(ev) {
 				     // activate servos
 	lastX = 0; // Math.floor(ev.touches[0].clientX / fuzz);
 	lastY = 0; // Math.floor(ev.touches[0].clientY / fuzz);
+	lastDX = 0;
+	lastDY = 0;
 	writeOnControl("START");
 	servosActive = true;
 	//console.log("START");
@@ -717,10 +719,13 @@ function touchHandler(ev) {
 	lastY = y;
 
 	console.log("dX dY ", dX, dY);
-	if ( dX != 0 || dY != 0 ) {
+	if ( (dX != 0 || dY != 0)
+	     && (dX != lastDX || dY != lastDY) ) {
 	    var msg = dX.toString() + " " + dY.toString();
 	    queueServoMove(msg);
 	    //writeOnServo(msg);
+	    lastDX = dX;
+	    lastDY = dY;
 	    console.log("sent " + msg);
 	}
     }
