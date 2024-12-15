@@ -709,9 +709,9 @@ function touchHandler(ev) {
 	let x = Math.floor(ev.touches[0].clientX / fuzz);
 	let y = Math.floor(ev.touches[0].clientY / fuzz);
 
-	if ( x != lastX )
+	//if ( x != lastX )
 	    dX = x > lastX ? 1 : -1;
-	if ( y != lastY )
+	//if ( y != lastY )
 	    dY = y > lastY ? 1 : -1;
 
 	if ( dX != 0 || dY != 0 ) {
