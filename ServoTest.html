@@ -709,7 +709,7 @@ function touchHandler(ev) {
 	let dX = 0;
 	let dY = 0;
 	
-	console.log("x lastX y lastY ", x, lastX, y, lastY);
+	//console.log("x lastX y lastY ", x, lastX, y, lastY);
 	if ( x != lastX )
 	    dX = x > lastX ? 1 : -1;
 	if ( y != lastY )
@@ -718,7 +718,7 @@ function touchHandler(ev) {
 	lastX = x;
 	lastY = y;
 
-	console.log("dX dY ", dX, dY);
+	//console.log("dX dY ", dX, dY);
 	if ( (dX != 0 || dY != 0)
 	     && (dX != lastDX || dY != lastDY) ) {
 	    var msg = dX.toString() + " " + dY.toString();
