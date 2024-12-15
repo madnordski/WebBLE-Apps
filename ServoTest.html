@@ -242,7 +242,7 @@ let enableUpdates = false;
 let servosActive = false;
 let lastDX, lastDY;
 let lastX, lastY;
-const fuzz = 40; // reduces the resolution of the touch area
+const fuzz = 30; // reduces the resolution of the touch area
 
 // **** EVENT LISTENERS ***
 
@@ -715,6 +715,9 @@ function touchHandler(ev) {
 	if ( y != lastY )
 	    dY = y > lastY ? 1 : -1;
 
+	lastX = x;
+	lastY = y;
+
 	console.log("dX dY ", dX, dY);
 	if ( dX != 0 || dY != 0 ) {
 	    // no need to send or remember zeros
@@ -726,8 +729,6 @@ function touchHandler(ev) {
 	    }
 	    lastDX = dX;
 	    lastDY = dY;
-	    lastX = x;
-	    lastY = y;
 	}
     }
     else if ( ev.type == 'touchend' ) { // stop all movement asap
