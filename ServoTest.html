@@ -719,8 +719,8 @@ function touchHandler(ev) {
 	console.log("dX dY ", dX, dY);
 	if ( dX != 0 || dY != 0 ) {
 	    var msg = dX.toString() + " " + dY.toString();
-	    //queueServoMove(msg);
-	    writeOnServo(msg);
+	    queueServoMove(msg);
+	    //writeOnServo(msg);
 	    console.log("sent " + msg);
 	}
     }
