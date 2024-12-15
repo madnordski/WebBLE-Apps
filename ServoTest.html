@@ -572,8 +572,8 @@ async function writeOnServo(value){
 	    // to STOP commands
 	    if ( error.name === 'NetworkError'
 	       || error.name === 'NotSupportedError' ) { // if busy, try again
-		//throw error;  // toss it back to the queue
-		console.warn("writeOnServo busy!", error.name, error.message);
+		throw error;  // toss it back to the queue
+		//console.warn("writeOnServo busy!", error.name, error.message);
 	    }
 	    else {
                 console.error("Failed writing to the Servo: ", error);
