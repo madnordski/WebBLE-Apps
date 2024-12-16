@@ -688,6 +688,8 @@ function queueServoMove(msg) {
    remains possible.
 */
 
+let moveCount = 0;
+
 function touchHandler(ev) {
     ev.preventDefault();      // supposed to turn off default actions
     //console.log(ev.touches, ev.type);
@@ -699,6 +701,7 @@ function touchHandler(ev) {
 	lastDY = 0;
 	writeOnControl("START");
 	servosActive = true;
+	moveCount = 0;
 	//console.log("START");
     }
     else if ( ev.type == 'touchmove' && servosActive ) { // tell the
@@ -726,13 +729,15 @@ function touchHandler(ev) {
 	    //writeOnServo(msg);
 	    lastDX = dX;
 	    lastDY = dY;
-	    console.log("sent " + msg);
+	    moveCount++;
+	    //console.log("sent " + msg);
 	}
     }
     else if ( ev.type == 'touchend' ) { // stop all movement asap
 	//delay(50);                      // maybe we can do without this???
 	writeOnControl("STOP");
 	servosActive = false;
+	console.log("Move count = ", moveCount);
     }
 }
 
