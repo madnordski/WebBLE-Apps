@@ -74,6 +74,15 @@ To connect the Android phone to Chrome running on our desktop:
      Find his project details at
      https://RandomNerdTutorials.com/esp32-web-bluetooth/
 
+   This script expands on the RNT example as follows:
+
+   **1** It handles the loss of BLE connections by reseting.
+
+   **2** It uses touch events to move servo motors.
+
+   **3** It implements a queue for touch events.
+   
+
   Copyright (c) 2024, Joseph J. King, PhD
 
   Permission is hereby granted, free of charge, for educational
@@ -198,6 +207,8 @@ To connect the Android phone to Chrome running on our desktop:
   
   <!-- status line -->
   <p align="center" id="servo_status">Servos Stopped</p>
+  <!-- moves -->
+  <p align="center" id="servo_moves"></p>
 </body>
 <!--  -->
 
@@ -209,10 +220,6 @@ To connect the Android phone to Chrome running on our desktop:
 // This script is dedicated to one server name so the connection
 // choice will be limited to one.
 
-// Disconnecting is accomplished by rebooting the ESP32.  This ensures
-// a complete reset and makes debugging easier by allowing for
-// repeated connects and disconnects.
-
 // Shorthand for document elements
 const redLED = document.getElementById('rled');
 const grnLED = document.getElementById('gled');
@@ -221,6 +228,7 @@ const xspdValue = document.getElementById('xspeed_value');
 const yspdSlider = document.getElementById('yspeed');
 const yspdValue = document.getElementById('yspeed_value');
 const servoStatus = document.getElementById('servo_status');
+const servoMoveCnt = document.getElementById('servo_moves');
 
 // Unique Id's for our characteristics (aka aspects)
 const deviceName ='ServoTest';
@@ -246,7 +254,7 @@ const fuzz = 40; // reduces the resolution of the touch area
 
 // **** EVENT LISTENERS ***
 
-// unload event
+// **1** unload event
 //  This resets the esp32 when the page is refreshed but
 //  if the page is closed, it does not get called.
 //  This puts us in a bad state because with the ESP32 connected to the
@@ -261,15 +269,20 @@ window.addEventListener('beforeunload', () => {
 // toggle the Red LED
 redLED.addEventListener('click', (event) => toggleRedLED());
 
-// use the green LED button to connect and disconnect the device
-// the esp32 turns the green led on when connected  
+// **1**
+// Disconnecting is accomplished by rebooting the ESP32.  This ensures
+// a complete reset and makes debugging easier by allowing for
+// repeated connects and disconnects.
+
+// Use the green LED button to connect and disconnect the device.
+// The esp32 turns the green led on when connected, off when disconnected.
+
 grnLED.addEventListener('click', (event) => {
     if ( isWebBluetoothEnabled() ) {
 	// connect or disconnect
 	if ( bluetoothDevice && bluetoothDevice.gatt.connected ) {
 	    // we are connected so disconnect
 	    if (bleServer && bleServer.connected) {
-		// we never actually started "notifications" so why?
 		if (activeStatusAspect) {
 		    activeStatusAspect.stopNotifications()
 		}
@@ -286,7 +299,7 @@ grnLED.addEventListener('click', (event) => {
     }
 });
 
-// establish the touchHandler events
+// establish the touchHandler events **2**
 document.querySelector('.dot').addEventListener('touchstart',
 						touchHandler, {passive: false});
 document.querySelector('.dot').addEventListener('touchend',
@@ -296,6 +309,7 @@ document.querySelector('.dot').addEventListener('touchmove',
 
 //****** Callback Handlers ********
 
+// **1**
 /* onDisconnected callback
      
    There was a bug in the RNT script that prevented this from
@@ -411,6 +425,7 @@ async function connectToDevice() {
 	    optionalServices: [bleService]
 	})
 	// act on the promise object returned
+	// **1** fixed typo in the RNT example (service -> server)
 	    .then(device => {
 		//console.log("Selected ", device.name);
 		grnLED.className = 'grnled';
@@ -500,8 +515,28 @@ function toggleRedLED() {
  can take time for the queue to clear. We therefore need an
  "out-of-band" method for stopping the servos.  The writeOnControl
  function used here provides this as well as other control functions
- such as disconnect by reset.
+ such as disconnect by reset (**1**).
 
+ Control String  Purpose
+ --------------  -------------------------------
+    DIE       This restarts the server. We do this when we disconnect
+              to ensure the next connection starts fresh. We
+              discovered there are situations when the onDisconnect
+	      callback cannot be relied upon.
+    ACK       This is used to acknowledge the client recieved our status
+              update.  We use this as proof of life for the client. If
+	      the client shutdown, we want to restart so that we can
+	      accept a new connection.
+    STOP      Stop the servos. Using a separate characteristic for STOP
+              and START insures these commands don't get lost in the
+	      stream of move commands the client sends when a finger is
+	      moving on the touch screen.
+    START     Prepare for movement. Sent when the touch screen if first
+              touched.
+    SPEED a s Sets the servo speed.  For example, "SPEED 0 6" sets the X
+              axis to speed zero and "SPEED 1 9" sets the Y servo to 9.
+              The speed setting is 0 to 10 with 0 for slowest, 10 for fastest.
+    
 */
 
 async function writeOnControl(value) {
@@ -649,6 +684,7 @@ function queueServoMove(msg) {
 }
 
 
+// **2**
 /* touchHandler
 
    This function handles the events generated by the touchpad
@@ -726,18 +762,18 @@ function touchHandler(ev) {
 	     && (dX != lastDX || dY != lastDY) ) {
 	    var msg = dX.toString() + " " + dY.toString();
 	    queueServoMove(msg);
-	    //writeOnServo(msg);
 	    lastDX = dX;
 	    lastDY = dY;
 	    moveCount++;
-	    //console.log("sent " + msg);
 	}
     }
     else if ( ev.type == 'touchend' ) { // stop all movement asap
 	//delay(50);                      // maybe we can do without this???
 	writeOnControl("STOP");
 	servosActive = false;
+	// for comparison with the ESP32 we print the number of moves sent
 	console.log("Move count = ", moveCount);
+	servoMoveCnt.innerHTML = "Moves completed: " + moveCount;
     }
 }
 
@@ -774,6 +810,7 @@ function initialValues() {
 }
 
 
+// **1**
 /* disconnectDevice
 
    This gets called when the user reloads the page for any reason. The
