@@ -660,6 +660,7 @@ async function processServoQueue() {
 	    servoQueue.shift();      // success, remove it from the queue
 	}
 	else {
+	    servoQueue.shift();
 	    console.error("Max number of retries reached!!!");
 	}
     }
