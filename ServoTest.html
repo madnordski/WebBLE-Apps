@@ -690,7 +690,8 @@ async function processServoQueue() {
 */
 
 function queueServoMove(msg) {
-    servoQueue.push({msg, 4});
+    const retries = 4;
+    servoQueue.push({msg, retries});
     processServoQueue();
 }
 
