@@ -288,7 +288,7 @@ grnLED.addEventListener('click', (event) => {
 		}
 	    }
 	    // disconnect by resetting the ESP32
-	    writeOnControl("DIE");
+	    writeOnControl("DIE");  // **1**
 	    sleep(100);
 	    initialValues();
 	}
@@ -567,6 +567,7 @@ async function writeOnControl(value) {
     }
 }
 
+// **3**
 /* writeOnServo
 
    The servoAspect tells the ESP32 to move the motors and the
@@ -622,7 +623,7 @@ async function writeOnServo(value){
 }
 
 /********************** Touch & Servo Queue Section ************************/
-
+// **3**
 /////////////////// let's try queuing requests to retain order
 
 const servoQueue = [];
@@ -646,24 +647,32 @@ let servoBusy = false;
 async function processServoQueue() {
     //console.log("queue length: ", servoQueue.length);
     if ( servoQueue.length == 0 ) return;
-    if ( servoBusy ) return; // not atomic so there's still a chance
-			     // we fail
+    if ( servoBusy ) return; // lack of preemption in javascript
+			     // allows this to work without a mutex
     servoBusy = true;
+    const {msg, retries} = servoQueue[0]; // peek and write
     
     try {
-	const msg = servoQueue[0]; // peek and write
 	//console.log("Send: ", msg);
-	await writeOnServo(msg);
-	servoQueue.shift();
+	if ( retries > 0 ) {
+	    await writeOnServo(msg); // this could allow another
+				     // microtask but servoBusy saves us
+	    servoQueue.shift();      // success, remove it from the queue
+	}
+	else {
+	    console.error("Max number of retries reached!!!");
+	}
     }
     catch (error) {
 	//console.warn("servoQueue error: ", error);
-	if ( error.name != 'NetworkError'
-	     && error.name != 'NotSupportedError' ) {
-	    console.error("Move discarded!!!");
-	    // keep the failed item at the front of the queue
-	    // otherwise it gets discarded
-	    writeQueue.shift();
+	if ( error.name == 'NetworkError'
+	     || error.name == 'NotSupportedError' ) {
+	    // retry when the BLE is busy
+	    servoQueue[0] = {msg, retries-1};
+	}
+	else {
+	    servoQueue.shift();
+	    console.error("Move discarded due to: ", error);
 	}
     }
     finally {
@@ -672,14 +681,14 @@ async function processServoQueue() {
     }
 }
 
-/* queueServoMove
+/* queueServoMove **3**
 
    Add a message to the servo move queue and nudge it into action.
 
 */
 
 function queueServoMove(msg) {
-    servoQueue.push(msg);
+    servoQueue.push({msg, retires: 4});
     processServoQueue();
 }
 
@@ -761,7 +770,7 @@ function touchHandler(ev) {
 	if ( (dX != 0 || dY != 0)
 	     && (dX != lastDX || dY != lastDY) ) {
 	    var msg = dX.toString() + " " + dY.toString();
-	    queueServoMove(msg);
+	    queueServoMove(msg); // **3**
 	    lastDX = dX;
 	    lastDY = dY;
 	    moveCount++;
