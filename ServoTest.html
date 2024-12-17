@@ -680,7 +680,9 @@ async function processServoQueue() {
     }
     finally {
 	servoBusy = false;
-	processServoQueue(); // keep going no matter what
+	if ( servoQueue.length > 0 ) {
+	    processServoQueue(); // keep going, if there's work to
+	}
     }
 }
 
