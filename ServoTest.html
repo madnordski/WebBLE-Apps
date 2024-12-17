@@ -690,7 +690,7 @@ async function processServoQueue() {
 */
 
 function queueServoMove(msg) {
-    servoQueue.push({msg, retires: 4});
+    servoQueue.push({msg, 4});
     processServoQueue();
 }
 
