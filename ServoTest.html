@@ -653,11 +653,13 @@ async function processServoQueue() {
     let {msg, retries} = servoQueue[0]; // peek and write
     // if we are supposed to be stopped, drain the queue (we own the queue)
     if ( !servosActive ) {
+	console.log("Preemptive STOP!!!");
 	while ( servoQueue.length > 0 ) {
 	    servoQueue.shift();
 	}
 	servoBusy = false;
-	console.log("Preemptive STOP!!!");
+	// reissue the stop
+	writeOnControl("STOP");
 	return;
     }
     // now we can send
