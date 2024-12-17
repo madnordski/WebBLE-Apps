@@ -669,8 +669,7 @@ async function processServoQueue() {
 	if ( error.name == 'NetworkError'
 	     || error.name == 'NotSupportedError' ) {
 	    // retry when the BLE is busy
-	    retries--;
-	    servoQueue[0] = {msg, retries};
+	    servoQueue[0] = {msg, retries - 1};
 	}
 	else {
 	    servoQueue.shift();
