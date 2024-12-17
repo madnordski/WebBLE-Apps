@@ -650,7 +650,7 @@ async function processServoQueue() {
     if ( servoBusy ) return; // lack of preemption in javascript
 			     // allows this to work without a mutex
     servoBusy = true;
-    const {msg, retries} = servoQueue[0]; // peek and write
+    let {msg, retries} = servoQueue[0]; // peek and write
     
     try {
 	console.log("Send: ", msg, retries);
@@ -669,7 +669,8 @@ async function processServoQueue() {
 	if ( error.name == 'NetworkError'
 	     || error.name == 'NotSupportedError' ) {
 	    // retry when the BLE is busy
-	    servoQueue[0] = {msg, retries - 1};
+	    retries--;
+	    servoQueue[0] = {msg, retries};
 	}
 	else {
 	    servoQueue.shift();
@@ -688,9 +689,9 @@ async function processServoQueue() {
 
 */
 
-let retries = 4;
 
 function queueServoMove(msg) {
+    const retries = 4;
     servoQueue.push({msg, retries});
     processServoQueue();
 }
