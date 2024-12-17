@@ -656,6 +656,7 @@ async function processServoQueue() {
 	while ( servoQueue.length > 0 ) {
 	    servoQueue.shift();
 	}
+	servoBusy = false;
 	console.log("Preemptive STOP!!!");
 	return;
     }
