@@ -653,7 +653,7 @@ async function processServoQueue() {
     const {msg, retries} = servoQueue[0]; // peek and write
     
     try {
-	//console.log("Send: ", msg);
+	console.log("Send: ", msg, retries);
 	if ( retries > 0 ) {
 	    await writeOnServo(msg); // this could allow another
 				     // microtask but servoBusy saves us
@@ -690,7 +690,7 @@ async function processServoQueue() {
 */
 
 function queueServoMove(msg) {
-    const retries = 4;
+    let retries = 4;
     servoQueue.push({msg, retries});
     processServoQueue();
 }
