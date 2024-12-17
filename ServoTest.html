@@ -651,7 +651,12 @@ async function processServoQueue() {
 			     // allows this to work without a mutex
     servoBusy = true;
     let {msg, retries} = servoQueue[0]; // peek and write
-    
+    // if we are supposed to be stopped, drain the queue
+    if ( !servosActive ) {
+	servoQueue.shift();
+	return;
+    }
+    // now we can send
     try {
 	console.log("Send: ", msg, retries);
 	if ( retries > 0 ) {
