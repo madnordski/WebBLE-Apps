@@ -330,7 +330,7 @@ function startBurst() {
     const msg = "1 1 " + burstCnt;
     queueServoMove(msg, burstCnt);
     if ( burstCnt < 100 ) {
-	setTimeout(startBurst, 50);
+	setTimeout(startBurst, 20);
 	console.log("burst ", burstCnt, msg);
     }
     else {
