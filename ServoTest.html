@@ -664,7 +664,7 @@ async function processServoQueue() {
     }
     // now we can send
     try {
-	console.log("Send: ", msg, retries);
+	//console.log("Send: ", msg, retries);
 	if ( retries > 0 ) {
 	    await writeOnServo(msg); // this could allow another
 				     // microtask but servoBusy saves us
