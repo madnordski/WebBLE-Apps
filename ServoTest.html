@@ -610,6 +610,7 @@ async function writeOnServo(value){
 	       || error.name === 'NotSupportedError' ) { // if busy, try again
 		//throw error;  // toss it back to the queue
 		//console.warn("writeOnServo busy!", error.name, error.message);
+		delay(20);
 		writeOnServo(value); // retry
 	    }
 	    else {
