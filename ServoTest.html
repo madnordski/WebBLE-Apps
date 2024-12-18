@@ -608,10 +608,10 @@ async function writeOnServo(value){
 	    // to STOP commands
 	    if ( error.name === 'NetworkError'
 	       || error.name === 'NotSupportedError' ) { // if busy, try again
-		throw error;  // toss it back to the queue
+		//throw error;  // toss it back to the queue
 		//console.warn("writeOnServo busy!", error.name, error.message);
-		//delay(20);
-		//writeOnServo(value); // retry
+		delay(20);
+		writeOnServo(value); // retry
 	    }
 	    else {
                 console.error("Failed writing to the Servo: ", error);
@@ -788,8 +788,8 @@ function touchHandler(ev) {
 	if ( (dX != 0 || dY != 0)
 	     && (dX != lastDX || dY != lastDY) ) {
 	    var msg = dX.toString() + " " + dY.toString() + " " + moveCount;
-	    queueServoMove(msg); // **3**
-	    //writeOnServo(msg);
+	    //queueServoMove(msg); // **3**
+	    writeOnServo(msg);
 	    lastDX = dX;
 	    lastDY = dY;
 	    moveCount++;
