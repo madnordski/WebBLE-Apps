@@ -313,14 +313,7 @@ blastIt.addEventListener('click', (event) => {
     if ( isWebBluetoothEnabled() ) {
 	// connect or disconnect
 	if ( bluetoothDevice && bluetoothDevice.gatt.connected ) {
-	    // we are connected so disconnect
-	    if (bleServer && bleServer.connected) {
-		if (activeStatusAspect) {
-		    activeStatusAspect.stopNotifications()
-		}
-	    }
-	    // disconnect by resetting the ESP32
-	    writeOnControl("START");  // **1**
+	    writeOnControl("START");
 	    servosActive = true;
 	    setTimeout(startBurst, 2000);
 	}
