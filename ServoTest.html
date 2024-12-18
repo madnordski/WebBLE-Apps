@@ -787,7 +787,7 @@ function touchHandler(ev) {
 	//console.log("dX dY ", dX, dY);
 	if ( (dX != 0 || dY != 0)
 	     && (dX != lastDX || dY != lastDY) ) {
-	    var msg = dX.toString() + " " + dY.toString();
+	    var msg = dX.toString() + " " + dY.toString() + " " + moveCount;
 	    //queueServoMove(msg); // **3**
 	    writeOnServo(msg);
 	    lastDX = dX;
