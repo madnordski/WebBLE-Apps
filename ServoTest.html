@@ -315,7 +315,7 @@ blastIt.addEventListener('click', (event) => {
 	if ( bluetoothDevice && bluetoothDevice.gatt.connected ) {
 	    writeOnControl("START");
 	    servosActive = true;
-	    setTimeout(startBurst, 2000);
+	    setTimeout(startBurst, 500);
 	}
 	else {
 	    // not connected so we connect
@@ -334,7 +334,7 @@ function startBurst() {
 	console.log("burst ", burstCnt, msg);
     }
     else {
-	setTimeout(endBurst, 2000);
+	setTimeout(endBurst, 500);
     }
     burstCnt++;
 }
