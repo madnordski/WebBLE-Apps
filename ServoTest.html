@@ -321,17 +321,8 @@ blastIt.addEventListener('click', (event) => {
 	    }
 	    // disconnect by resetting the ESP32
 	    writeOnControl("START");  // **1**
-	    sleep(100);
 	    servosActive = true;
-	    let i = 0;
-	    for (i=0; i<10; i++) {
-		const msg = "-1 1 " + i;
-		queueServoMove(msg);
-		console.log("Send number ", i, " ", msg);
-	    }
-	    sleep(2000);
-	    servosActive = false;
-	    writeOnControl("STOP");
+	    burstInterval = setTimeout(startBurst, 2000);
 	}
 	else {
 	    // not connected so we connect
@@ -340,6 +331,25 @@ blastIt.addEventListener('click', (event) => {
     }
 });
 
+let burstCnt = 0;
+
+function startBurst() {
+    const msg = "1 1 " + burstCnt;
+    queueServoMove(1, 1, burstCnt);
+    if ( burstCnt < 10 ) {
+	setTimeout(burst, 50);
+    }
+    else {
+	setTimeout(endBurst, 2000);
+    }
+    burstCnt++;
+}
+
+function endBurst() {
+    servosActive = fasle;
+    writeOnControl("STOP");
+}
+	
 //****** Callback Handlers ********
 
 // **1**
