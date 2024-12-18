@@ -328,7 +328,8 @@ let burstCnt = 0;
 
 function startBurst() {
     const msg = "1 1 " + burstCnt;
-    queueServoMove(msg);
+    //queueServoMove(msg);
+    writeOnServo(msg);
     if ( burstCnt < 100 ) {
 	setTimeout(startBurst, 20);
 	console.log("burst ", burstCnt, msg);
@@ -645,11 +646,11 @@ async function writeOnServo(value){
 	    // to STOP commands
 	    if ( error.name === 'NetworkError'
 	       || error.name === 'NotSupportedError' ) { // if busy, try again
-		throw error;  // toss it back to the queue
+		//throw error;  // toss it back to the queue
 		// FOR TESTING W/O QUEUE
-		//console.warn("writeOnServo busy!", error.name, error.message);
-		//delay(20);
-		//writeOnServo(value); // retry
+		console.warn("writeOnServo busy!", error.name, error.message);
+		delay(20);
+		writeOnServo(value); // retry
 	    }
 	    else {
                 console.error("Failed writing to the Servo: ", error);
