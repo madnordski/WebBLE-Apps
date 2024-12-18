@@ -322,9 +322,10 @@ blastIt.addEventListener('click', (event) => {
 	    // disconnect by resetting the ESP32
 	    writeOnControl("START");  // **1**
 	    let i = 0;
-	    for (i=0; i<100; i++) {
+	    for (i=0; i<10; i++) {
 		const msg = "-1 1 " + i;
 		queueServoMove(msg);
+		console.log("Send number ", i, " ", msg);
 	    }
 	    writeOnControl("STOP");
 	}
