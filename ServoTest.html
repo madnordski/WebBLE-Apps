@@ -315,6 +315,7 @@ blastIt.addEventListener('click', (event) => {
 	if ( bluetoothDevice && bluetoothDevice.gatt.connected ) {
 	    writeOnControl("START");
 	    servosActive = true;
+	    burstCnt = 0;
 	    setTimeout(startBurst, 500);
 	}
 	else {
