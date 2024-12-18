@@ -609,7 +609,7 @@ async function writeOnServo(value){
 	    if ( error.name === 'NetworkError'
 	       || error.name === 'NotSupportedError' ) { // if busy, try again
 		//throw error;  // toss it back to the queue
-		console.warn("writeOnServo busy!", error.name, error.message);
+		//console.warn("writeOnServo busy!", error.name, error.message);
 		writeOnServo(value); // retry
 	    }
 	    else {
