@@ -322,7 +322,7 @@ blastIt.addEventListener('click', (event) => {
 	    // disconnect by resetting the ESP32
 	    writeOnControl("START");  // **1**
 	    servosActive = true;
-	    burstInterval = setTimeout(startBurst, 2000);
+	    setTimeout(startBurst, 2000);
 	}
 	else {
 	    // not connected so we connect
@@ -337,7 +337,7 @@ function startBurst() {
     const msg = "1 1 " + burstCnt;
     queueServoMove(1, 1, burstCnt);
     if ( burstCnt < 10 ) {
-	setTimeout(burst, 50);
+	setTimeout(startBurst, 50);
     }
     else {
 	setTimeout(endBurst, 2000);
@@ -346,7 +346,7 @@ function startBurst() {
 }
 
 function endBurst() {
-    servosActive = fasle;
+    servosActive = false;
     writeOnControl("STOP");
 }
 	
