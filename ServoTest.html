@@ -658,8 +658,6 @@ async function processServoQueue() {
 	    servoQueue.shift();
 	}
 	servoBusy = false;
-	// reissue the stop
-	writeOnControl("STOP");
 	return;
     }
     // now we can send
@@ -668,7 +666,7 @@ async function processServoQueue() {
 	if ( retries > 0 ) {
 	    await writeOnServo(msg); // this could allow another
 				     // microtask but servoBusy saves us
-	    servoQueue.shift();      // success, remove it from the queue
+	    servoQueue.shift();  // success, remove it from the queue
 	}
 	else {
 	    servoQueue.shift();
