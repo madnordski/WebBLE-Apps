@@ -335,7 +335,7 @@ let burstCnt = 0;
 
 function startBurst() {
     const msg = "1 1 " + burstCnt;
-    queueServoMove(1, 1, burstCnt);
+    queueServoMove(msg, burstCnt);
     if ( burstCnt < 10 ) {
 	setTimeout(startBurst, 50);
 	console.log("burst ", burstCnt, msg);
