@@ -898,10 +898,6 @@ function disconnectDevice() {
 	bluetoothDevice.gatt.disconnect();
 	bluetoothDevice = null;
 	bleServer = null;
-    } else {
-        // Throw an error if Bluetooth is not connected
-        console.error("Bluetooth is not connected.");
-        window.alert("Bluetooth is not connected.")
     }
 }
 
