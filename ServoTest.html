@@ -650,7 +650,7 @@ async function writeOnServo(value){
 		//throw error;  // toss it back to the queue
 		// FOR TESTING W/O QUEUE
 		console.warn("writeOnServo busy!", error.name, error.message);
-		delay(10);
+		//delay(10);
 		writeOnServo(value); // retry
 	    }
 	    else {
