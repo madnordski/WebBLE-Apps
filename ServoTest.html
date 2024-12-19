@@ -651,9 +651,9 @@ async function writeOnServo(value){
 	    // to STOP commands
 	    if ( error.name === 'NetworkError'
 	       || error.name === 'NotSupportedError' ) { // if busy, try again
-		//throw error;  // toss it back to the queue
+		throw error;  // toss it back to the queue
 		// FOR TESTING W/O QUEUE
-		console.warn("writeOnServo busy!", error.name, error.message);
+		//console.warn("writeOnServo busy!", error.name, error.message);
 		//delay(10);
 		//writeOnServo(value); // retry
 	    }
