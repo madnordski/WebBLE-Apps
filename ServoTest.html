@@ -368,24 +368,14 @@ function onDisconnected(event) {
 
 /* handleStatusUpdate
 
-   Responds to changes of the ESP32 status aspect. When the ESP32
-   triggers this BLE indication to give us a status update, we must
-   acknowledge it. If not, the ESP32 will assume we went away and
-   reboot.
-
-   On the ESP32 side we send a status when the status changes or once
-   a second if there is no change. So, yes Virgina, we did overload
-   the status aspect by also making it a heartbeat (or ping pong)
-   proof of life.
+   On the ESP32 side we send a status when the status changes. The
+   stop status includes the number of moves the ESP32 received.
 */
 
 function handleStatusUpdate(event) {
     const value = new Uint8Array(event.target.value.buffer);
     const valueStr = new TextDecoder().decode(value);
     servoStatus.innerHTML = valueStr;
-    //console.log("indications are ", valueStr);
-    // send acknowledgement to the ESP32 so it knows we're still here
-    writeOnControl("ACK");
 }
 
 // **** Function definitions ***
@@ -566,11 +556,11 @@ function toggleRedLED() {
     DIE       This restarts the server. We do this when we disconnect
               to ensure the next connection starts fresh. We
               discovered there are situations when the onDisconnect
-	      callback cannot be relied upon.
+	      callback cannot be relied upon. (obsolete)
     ACK       This is used to acknowledge the client recieved our status
               update.  We use this as proof of life for the client. If
 	      the client shutdown, we want to restart so that we can
-	      accept a new connection.
+	      accept a new connection. (obsolete)
     STOP      Stop the servos. Using a separate characteristic for STOP
               and START insures these commands don't get lost in the
 	      stream of move commands the client sends when a finger is
@@ -652,7 +642,7 @@ async function writeOnServo(value){
 	    // to STOP commands
 	    if ( error.name === 'NetworkError'
 	       || error.name === 'NotSupportedError' ) { // if busy, try again
-		throw error;  // toss it back to the queue
+		throw error;  // toss it back to the queue for a retry
 		// FOR TESTING W/O QUEUE
 		//console.warn("writeOnServo busy!", error.name, error.message);
 		//delay(10);
