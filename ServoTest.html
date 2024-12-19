@@ -894,7 +894,11 @@ function initialValues() {
 function disconnectDevice() {
     //console.log("Disconnect Device.");
     if (bleServer && bleServer.connected) {
-	writeOnControl("DIE");  // tell the esp32 to restart
+	//writeOnControl("DIE");  // tell the esp32 to restart
+	// shutdown the bluetooth connection
+	bluetoothDevice.gatt.disconnect();
+	bluetoothDevice = null;
+	bleServer = null;
     } else {
         // Throw an error if Bluetooth is not connected
         console.error("Bluetooth is not connected.");
