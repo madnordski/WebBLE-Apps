@@ -333,7 +333,7 @@ function startBurst() {
     writeOnServo(msg);
     if ( burstCnt < 100 ) {
 	setTimeout(startBurst, 20);
-	console.log("burst ", burstCnt, msg);
+	//console.log("burst ", burstCnt, msg);
     }
     else {
 	setTimeout(endBurst, 500);
