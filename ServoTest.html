@@ -289,10 +289,14 @@ grnLED.addEventListener('click', (event) => {
 		    activeStatusAspect.stopNotifications()
 		}
 	    }
+	    // shutdown the bluetooth connection
+	    bluetoothDevice.gatt.disconnect();
+	    bluetoothDevice = null;
+	    bleServer = null;
 	    // disconnect by resetting the ESP32
-	    writeOnControl("DIE");  // **1**
-	    sleep(100);
-	    initialValues();
+	    //writeOnControl("DIE");  // **1**
+	    //sleep(100);
+	    //initialValues();
 	}
 	else {
 	    // not connected so we connect
