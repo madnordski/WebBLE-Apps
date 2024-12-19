@@ -331,8 +331,8 @@ function startBurst() {
     const msg = "1 1 " + burstCnt;
     //queueServoMove(msg);
     writeOnServo(msg);
-    if ( burstCnt < 10 ) {
-	setTimeout(startBurst, 8000);
+    if ( burstCnt < 100 ) {
+	setTimeout(startBurst, 50);
 	//console.log("burst ", burstCnt, msg);
     }
     else {
