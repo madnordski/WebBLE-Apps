@@ -766,7 +766,7 @@ let moveCount = 0;
 
 function touchHandler(ev) {
     ev.preventDefault();      // supposed to turn off default actions
-    console.log(ev.touches, ev.type);
+    //console.log(ev.touches, ev.type);
     if ( ev.type == 'touchstart' ) { // get a starting point and
 				     // activate servos
 	lastX = Math.floor(ev.touches[0].clientX / fuzz);
