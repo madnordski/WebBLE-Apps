@@ -764,7 +764,9 @@ function queueServoMove(msg) {
 
 let moveCount = 0;
 let startTime = 0;
-      
+let lastMoveTime = 0;
+let minTime = 0;
+
 function touchHandler(ev) {
     ev.preventDefault();      // supposed to turn off default actions
     //console.log(ev.touches, ev.type);
@@ -778,6 +780,7 @@ function touchHandler(ev) {
 	servosActive = true;
 	moveCount = 0;
 	startTime = performance.now();
+	lastMoveTime = startTime;
 	//console.log("START");
     }
     else if ( ev.type == 'touchmove' && servosActive ) { // tell the
@@ -787,7 +790,7 @@ function touchHandler(ev) {
 	let y = Math.floor(ev.touches[0].clientY / fuzz);
 	let dX = 0;
 	let dY = 0;
-	
+
 	//console.log("x lastX y lastY ", x, lastX, y, lastY);
 	if ( x != lastX )
 	    dX = x > lastX ? 1 : -1;
@@ -806,6 +809,8 @@ function touchHandler(ev) {
 	    lastDX = dX;
 	    lastDY = dY;
 	    moveCount++;
+	    let thisTime = performance.now() - lastMoveTime;
+	    if ( thisTime < minTime || minTime == 0 ) minTime = thisTime;
 	}
     }
     else if ( ev.type == 'touchend' ) { // stop all movement asap
@@ -815,7 +820,10 @@ function touchHandler(ev) {
 	// for comparison with the ESP32 we print the number of moves sent
 	console.log("Move count = ", moveCount);
 	servoMoveCnt.innerHTML = "Moves sent: " + moveCount;
-	console.log("Total time: ", performance.now() - startTime);
+	const totalTime = performance.now() - startTime;
+	console.log("Total time: ", totalTime/1000, " seconds");
+	console.log("Ave time: ", totalTime / moveCount, " ms");
+	console.log("Min time: ", minTime, " ms");
     }
 }
 
