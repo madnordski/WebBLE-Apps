@@ -313,7 +313,7 @@ function startBurst() {
     //queueServoMove(msg);
     writeOnServo(msg);
     if ( burstCnt < 100 ) {
-	setTimeout(startBurst, 20);
+	setTimeout(startBurst, 10);
 	//console.log("burst ", burstCnt, msg);
     }
     else {
