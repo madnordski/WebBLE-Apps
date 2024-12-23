@@ -299,7 +299,7 @@ blastIt.addEventListener('click', (event) => {
 	    writeOnControl("START");
 	    servosActive = true;
 	    burstCnt = 0;
-	    setTimeout(startBurst, 500);
+	    setTimeout(startBurst, 20);
 	}
 	else {
 	    // not connected so we connect
@@ -313,11 +313,11 @@ function startBurst() {
     //queueServoMove(msg);
     writeOnServo(msg);
     if ( burstCnt < 100 ) {
-	setTimeout(startBurst, 100);
+	setTimeout(startBurst, 20);
 	//console.log("burst ", burstCnt, msg);
     }
     else {
-	setTimeout(endBurst, 500);
+	setTimeout(endBurst, 20);
     }
     burstCnt++;
 }
