@@ -763,7 +763,8 @@ function queueServoMove(msg) {
 */
 
 let moveCount = 0;
-
+let startTime = 0;
+      
 function touchHandler(ev) {
     ev.preventDefault();      // supposed to turn off default actions
     //console.log(ev.touches, ev.type);
@@ -776,6 +777,7 @@ function touchHandler(ev) {
 	writeOnControl("START");
 	servosActive = true;
 	moveCount = 0;
+	startTime = performance.now();
 	//console.log("START");
     }
     else if ( ev.type == 'touchmove' && servosActive ) { // tell the
@@ -813,6 +815,7 @@ function touchHandler(ev) {
 	// for comparison with the ESP32 we print the number of moves sent
 	console.log("Move count = ", moveCount);
 	servoMoveCnt.innerHTML = "Moves sent: " + moveCount;
+	console.log("Total time: ", performance.now() - startTime);
     }
 }
 
