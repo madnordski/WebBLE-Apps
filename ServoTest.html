@@ -621,8 +621,8 @@ async function writeOnServo(value){
 		//throw error;  // toss it back to the queue for a retry
 		// FOR TESTING W/O QUEUE
 		console.warn("writeOnServo busy!", error.name, error.message);
-		//delay(10);
-		//writeOnServo(value); // retry
+		delay(10);
+		writeOnServo(value); // retry
 	    }
 	    else {
                 console.error("Failed writing to the Servo: ", error);
@@ -809,7 +809,7 @@ function touchHandler(ev) {
 	}
     }
     else if ( ev.type == 'touchend' ) { // stop all movement asap
-	//delay(50);                      // maybe we can do without this???
+	delay(20);                      // maybe we can do without this???
 	writeOnControl("STOP");
 	servosActive = false;
 	// for comparison with the ESP32 we print the number of moves sent
