@@ -764,8 +764,6 @@ function queueServoMove(msg) {
 
 let moveCount = 0;
 let startTime = 0;
-let lastMoveTime = 0;
-let minTime = 0;
 
 function touchHandler(ev) {
     ev.preventDefault();      // supposed to turn off default actions
@@ -809,13 +807,6 @@ function touchHandler(ev) {
 	    lastDX = dX;
 	    lastDY = dY;
 	    moveCount++;
-	    if ( lastMoveTime == 0 ) {
-		lastMoveTime = performance.now();
-	    }
-	    else {
-		const thisTime = performance.now() - lastMoveTime;
-		if ( thisTime < minTime || minTime == 0 ) minTime = thisTime;
-	    }
 	}
     }
     else if ( ev.type == 'touchend' ) { // stop all movement asap
@@ -826,9 +817,8 @@ function touchHandler(ev) {
 	console.log("Move count = ", moveCount);
 	servoMoveCnt.innerHTML = "Moves sent: " + moveCount;
 	const totalTime = performance.now() - startTime;
-	console.log("Total time: ", totalTime/1000, " seconds");
-	console.log("Ave time: ", totalTime / moveCount, " ms");
-	console.log("Min time: ", minTime, " ms");
+	console.log("Total time: ", Math.round(totalTime/1000), " seconds");
+	console.log("Ave time: ", Math.round(totalTime / moveCount), " ms");
     }
 }
 
