@@ -310,11 +310,11 @@ blastIt.addEventListener('click', (event) => {
 
 function startBurst() {
     const msg = "1 1 " + burstCnt;
-    //queueServoMove(msg);
     if ( burstCnt < 100 ) {
 	writeOnServo(msg);
+	//queueServoMove(msg);
 	burstCnt++;
-	setTimeout(startBurst, 20);
+	setTimeout(startBurst, 10);
 	//console.log("burst ", burstCnt, msg);
     }
     else {
