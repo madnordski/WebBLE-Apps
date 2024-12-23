@@ -310,8 +310,8 @@ let burstCnt = 0;
 
 function startBurst() {
     const msg = "1 1 " + burstCnt;
-    queueServoMove(msg);
-    //writeOnServo(msg);
+    //queueServoMove(msg);
+    writeOnServo(msg);
     if ( burstCnt < 100 ) {
 	setTimeout(startBurst, 50);
 	//console.log("burst ", burstCnt, msg);
@@ -801,8 +801,8 @@ function touchHandler(ev) {
 	if ( (dX != 0 || dY != 0)
 	     && (dX != lastDX || dY != lastDY) ) {
 	    var msg = dX.toString() + " " + dY.toString() + " " + moveCount;
-	    //queueServoMove(msg); // **3**
-	    writeOnServo(msg); // FOR TESTING W/O QUEUE
+	    queueServoMove(msg); // **3**
+	    //writeOnServo(msg); // FOR TESTING W/O QUEUE
 	    lastDX = dX;
 	    lastDY = dY;
 	    moveCount++;
