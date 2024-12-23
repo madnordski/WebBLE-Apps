@@ -780,7 +780,7 @@ function touchHandler(ev) {
 	servosActive = true;
 	moveCount = 0;
 	startTime = performance.now();
-	lastMoveTime = startTime;
+	lastMoveTime = 0;
 	//console.log("START");
     }
     else if ( ev.type == 'touchmove' && servosActive ) { // tell the
@@ -809,8 +809,13 @@ function touchHandler(ev) {
 	    lastDX = dX;
 	    lastDY = dY;
 	    moveCount++;
-	    let thisTime = performance.now() - lastMoveTime;
-	    if ( thisTime < minTime || minTime == 0 ) minTime = thisTime;
+	    if ( lastMoveTime == 0 ) {
+		lastMoveTime = performance.now();
+	    }
+	    else {
+		const thisTime = performance.now() - lastMoveTime;
+		if ( thisTime < minTime || minTime == 0 ) minTime = thisTime;
+	    }
 	}
     }
     else if ( ev.type == 'touchend' ) { // stop all movement asap
