@@ -299,6 +299,7 @@ blastIt.addEventListener('click', (event) => {
 	    writeOnControl("START");
 	    servosActive = true;
 	    burstCnt = 0;
+	    startTime = performance.now();
 	    setTimeout(startBurst, 20);
 	}
 	else {
@@ -323,9 +324,12 @@ function startBurst() {
 }
 
 function endBurst() {
+    const elapsedTime = performance.now() - startTime;
     servosActive = false;
     writeOnControl("STOP");
     servoMoveCnt.innerHTML = "Burst sent: " + burstCnt;
+    console.log("Actual ave time: ", Math.round(elapsedTime/burstCnt),
+		" ms/move");
 }
 	
 //****** Callback Handlers ********
@@ -817,7 +821,8 @@ function touchHandler(ev) {
 	servoMoveCnt.innerHTML = "Moves sent: " + moveCount;
 	const totalTime = performance.now() - startTime;
 	console.log("Total time: ", Math.round(totalTime/1000), " seconds");
-	console.log("Ave time: ", Math.round(totalTime / moveCount), " ms");
+	console.log("Ave time: ", Math.round(totalTime / moveCount),
+		    " ms/move");
     }
 }
 
