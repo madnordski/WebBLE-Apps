@@ -290,6 +290,8 @@ document.querySelector('.dot').addEventListener('touchend',
 document.querySelector('.dot').addEventListener('touchmove',
 						touchHandler, {passive: false});
 
+let burstCnt = 0;
+
 blastIt.addEventListener('click', (event) => {
     if ( isWebBluetoothEnabled() ) {
 	// connect or disconnect
@@ -306,14 +308,12 @@ blastIt.addEventListener('click', (event) => {
     }
 });
 
-let burstCnt = 0;
-
 function startBurst() {
     const msg = "1 1 " + burstCnt;
     //queueServoMove(msg);
     writeOnServo(msg);
     if ( burstCnt < 100 ) {
-	setTimeout(startBurst, 10);
+	setTimeout(startBurst, 100);
 	//console.log("burst ", burstCnt, msg);
     }
     else {
