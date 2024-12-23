@@ -801,8 +801,8 @@ function touchHandler(ev) {
 	if ( (dX != 0 || dY != 0)
 	     && (dX != lastDX || dY != lastDY) ) {
 	    var msg = dX.toString() + " " + dY.toString() + " " + moveCount;
-	    queueServoMove(msg); // **3**
-	    //writeOnServo(msg); // FOR TESTING W/O QUEUE
+	    //queueServoMove(msg); // **3**
+	    writeOnServo(msg); // FOR TESTING W/O QUEUE
 	    lastDX = dX;
 	    lastDY = dY;
 	    moveCount++;
