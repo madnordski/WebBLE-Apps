@@ -135,9 +135,10 @@ bool gACK = true;    // we start with this true for each connection because
 // We have a linked list that will record all of moves when requested.
 
 typedef struct listNode {
-  Servo *servo;
-  int speed;
-  int direction;
+  int speed1;
+  int direction1;
+  int speed2;
+  int direction2;
   unsigned long time;
   struct listNode *next;
 } Node;
@@ -167,21 +168,25 @@ void startList() {
     Add a move to the list. Notice, the last node will be
     empty. Relies on thisNode!!!
     
-    @param servo The servo that got this move command.
-    @param speed The speed setting for this servo.
-    @param direction The direction of movement.
+    @param speed1 The speed setting for this servo.
+    @param direction1 The direction of movement.
+    @param speed2 The speed setting for this servo.
+    @param direction2 The direction of movement.
+    @param time The time in ms since the start of recording.
     @return nothing.
 */
 
-void addToList(Servo *servo, int speed, int direction) {
+void addToList(int speed1, int direction1,
+	       int speed2, int direction2, unsigned long time) {
   if ( thisNode == NULL ) {
     sp1("ERROR in addToList: Attempt to add to a null list failed!");
   }
   else {
-    thisNode->servo = servo;
-    thisNode->speed = speed;
-    thisNode->direction = direction;
-    thisNode->time = millis() - gRecordStart;
+    thisNode->speed1 = speed1;
+    thisNode->direction1 = direction1;
+    thisNode->speed2 = speed2;
+    thisNode->direction2 = direction2;
+    thisNode->time = time;
     thisNode->next = (Node *) malloc(sizeof(Node));
     thisNode = thisNode->next;
     thisNode->next = NULL;
@@ -230,15 +235,16 @@ void playList() {
   gRecording = false;
 
   pStatusAspect->setValue("Playing back");
-  pStatusAspect->indicate();
+  pStatusAspect->notify();
   
   start = millis();
   
   while ( gPlaying && node != NULL && node->next != NULL ) {
     // each node has includes a delay from the start
     while (node->time > millis() - start) {}
-    // now we move
-    servoMove(node->servo, node->speed, node->direction);
+    // now we move or stop
+    moveServos(node->speed1, node->direction1,
+	       node->speed2, node->direction2);
     node = node->next;
   }
 
@@ -251,19 +257,19 @@ void playList() {
 */
 
 void playStop() {
-  servoStop(&servo1);
-  servoStop(&servo2);
-  gServoStatus = STOPPED;
+  stopServos();
   gPlaying = false;
   pStatusAspect->setValue("Playback Ended");
-  pStatusAspect->indicate();
+  pStatusAspect->notify();
 }
 
 void printList() {
   Node *node = rootNode;
   while ( node != NULL && node->next != NULL ) {
-    Serial.print("speed "); Serial.println(node->speed);
-    Serial.print("direction "); Serial.println(node->direction);
+    Serial.print("speed1 "); Serial.println(node->speed1);
+    Serial.print("direction1 "); Serial.println(node->direction1);
+    Serial.print("speed2 "); Serial.println(node->speed2);
+    Serial.print("direction2 "); Serial.println(node->direction2);
     Serial.print("time "); Serial.println(node->time);
     node = node->next;
   }
@@ -290,10 +296,42 @@ void servoMove(Servo *servo, int speed, int direction) {
   
   // NB: speed: 0 = 90 degrees = stop
   servo->write(code);
-  delay(15);
+  delay(5);
+  gServoStatus = MOVING;
+}
+
+/** moveServos
+
+    Move both servos and the specified speed and direction.  See
+    servoMove for an explanation of how the code is calculated.
+
+    @param speed1 ranges from slowest (0) to fastest (10).
+    @param direction1 use the constant CW for clockwise and CCW for
+    counter clockwise.
+    @param speed2 ranges from slowest (0) to fastest (10).
+    @param direction2 use the constant CW for clockwise and CCW for
+    counter clockwise.
+    @return nothing
+*/
+
+void moveServos(int speed1, int direction1,
+		int speed2, int direction2) {
+  unsigned long time = millis() - gRecordStart;
+  // speed = 0 to 10, direction = -1 for CW, 1 for CCW
+  if ( speed1 < 0 || speed1 > 10 ) speed1 = 5; // default speed if out of bounds
+  if ( speed2 < 0 || speed2 > 10 ) speed2 = 5; // default speed if out of bounds
+  int code1 = 90 + direction1 * speed1 * 9; // d=-1: 90 to 0, d=1: 90 to 180
+  int code2 = 90 + direction2 * speed2 * 9; // d=-1: 90 to 0, d=1: 90 to 180
+  
+  // NB: speed: 0 = 90 degrees = stop (use release to avoid jitter)
+  servo1.write(code1);  // for a car, keep these close together
+  servo2.write(code2);
+  if ( speed1 == 0 ) servo1.release();
+  if ( speed2 == 0 ) servo2.release();
+  // delay(5); // no delay???
   gServoStatus = MOVING;
   if ( gRecording ) 
-    addToList(servo, speed, direction);
+    addToList(speed1, direction1, speed2, direction2, time);
 }
 
 /** servoStop
@@ -309,6 +347,20 @@ void servoStop(Servo *servo) {
   servoMove(servo, STOP, STOP);
   servo->release();
   delay(15);
+  gServoStatus = STOPPED;
+}
+
+/** stopServos
+
+    Stop both servos.
+
+    @return nothing
+*/
+
+void stopServos() {
+  moveServos(0, 0, 0, 0);
+  servo1.release();
+  servo2.release();
   gServoStatus = STOPPED;
 }
 
@@ -435,9 +487,7 @@ class ControlAspectCallbacks : public BLECharacteristicCallbacks {
 	  playStop();
 	}
 	else {
-	  servoStop(&servo1);
-	  servoStop(&servo2);
-	  gServoStatus = STOPPED;
+	  stopServos();
 	  sp1("Stop completed.");
 	}
       }
@@ -500,10 +550,8 @@ class ServoAspectCallbacks : public BLECharacteristicCallbacks {
 	// move clockwise or counter clockwise
 	// NB: the motors get mounted upside down with respect to
 	// each other so CCW for one is CW for the other
-	if ( x )
-	  servoMove(&servo1, abs(x), x > 0 ? CCW : CW);
-	if ( y )
-	  servoMove(&servo2, abs(y), y > 0 ? CW : CCW);
+	moveServos(abs(x), x > 0 ? CCW : CW,
+		   abs(y), y > 0 ? CW : CCW);
       }
     }
   }
@@ -535,8 +583,8 @@ void setup() {
   pStatusAspect = pService->createCharacteristic(
 		      STATUS_ASPECT_UUID,
                       BLECharacteristic::PROPERTY_READ   |
-                      BLECharacteristic::PROPERTY_WRITE  |
-                      BLECharacteristic::PROPERTY_INDICATE
+                      BLECharacteristic::PROPERTY_WRITE_NR  |
+                      BLECharacteristic::PROPERTY_NOTIFY
                     );
 
   // Create the RED LED Characteristic
@@ -550,7 +598,7 @@ void setup() {
   // The client writes to this to move the servos
   pServoAspect = pService->createCharacteristic(
 		      SERVO_ASPECT_UUID,
-                      BLECharacteristic::PROPERTY_WRITE
+                      BLECharacteristic::PROPERTY_WRITE_NR
                     );
 
   // Create the control Characteristic
@@ -559,7 +607,7 @@ void setup() {
   // and acknowledge, see handler for details.
   pControlAspect = pService->createCharacteristic(
 		      CONTROL_ASPECT_UUID,
-		      BLECharacteristic::PROPERTY_WRITE);
+		      BLECharacteristic::PROPERTY_WRITE_NR);
 
   // Create a BLE Descriptor for the status aspect because it uses INDICATE
   pStatusAspect->addDescriptor(new BLE2902());
@@ -636,17 +684,6 @@ void setup() {
   sp2("number of nodes possible: ", h / sizeof(listNode));
 
   sp1("--------------------------------------------------------");
-  sp1("simple test of linked list...");
-  startList();
-  for (int i=0; i <= 10; i++) {
-    addToList(&servo1, i, 1);
-    addToList(&servo2, i, 1);
-    spin(50 * i);
-  }
-  sp2("free heap after mallocs: ", heap_caps_get_free_size(MALLOC_CAP_DEFAULT));
-  printList();
-  freeList();
-  sp2("free heap after free: ", heap_caps_get_free_size(MALLOC_CAP_DEFAULT));
   
 #endif
   
@@ -714,7 +751,7 @@ void loop() {
 
     // send our status update (which is also a heartbeat, aka ping-pong)
     pStatusAspect->setValue(msg);
-    pStatusAspect->indicate();
+    pStatusAspect->notify();
 
     // reset the heartbeat timer
     gHeartbeat = millis();
