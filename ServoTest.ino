@@ -11,7 +11,7 @@
      connected.  The intended client is ServoTest.html and runs in a
      Chrome browser on Android.  You can see BLE characteristics and
      toggle the red LED state using a BLE tool such as nRF Connect or
-     Light Blue.  Read the comments in this file and especially in
+     LightBlue.  Read the comments in this file and especially in
      ServoTest.html to understand what's going on here as well as a
      few important lessons regarding the use of Arduino ESP32 BLE
      library, touch events, Web BLE in Chrome and moving motors with
@@ -20,16 +20,16 @@
      This code has been run on an XIAO ESP32-C3 and an XIAO ESP32-S3
      but should run on other ESP32 boards. If your Arduino BLE library
      is out of date or you still have the old one installed, you'll
-     get a complie error due to the return type of
-     BLECharacteristic::getValue() changed.  Be sure to uninstall
+     get a complie error due to a change to the return type of
+     BLECharacteristic::getValue().  Be sure to uninstall
      older versions. I had to do this even after installing the new
      version.
 
-     NB: the word ASPECT is used to represent CHARACTERISTICS in many
-     places only because characteristics cumbersome to type. It has no
-     special meaning beyond representing characteristics. Just in case
-     you didn't know, NB is latin for <i>nota bene</i> which
-     translates to note well.
+     NB: the word ASPECT is used to represent CHARACTERISTICS in
+     variable names only because characteristics was cumbersome to
+     type. It has no special meaning beyond representing
+     characteristics. Just in case you didn't know, NB is latin for
+     <i>nota bene</i> which translates to note well.
      
      Uses BLE read/write/notify. 
 
@@ -43,7 +43,8 @@
      **1** Client Characteristic Configuration Descriptors (CCCD) meanings
      and use for 2902 and 2901.
 
-     **2** What is the preferred interval and does it make a difference?
+     **2** When using a WebBLE client, what is the preferred interval
+     and does it make a difference?
 
      **3** Optimizing the handling of motor movement or other possibly
      time consuming requests by using PROPERTY_WRITE_NR and FreeRTOS
@@ -66,7 +67,12 @@
 #include <BLE2901.h>
 #include <ESP32Servo.h>
 
+// uncomment to turn on debugging but also be aware, printing to the
+// serial monitor impacts timing (i.e. some ble callbacks might take
+// too long)
+
 //#define DEBUG
+
 #ifdef DEBUG
 #define sp1(x)   Serial.println(x)
 #define sp2(x,y) Serial.print(x);Serial.println(y)
@@ -74,6 +80,8 @@
 #define sp1(x)
 #define sp2(x,y)
 #endif
+
+// simplify serial print when full debugging isn't desired
 #define sp2s(x,y) Serial.print(x);Serial.print(" ");Serial.println(y)
 #define sp2x(x,y) Serial.print(x);Serial.println(y)
 #define sp1x(x)   Serial.println(x)
@@ -94,12 +102,8 @@ int minIntervalNA = 0; // don't set the minInterval, it's up to the client
 int minIntervalAndroid = 6; // 7.5ms (lowest setting for Android)
 int minInterval10  = 8;   //  10ms
 int minInterval20  = 16;   //  20ms
-int minInterval30  = 24;  //  30ms
 int minInterval40  = 32;  //  40ms
-int minInterval50  = 40;  //  50ms
-int minInterval75  = 60;  //  75ms
 int minInterval80  = 64;  //  80ms
-int minInterval100 = 80;  // 100ms
 int minInterval160 = 128; // 160ms
 int minInterval180 = 155; // 180ms (time for 6 20ms packets)
 int minInterval200 = 160; // 200ms (6 packet w/headroom)
@@ -112,14 +116,21 @@ int gIntervalSetting = minIntervalNA;
 // state variables
 bool deviceConnected = false;
 bool oldDeviceConnected = false;
-uint32_t value = 0;
 
 // we connect our LEDs and Servos to these pins on the ESP32-C3
 // NB: the C3 requires D9 instead of just 9 -- change this as needed
+
+#ifdef D9
 const int redPin = D9; // Use the appropriate GPIO pin for your setup
 const int grnPin = D10; // connected
 const int servo1Pin = D7; // must use D notation for digital pins on this board
 const int servo2Pin = D4; // must use D notation for digital pins on this board
+#else
+const int redPin = 9; // Use the appropriate GPIO pin for your setup
+const int grnPin = 10; // connected
+const int servo1Pin = 7; // must use D notation for digital pins on this board
+const int servo2Pin = 4; // must use D notation for digital pins on this board
+#endif
 
 // we will need servo class instances
 Servo servo1;   // X
@@ -127,8 +138,8 @@ Servo servo2;   // Y
 
 // **3** Create a queue for servo movements. This is used to keep
 // things from piling up on the BLE stack. It reduces errors
-// (slightly). NB: errors were eliminated by a client-side queue and
-// retry without tasks and queues on this, the server side.
+// (slightly). NB: errors were largely by use of WRITE_NR instead of
+// WRITE.
 
 // our servo queue handle
 QueueHandle_t servoCommandQueue;
@@ -141,6 +152,9 @@ struct ServoCommand {
   
 // See the following for generating UUIDs:
 // https://www.uuidgenerator.net/
+// If you modify this file to create your own project, generate new
+// UUIDs to replace these.
+
 #define SERVICE_UUID        "75f29868-d8a4-452c-a78b-1f698ee6ab2b"
 #define STATUS_ASPECT_UUID "1a476625-3aae-4ab4-a1a7-0c9e1f5c97e0"
 #define LED_ASPECT_UUID "19b10002-e8f2-537e-4f6c-d104768a1214"
@@ -186,7 +200,7 @@ void servoMove(Servo *servo, int speed, int direction) {
   
   // NB: speed: 0 = 90 degrees = stop
   servo->write(code);
-  delay(15);
+  //spin(15);
 }
 
 /** servoStop
@@ -201,7 +215,7 @@ void servoMove(Servo *servo, int speed, int direction) {
 void servoStop(Servo *servo) {
   servoMove(servo, STOP, STOP);
   servo->release();
-  delay(15);
+  //spin(15);
   gServoStatus = STOPPED;
 }
 
@@ -214,7 +228,8 @@ void servoStop(Servo *servo) {
 
 class ServerCallbacks: public BLEServerCallbacks {
   /** onConnect
-      Set the connection flag and turn the green led on.
+      Set the connection flag and turn the green led on.  The loop()
+      takes action when the connection status changes.
   */
   
   void onConnect(BLEServer* pServer) {
@@ -223,11 +238,12 @@ class ServerCallbacks: public BLEServerCallbacks {
   };
 
   /** onDisconnect
-      Set the connection flag and turn off the green LED.
-      When does this get called?
-      1. Intentional disconnect?
-      2. Browser close?
-      3. Bluetooth turned off?
+      Set the connection flag and turn off the green LED. The loop()
+      takes action when the deviceConnected status changes.
+      Gets called when the WebBLE client:
+      1. Intentionally disconnects
+      2. Browser is closed
+      3. Turns Bluetooth off
   */
   
   void onDisconnect(BLEServer* pServer) {
@@ -246,9 +262,9 @@ class ServerCallbacks: public BLEServerCallbacks {
 class LEDAspectCallbacks : public BLECharacteristicCallbacks {
   /** onWrite
       
-      Get the value the client has sent. The version of the ESP32-C3
-      BLE Arduino library we are using returns a C++ String. Some
-      versions returned a C-string pointer instead (October 2024).
+      Get the value the client has sent. Some older verions of the BLE
+      Arduino library returned a stanard C string. Newer versions
+      return a C-string pointer instead (October 2024).
 
       @param pLedAspect The Charactistic object containing the value.
       @return nothing
@@ -265,7 +281,8 @@ class LEDAspectCallbacks : public BLECharacteristicCallbacks {
       // act on the command with no error checking
       if ( strstr("off", cstr) ) {
         digitalWrite(redPin, LOW);
-      } else {
+      }
+      else { // we could insist on "on" but we don't
         digitalWrite(redPin, HIGH);
       }
     }
@@ -282,24 +299,26 @@ class LEDAspectCallbacks : public BLECharacteristicCallbacks {
     DIE       This restarts the server. We do this when we disconnect
               to ensure the next connection starts fresh. We
               discovered there are situations when the onDisconnect
-	      callback cannot be relied upon. (obsolete)
+	      callback cannot be relied upon. (obsolete, not used)
     ACK       This is used to acknowledge the client recieved our status
               update.  We use this as proof of life for the client. If
 	      the client shutdown, we want to restart so that we can
-	      accept a new connection. (obsolete)
+	      accept a new connection. (obsolete, not used)
     STOP      Stop the servos. Using a separate characteristic for STOP
               and START insures these commands don't get lost in the
 	      stream of move commands the client sends when a finger is
-	      moving on the touch screen.
+	      moving on the touch screen.  NB: these also circumvent
+              move commands in the queue (when used).
     START     Prepare for movement. Sent when the touch screen if first
-              touched.
-    SPEED a s Sets the servo speed.  For example, "SPEED 0 6" sets the X
-              axis to speed zero and "SPEED 1 9" sets the Y servo to 9.
-              The speed setting is 0 to 10 with 0 for slowest, 10 for fastest.
-    
+              touched.  Needed to make STOP work properly.
+    SPEED a s Sets the servo speed.  a is for axis (0=x, 1=y) and s is
+              for speed (0 to 10). For example, "SPEED 0 6" sets the X
+              axis to speed zero and "SPEED 1 9" sets the Y servo to
+              9.  The speed setting is 0 to 10 with 0 for slowest, 10
+              for fastest.
 */
 
-bool gACK = true; // this is no longer used
+bool gACK = true; // was for proof of life, this is no longer used
 
 class ControlAspectCallbacks : public BLECharacteristicCallbacks {
   void onWrite(BLECharacteristic *pControlAspect){
@@ -319,12 +338,12 @@ class ControlAspectCallbacks : public BLECharacteristicCallbacks {
       }
       else if ( strstr(cstr, "STOP") ) {
 	unsigned long elapsedTime;
+	elapsedTime =  millis() - gStartTime;
 	// STOP THE ENGINES!
 	gServoStatus = STOPPED; // do this first because moves could be queued
 	servoStop(&servo1);
 	servoStop(&servo2);
 	sp1("Stop completed.");
-	elapsedTime =  millis() - gStartTime;
 	spin(20);
 	sp2x("elapsed time: ", elapsedTime);
 	spin(20);
@@ -338,7 +357,7 @@ class ControlAspectCallbacks : public BLECharacteristicCallbacks {
 	gMoveCount = 0;
 	gLastN = 0;
 	gStartTime = millis();
-	sp1x("Ready completed.");
+	sp1("Ready completed.");
       }
       else if ( strstr(cstr, "SPEED")
 		&& (p = strtok_r(cstr, " ", &tok)) != NULL ) {
@@ -362,13 +381,18 @@ class ControlAspectCallbacks : public BLECharacteristicCallbacks {
     client. NB: this does not include starting or stopping the servos.
 
     The client sends two numbers (X,Y) as a text message. These numbers
-    tell us which motor to turn on and which direction it should turn.
+    tell us which motor to move and which direction it should turn.
 
     Acceptible values for X and Y are only -1 and 1, zero is ignored
     so use the STOP command to stop the servos. The -1 is for
     clockwise and 1 if for CCW.  The speed of the motors is set with
     the SPEED command.  This will only ever start or reverse servo
     motion at the user set speed.
+
+    The command string also contains a move number. We used this to
+    ensure we are performing moves in the intended order.  NB: when
+    using client retry without also using a client queue, move
+    commands sometimes arrived in the incorrect order.
 */
 
 class ServoAspectCallbacks : public BLECharacteristicCallbacks {
@@ -405,13 +429,22 @@ class ServoAspectCallbacks : public BLECharacteristicCallbacks {
 	sp2("y=", y);
 	command.x = x;
 	command.y = y;
-	
-	// queue this move and return
-	if ( xQueueSend(servoCommandQueue, &command, 0) != pdTRUE ) {
-	  Serial.println("Servo queue is full!");
+
+	if ( true ) { // TRUE = use queue, FALSE = don't use queue
+	  // queue this move and return
+	  if ( xQueueSend(servoCommandQueue, &command, 0) != pdTRUE ) {
+	    Serial.println("Servo queue is full!");
+	  }
+	  else if ( x || y ) {
+	    gServoStatus = MOVING;
+	  }
 	}
-	else if ( x || y ) {
-	  gServoStatus = MOVING;
+	else if ( gServoStatus != STOPPED ) {
+	  if ( command.x )
+	    servoMove(&servo1, gXSpeed, command.x > 0 ? CCW : CW);
+	  if ( command.y )
+	    servoMove(&servo2, gYSpeed, command.y > 0 ? CCW : CW);
+	  if ( x || y ) gServoStatus= MOVING;
 	}
       }
     }
@@ -422,8 +455,9 @@ class ServoAspectCallbacks : public BLECharacteristicCallbacks {
 
  **3** Moving motors gets it's own thread because it takes
  time. Servicing it in the BLE callback causes the BLE stack to get
- overwhelmed, increasing the number of errors that occur when
- the client writes to this server to move servos.
+ overwhelmed under certain test conditions resulting in an increased
+ number of errors that occur when the client writes to this server to
+ move servos.
 
  NB: When we get the stop command, this task will drain the queue.
  
@@ -431,11 +465,12 @@ class ServoAspectCallbacks : public BLECharacteristicCallbacks {
  
 */
 
-void servoTask(void *param) {
+void servoTask(void *param) { 
   ServoCommand command;
   while ( true ) {
     if ( xQueueReceive(servoCommandQueue, &command, portMAX_DELAY) ) {
-      if ( gServoStatus != STOPPED ) {
+      if ( gServoStatus != STOPPED ) { // control command stop, drains
+				       // the queue
 	if ( command.x )
 	  servoMove(&servo1, gXSpeed, command.x > 0 ? CCW : CW);
 	if ( command.y )
@@ -444,6 +479,8 @@ void servoTask(void *param) {
     }
   }
 }
+
+// SETUP
 
 void setup() {
   // serial output for debugging only, see #debug above
@@ -466,8 +503,24 @@ void setup() {
   BLEService *pService = pServer->createService(SERVICE_UUID);
 
   // Create the Status Characteristic (herein called Aspects)
-  // This is used to communicate the status of servos but is also used
-  // as a heartbeat - the client responds to the heartbeat to prove it's alive
+  // This is used to communicate the status of servos
+  
+  /* NB: Tested and rejected:
+
+     1. Use of this for a heartbeat to detect client disconnection.  We
+     tested using this plus gACK acknowledgement as a way for the
+     client to prove it was alive.  Due to a bug in the RNT example,
+     client disconnects were not being handled properly.  Once we
+     found and corrected the bug in ServoTest.html, proof of life was
+     no longer necessary.
+     
+     2. Use of INDICATE instead of NOTIFY. By using INDICATE we
+     determined it has no functional benefit when using WebBLE and the
+     Arduino BLE library.  It does increase overhead in the BLE layer,
+     however, by requiring replies for each INDICATE sent.  When using
+     the Arduino Library for BLE, INDICATE should not be used.
+  */
+  
   pStatusAspect = pService->createCharacteristic(
 		      STATUS_ASPECT_UUID,
                       BLECharacteristic::PROPERTY_READ   |
@@ -488,40 +541,42 @@ void setup() {
   // PROPERTY_WRITE.  With no client or server side queues or retries
   // the error rate was reduced in half when WRITE_NR was used as
   // compared to WRITE (with response).  We learned that the BLE Layer
-  // expects a response when READ, WRITE and INDICATE are used and
-  // that this takes time and resources. When using the Espressif IDF
-  // one can make full use of the response but when using the Arduino
-  // BLE library the response methods are not available.
-  // Functionally, this makes INDICATE no different than NOTIFY except
-  // that INDICATE adds overhead.  For WRITE versus WRITE_NR we
-  // inferred that when the WebBLE client does not get the reply in
-  // time, a Network error is thrown as observed by our
-  // Javascript. Therefore, if there are critical messages to write
-  // use WRITE instead of WRITE_NR so that failures can be detected
-  // and retried by the Javascript.  Otherwise, use WRITE_NR because
-  // there is less overhead which makes it faster.
+  // expects a response when WRITE and INDICATE are used and that this
+  // takes time and resources. When using the Espressif IDF one can
+  // make full use of the response but when using the Arduino BLE
+  // library, the response callbacks are not available.  Functionally,
+  // this makes INDICATE no different than NOTIFY except that INDICATE
+  // adds overhead.  For WRITE versus WRITE_NR we inferred that when
+  // the WebBLE client does not get the reply in time, a Network error
+  // is thrown as observed by the Javascript debugger. Therefore, use
+  // WRITE_NR because there is less overhead which makes it faster. In
+  // our experiments, no messages were silently lost when WRITE_NR was
+  // used.
   
   // Create the Servo Characteristic
   // The client writes to this to move the servos
+  
   pServoAspect = pService->createCharacteristic(
 		      SERVO_ASPECT_UUID,
                       BLECharacteristic::PROPERTY_WRITE_NR
                     );
 
-  // **3** For the Control Characteristic, make the BLE Layer wait for
-  // a response by using WRITE. This allows us to retry all failures
-  // on the client (javascript) side.
+  // **3** For the Control Characteristic, use WRITE_NR.
+  // While WRITE might seem like a way to allow us to retry all failures
+  // on the client (javascript) side -- it screws up subsequent writes
+  // to the ServoAspect..
   
-  // Create the control Characteristic It turned out to be essential
-  // to have a characteristic-write so that the client could stop the
+  // Create the control Characteristic -- It turned out to be essential
+  // to have a characteristic-write_nr so that the client could stop the
   // servos immediately. When stop was within the stream of move
   // commands, the servos would keep going until the backlog of move
   // commands completed.  By having this control aspect we can stop
-  // the motors immediately.  Other uses include restart, speed
-  // setting and acknowledge, see handler for details.
+  // the motors immediately.  Other uses include start and speed
+  // setting, see handler for details.
+  
   pControlAspect = pService->createCharacteristic(
 		      CONTROL_ASPECT_UUID,
-		      BLECharacteristic::PROPERTY_WRITE);
+		      BLECharacteristic::PROPERTY_WRITE_NR);
 
   // **1** Client Characteristic Configuration Descriptors (CCCD),
   // 2901 & 2902.
@@ -530,7 +585,7 @@ void setup() {
   // it uses NOTIFY
   pStatusAspect->addDescriptor(new BLE2902());
 
-  // these are definitely not needed
+  // these are definitely not needed here (only needed for NOTIFY & INDICATE)
   //pLedAspect->addDescriptor(new BLE2902());
   //pServoAspect->addDescriptor(new BLE2902());
   //pControlAspect->addDescriptor(new BLE2902());
@@ -552,7 +607,7 @@ void setup() {
   ledD2901->setAccessPermissions(ESP_GATT_PERM_READ);
   pLedAspect->addDescriptor(ledD2901);
   
-  // **1** What we learned here we need a CCCD for each characteristic
+  // **1** What we learned here: we need a CCCD for each characteristic
   // with which we want to perform notify or indicate operations.  The
   // 2902 CCCD is needed because notify & indicate are actually
   // enabled by the client.  The client sets a value in the 2902 CCCD
@@ -587,7 +642,7 @@ void setup() {
   startServos();
 
   // **3**
-  // Create the task & queue so that when the client asked to move the
+  // Create the task & queue so that when the client asks to move the
   // motors, the BLE stack can return right away. This task will then
   // move the motors in the background.
 
@@ -615,14 +670,16 @@ void setup() {
   // **2** We tried using different intervals here to see if that had
   // any impact on our app.  We arranged for the javascript to send
   // servo commands via WRITE with no queue or retry.  The we compiled
-  // this code with each interval setting. For each, we counted the
-  // number of write errors after moving a finger on the touchpad area
-  // in a consistent and prescribed manner.  We repeated this twice
-  // for each setting.  On average, there was no difference but 50 ms
-  // produced the fewest errors total, followed by 30 ms. These
-  // one-time differences were mostly likely due to finger movement
-  // variation.  We concluded that WebBLE ignores this preference
-  // which is not surprising and allowed by the BLE protocol.
+  // this code with each interval setting. We also created a BURST
+  // button on the client that sent move commands at a fixed interval
+  // using javascript. The shortest usable burst interval was around
+  // 20ms. We recorded the number of errors during the burst and
+  // verified the timing on the ESP32 side.  We repeated bursts for
+  // each minPreferred setting 3 times.  While there was some
+  // variation, there were no differences that could be associated
+  // with any particular value of minPreferred.  We concluded that
+  // WebBLE ignores this preference which is not surprising and
+  // allowed by the BLE protocol.
   
   // 0x0 leaves the connection interval up to the client
   pAdvertising->setMinPreferred(gIntervalSetting);
@@ -643,7 +700,7 @@ void setup() {
 void startBLE() {
   // it's possible to do all the BLE setup here and then we
   // could deinit() ble to disconnect all clients
-  // but, why not just restart???
+  // but, why not just restart??? Is deinit() ever necessary???
 }
 
 // these global variables support our loop
@@ -658,7 +715,7 @@ void loop() {
   char moves[10];
   
   // BLE notify is used to tell the client we have a status update.
-  // Status updates come every second or when the status changes.
+  // Status updates are sent when the status changes.
   // We only do updates when we're connected of course.
   // nb: Notify or Indicate -- functionally the same, Indicate is more
   // overhead.
@@ -667,11 +724,12 @@ void loop() {
     gLastStatus = gServoStatus;
     if ( gLastStatus == MOVING  ) strcpy(msg, "Servos Moving");
     if ( gLastStatus == STOPPED ) {
+      // include the number of moves performed when stopped
       strcpy(msg, "Stopped ");
       itoa(gMoveCount, moves, 10);
       strcat(msg, moves);
       if ( gMoveCount != gLastCnt ) {
-	Serial.println(msg);
+	sp1x(msg);
 	gLastCnt = gMoveCount;
       }
     }
@@ -684,8 +742,6 @@ void loop() {
   }
   
   // Our onDisconnect callback has been triggered.
-  // This might not ever happen because the client tells us to restart
-  // when it goes away.
   if (!deviceConnected && oldDeviceConnected) {
     sp1("Device disconnected.");
     delay(500); // give the bluetooth stack the chance to get things ready
