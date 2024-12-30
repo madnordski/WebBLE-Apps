@@ -559,9 +559,7 @@ async function writeOnServo(value){
 	    // in rapid succession
 	    if ( error.name === 'NetworkError'
 	       || error.name === 'NotSupportedError' ) { // if busy, try again
-		//console.log("busy, trying again");
-		await delay(50);
-		return writeOnServo(value);
+		console.log("busy error", error);
 	    }
 	    else {
                 console.warn("Error writing to the Servo: ", error);
