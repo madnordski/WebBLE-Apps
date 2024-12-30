@@ -60,7 +60,8 @@
 #include <esp_heap_caps.h>
 #include <esp_flash.h> // For flash memory APIs
 
-//#define DEBUG (timings are wrong when debug is enabled)
+//#define DEBUG
+// (timings are wrong when debug is enabled)
 #ifdef DEBUG
 #define sp1(x)   Serial.println(x)
 #define sp2(x,y) Serial.print(x);Serial.println(y)
@@ -68,6 +69,8 @@
 #define sp1(x)
 #define sp2(x,y)
 #endif
+#define sp1x(x)   Serial.println(x)
+#define sp2x(x,y) Serial.print(x);Serial.println(y)
 
 // BLE instance pointers
 BLEServer *pServer = NULL;
@@ -128,9 +131,6 @@ unsigned long gRecordStart = 0;
 // any reason. We did it this way because the client can end without
 // ever triggering the onDisconnect callback. ESP.restart() is our
 // standard way to get ready for the next connection.
-
-bool gACK = true;    // we start with this true for each connection because
-                     // we are checking on the previous status update
 
 // We have a linked list that will record all of moves when requested.
 
@@ -322,10 +322,14 @@ void moveServos(int speed1, int direction1,
   if ( speed2 < 0 || speed2 > 10 ) speed2 = 5; // default speed if out of bounds
   int code1 = 90 + direction1 * speed1 * 9; // d=-1: 90 to 0, d=1: 90 to 180
   int code2 = 90 + direction2 * speed2 * 9; // d=-1: 90 to 0, d=1: 90 to 180
+  sp2("d1=", direction1);
+  sp2("d2=", direction2);
+  sp2("c1=", code1);
+  sp2("c2=", code2);
   
   // NB: speed: 0 = 90 degrees = stop (use release to avoid jitter)
-  servo1.write(code1);  // for a car, keep these close together
   servo2.write(code2);
+  servo1.write(code1);  // for a car, keep these close together
   if ( speed1 == 0 ) servo1.release();
   if ( speed2 == 0 ) servo2.release();
   // delay(5); // no delay???
@@ -373,14 +377,12 @@ void stopServos() {
 
 class ServerCallbacks: public BLEServerCallbacks {
   /** onConnect
-      Set the connection flag, turn the green led on and set gACK to
-      true.
+      Set the connection flag and turn the green led on.
   */
   
   void onConnect(BLEServer* pServer) {
     deviceConnected = true;
     digitalWrite(grnPin, HIGH);
-    gACK = true; // set this true for the first proof of life check
   };
 
   /** onDisconnect
@@ -439,10 +441,6 @@ class LEDAspectCallbacks : public BLECharacteristicCallbacks {
               to ensure the next connection starts fresh. We
               discovered there are situations when the onDisconnect
 	      callback cannot be relied upon.
-    ACK       This is used to acknowledge the client recieved our status
-              update.  We use this as proof of life for the client. If
-	      the client shutdown, we want to restart so that we can
-	      accept a new connection.
     STOP      Stop the servos. Using a separate characteristic for STOP
               and START insures these commands don't get lost in the
 	      stream of move commands the client sends when a finger is
@@ -467,10 +465,6 @@ class ControlAspectCallbacks : public BLECharacteristicCallbacks {
       if ( strstr(cstr, "DIE") ) {
 	// the cleanest way to be ready for next connection is to restart
 	ESP.restart();
-      }
-      else if ( strstr(cstr, "ACK") ) {
-	// proof of life acknowledgment from client
-	gACK = true;
       }
       else if ( strstr(cstr, "REC_BEGIN") ) {
 	startList();
@@ -591,7 +585,7 @@ void setup() {
   // This toggles the red led
   pLedAspect = pService->createCharacteristic(
                       LED_ASPECT_UUID,
-                      BLECharacteristic::PROPERTY_WRITE
+                      BLECharacteristic::PROPERTY_WRITE_NR
                     );
 
   // Create the Servo Characteristic
@@ -672,7 +666,10 @@ void setup() {
   digitalWrite(grnPin, LOW);
 
   // optionally do a little dance at startup
-  //servoTest(&servo1);
+#ifdef DEBUG
+  //servoTest();
+#endif
+
   // system info
 
 #ifdef DEBUG
@@ -699,11 +696,6 @@ void startBLE() {
 
 int gLastStatus = READY; // set to ready so that we write immediately
 
-// when connected, check on the client reqularly by indicating status
-unsigned long gHeartbeat = millis();     // timer
-const unsigned long gHBI = 1000;         // heartbeat interval
-const unsigned long gProofOfLife = 2000; // client must respond in this time
-
 void loop() {
   char msg[21];
 
@@ -715,47 +707,26 @@ void loop() {
     playStop();
   }
   
-  // BLE indicate is used to tell the client we have a status update.
-  // Status updates come every second or when the status changes.
-  // We only do updates when we're connected of course.
-  // nb: Notify or Indicate -- not sure it matters when using the ESP
-  // BLE library for Arduino because we don't have access to error
-  // callbacks (that's why we do our own using gACK).
+  // BLE notify is used to tell the client we have a status update.
+  // Status updates come when the status changes.  We only do updates
+  // when we're connected of course.  nb: Notify or Indicate -- no
+  // reason to ever use Indicate!  When using the BLE library for
+  // Arduino because we don't have access to error callbacks which
+  // makes Indicate functionally the same as Notify but with more
+  // overhead and a greater chance of error.
   
-  if ( deviceConnected
-       && (gLastStatus != gServoStatus || millis() - gHeartbeat > gHBI) ) {
+  if ( deviceConnected && gLastStatus != gServoStatus ) {
     gLastStatus = gServoStatus;
     if ( gLastStatus == MOVING  ) strcpy(msg, "Servos Moving");
     if ( gLastStatus == STOPPED ) strcpy(msg, "Servos Stopped");
     if ( gLastStatus == READY   ) strcpy(msg, "Servos Ready");
     if ( gRecording )             strcpy(msg, "Recording...");
 
-    // Before indicating a status update, we check to see if the
-    // previous update was acknowledged by the client.
-    // This proof of life must be received in gProofOfLifeTime or we
-    // reboot so that we are ready for the next connection.
-    // NB: gACK is set to true when a client connects
-    
-    unsigned long start = millis();   // start the proof of life timer
-    while ( !gACK ) {
-      if ( millis() - start > gProofOfLife ) {
-	ESP.restart();
-      }
-      sp1("waiting for ACK...");
-      spin(50);
-    }
-    sp1("ACK recieved");
-
-    // set gACK to false for this update - the client will set it true
-    gACK = false;
-
     // send our status update (which is also a heartbeat, aka ping-pong)
     pStatusAspect->setValue(msg);
     pStatusAspect->notify();
 
-    // reset the heartbeat timer
-    gHeartbeat = millis();
-    sp2("Indication sent: ", msg);
+    sp2("Notification sent: ", msg);
   }
   
   // Our onDisconnect callback has been triggered.
@@ -808,25 +779,22 @@ void startServos() {
   delay(300);
 }
 
-void servoTest(Servo *servo) {
-  int speed = 5;
+void servoTest() {
+  int speed = 10;
   Serial.println("start servo test");
   // zero to 90 = 1.0 ms to 1.5 ms
   // 90 to 180 = 1.5 ms to 2.0 ms
-  Serial.println("Spin CW");
-  servoMove(servo, speed, CW);
-  for (unsigned long start = millis(); millis() - start < 2000; ) {
-  }
-  servoStop(servo);
-  delay(1000);
-  Serial.println("Spin CCW");
-  servoMove(servo, speed, CCW);
-  for (unsigned long start = millis(); millis() - start < 2000; ) {
-  }
-  servoStop(servo);
-  delay(1000);
-  Serial.println("Bonus! Spin both CCW");
+  Serial.println("go forward");
   servoMove(&servo1, speed, CCW);
+  servoMove(&servo2, speed, CW);
+  
+  for (unsigned long start = millis(); millis() - start < 2000; ) {
+  }
+  servoStop(&servo1); servoStop(&servo2);
+  for (unsigned long start = millis(); millis() - start < 1000; ) {
+  }
+  Serial.println("go back");
+  servoMove(&servo1, speed, CW);
   servoMove(&servo2, speed, CCW);
   for (unsigned long start = millis(); millis() - start < 2000; ) {
   }
