@@ -559,10 +559,10 @@ async function writeOnServo(value){
 	    // in rapid succession
 	    if ( error.name === 'NetworkError'
 	       || error.name === 'NotSupportedError' ) { // if busy, try again
-		console.log("busy error", error);
+		console.warn("busy error", error);
 	    }
 	    else {
-                console.warn("Error writing to the Servo: ", error);
+                console.error("Error writing to the Servo: ", error);
             }
 	}
     } else {
