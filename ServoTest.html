@@ -8,9 +8,9 @@
      
      This project is being used to help develop the interface for a
      project that might use servos, dc motors, stepping motors or a
-     combination of these.  While we await arrival of the hardware we
-     need to conduct our physical experiments, we can make progress by
-     tinkering with the user interface.
+     combination of these.  While we await arrival of the hardware, we
+     can conduct a few experiments. Here we will make progress by
+     tinkering with the user interface and WebBLE.
 
      WebBLE reference:
          https://developer.chrome.com/docs/capabilities/bluetooth
@@ -25,13 +25,13 @@
      NB: The WebBLE security model requires that thiis script run over
      https, which we accomplish by launching it from our GITHUB
      page. Alternatively, (according to documentation) it can be
-     loaded from the phone it runs on.  However, editing and debuging
-     javascript on a phone is very limited.  Using a browser on our
-     desktop computer allows the use the full javascript debugger in
-     Chrome.
+     loaded from the phone it runs on.  However, we have not tried
+     this.  We connect our phone to our computer of USB so that we can
+     use a browser on our desktop computer which allows the use the
+     full javascript debugger in Chrome.
 
-     For the most part, we call BLE Characteristics, Aspects because it
-     is easier to type.
+     NB: For the most part, we call BLE Characteristics, Aspects
+     because it is easier to type.
 
 To connect the Android phone to Chrome running on our desktop:
 
@@ -41,7 +41,7 @@ To connect the Android phone to Chrome running on our desktop:
 
 3. If USB debugging is already enabled, disable it, pause and enable
    it again before proceeding. If you don't have developer options,
-   google how to enable them.
+   google how to enable them. (may only be neccessary the first time)
 
 4. On the phone, load the web page you want to connect and debug. In
    this case, it is:
@@ -55,7 +55,7 @@ To connect the Android phone to Chrome running on our desktop:
 6. The phone should prompt you to allow USB Debugging, select Allow.
 
 7. On the web page check the checkbox "Discover network targets", if it
-   already checked, uncheck it.  Take a breath.
+   is already checked, uncheck it.  Take a breath.
 
 8. Now uncheck the "Discover network tarkets" checkbox.
 
@@ -70,8 +70,9 @@ To connect the Android phone to Chrome running on our desktop:
    
    **2** It uses touch events to move servo motors.
 
-   **3** It implements a queue for touch events.
-   
+   **3** It implements a queue for touch events and will retry in the
+   event of an error.  The queue ensures that the commands are sent in
+   the correct order.
 
   Copyright (c) 2024, Joseph J. King, PhD
 
@@ -194,6 +195,9 @@ To connect the Android phone to Chrome running on our desktop:
     </tr>
     <tr><td>Connect</td><td>Red LED</td></tr>
     <tr><td colspan=2>
+	<!-- we added a burst button so that we could control the time
+	between move commands sent to the esp32 for testing.
+	-->
     <button type='button' id='blast' name='BLAST'>BURST</button></td></tr>
   </table>
   
@@ -291,6 +295,15 @@ document.querySelector('.dot').addEventListener('touchmove',
 						touchHandler, {passive: false});
 
 let burstCnt = 0;
+let burstInterval = 20; // milliseconds between move commands to ESP32
+
+/* BURST of move commands can be sent at the press of a button.  This
+ * is used to test minPreference() and WRITE_NR settings on the ESP32.
+ *
+ * We observed, the shortest time between moves when using our finger
+ * on the touch area was about 20 ms.
+ *
+ */
 
 blastIt.addEventListener('click', (event) => {
     if ( isWebBluetoothEnabled() ) {
@@ -300,7 +313,7 @@ blastIt.addEventListener('click', (event) => {
 	    servosActive = true;
 	    burstCnt = 0;
 	    startTime = performance.now();
-	    setTimeout(startBurst, 20);
+	    setTimeout(startBurst, burstInterval);
 	}
 	else {
 	    // not connected so we connect
@@ -309,25 +322,42 @@ blastIt.addEventListener('click', (event) => {
     }
 });
 
+/* startBurst
+
+   This calls itself 100 tines with the specified timing between each
+   call. Keep in mind that javascript is single thread and there is no
+   premption so the exact timing could be longer.  We observed 20ms
+   was about as fast as we could go with our finger and this routine.
+*/
+
 function startBurst() {
     const msg = "1 1 " + burstCnt;
     if ( burstCnt < 100 ) {
-	writeOnServo(msg);
-	//queueServoMove(msg);
+	writeOnServo(msg);     // when sending bursts for errors or
+	// performance optimization, we don't want to retry or use the queue
+	//queueServoMove(msg); 
 	burstCnt++;
-	setTimeout(startBurst, 20);
+	setTimeout(startBurst, burstInterval);
 	//console.log("burst ", burstCnt, msg);
     }
     else {
-	setTimeout(endBurst, 20);
+	setTimeout(endBurst, burstInterval);
     }
 }
+
+/* endBurst
+
+   This sends the stop at the end of a burst of moves. We print the
+   time per move but keep in mind this includes the start and stop so
+   we expect it to be close but not exactly the burstInterval.
+
+*/
 
 function endBurst() {
     const elapsedTime = performance.now() - startTime;
     servosActive = false;
     writeOnControl("STOP");
-    servoMoveCnt.innerHTML = "Burst sent: " + burstCnt;
+    servoMoveCnt.innerHTML = "Moves sent: " + burstCnt;
     console.log("Actual ave time: ", Math.round(elapsedTime/burstCnt),
 		" ms/move");
 }
@@ -340,6 +370,9 @@ function endBurst() {
    There was a bug in the RNT script that prevented this from
    firing. When the ESP32 disconnects, we reload this page so that we
    can start fresh and be ready for a new connection.
+
+   This callback is established when the connection is made, see
+   connectToDevice.
 */
 
 function onDisconnected(event) {
@@ -625,8 +658,6 @@ async function writeOnServo(value){
 		//throw error;  // toss it back to the queue for a retry
 		// FOR TESTING W/O QUEUE
 		console.warn("writeOnServo busy!", error.name, error.message);
-		//delay(20);
-		//writeOnServo(value); // retry
 	    }
 	    else {
                 console.error("Failed writing to the Servo: ", error);
@@ -657,7 +688,8 @@ let servoBusy = false;
    
    The touchmove event simply enqueues BLE writes to a queue using
    queueServoMove.  This function will call itself as needed to empty
-   the queue.
+   the queue. NB: retries and queuing could be disabled by a few
+   commented-out lines in writeOnServo and in the touchmove handler.
    
 */
 
