@@ -896,14 +896,14 @@ function initialValues() {
 function disconnectDevice() {
     console.log("Disconnect Device called.");
     if (bleServer && bleServer.connected) {
-	if (activeStatusAspect) {
-	    activeStatusAspect.stopNotifications()
-	}
+	//if (activeStatusAspect) {
+	//    activeStatusAspect.stopNotifications()
+	//}
 	// shutdown the bluetooth connection
 	writeOnControl("DIE");
 	console.log("Die sent");
-	sleep(100);
-	bluetoothDevice.gatt.disconnect();
+	//sleep(100);
+	//bluetoothDevice.gatt.disconnect();
 	bluetoothDevice = null;
 	bleServer = null;
     }
