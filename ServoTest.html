@@ -269,15 +269,7 @@ grnLED.addEventListener('click', (event) => {
 	// connect or disconnect
 	if ( bluetoothDevice && bluetoothDevice.gatt.connected ) {
 	    // we are connected so disconnect
-	    if (bleServer && bleServer.connected) {
-		if (activeStatusAspect) {
-		    activeStatusAspect.stopNotifications()
-		}
-	    }
-	    // shutdown the bluetooth connection
-	    bluetoothDevice.gatt.disconnect();
-	    bluetoothDevice = null;
-	    bleServer = null;
+	    disconnectDevice();
 	}
 	else {
 	    // not connected so we connect
@@ -902,8 +894,12 @@ function initialValues() {
 function disconnectDevice() {
     //console.log("Disconnect Device.");
     if (bleServer && bleServer.connected) {
-	//writeOnControl("DIE");  // tell the esp32 to restart
+	if (activeStatusAspect) {
+	    activeStatusAspect.stopNotifications()
+	}
 	// shutdown the bluetooth connection
+	writeOnControl("DIE");
+	sleep(100);
 	bluetoothDevice.gatt.disconnect();
 	bluetoothDevice = null;
 	bleServer = null;
