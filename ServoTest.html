@@ -369,6 +369,7 @@ function endBurst() {
 
 function onDisconnected(event) {
     console.log('Device Disconnected');
+    writeOnControl("DIE");
     //location.reload(); // reset both ends
     
 }
