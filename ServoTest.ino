@@ -71,7 +71,7 @@
 // serial monitor impacts timing (i.e. some ble callbacks might take
 // too long)
 
-//#define DEBUG
+#define DEBUG
 
 #ifdef DEBUG
 #define sp1(x)   Serial.println(x)
@@ -120,17 +120,16 @@ bool oldDeviceConnected = false;
 // we connect our LEDs and Servos to these pins on the ESP32-C3
 // NB: the C3 requires D9 instead of just 9 -- change this as needed
 
-#ifdef D9
 const int redPin = D9; // Use the appropriate GPIO pin for your setup
 const int grnPin = D10; // connected
 const int servo1Pin = D7; // must use D notation for digital pins on this board
 const int servo2Pin = D4; // must use D notation for digital pins on this board
-#else
+/*
 const int redPin = 9; // Use the appropriate GPIO pin for your setup
 const int grnPin = 10; // connected
 const int servo1Pin = 7; // must use D notation for digital pins on this board
 const int servo2Pin = 4; // must use D notation for digital pins on this board
-#endif
+*/
 
 // we will need servo class instances
 Servo servo1;   // X
