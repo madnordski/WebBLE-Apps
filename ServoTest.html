@@ -357,7 +357,7 @@ function endBurst() {
     const elapsedTime = performance.now() - startTime;
     servosActive = false;
     writeOnControl("STOP");
-    servoMoveCnt.innerHTML = "Moves sent: " + burstCnt;
+    servoMoveCnt.innerHTML = "Moves, Sent " + burstCnt;
     console.log("Actual ave time: ", Math.round(elapsedTime/burstCnt),
 		" ms/move");
 }
