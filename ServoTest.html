@@ -303,6 +303,12 @@ let burstInterval = 5; // milliseconds between move commands to ESP32
  * We observed, the shortest time between moves when using our finger
  * on the touch area was about 20 ms.
  *
+ * On rare occaisions, we were able to get an error using the touch
+ * interface but had to reduce the burstInterval down to 5ms to see
+ * the error on the C3 (have not replicated this with the faster S3).
+ * Even on the C3 it didn't always occur.  So yeah, WebBLE/ESP32-BLE is
+ * pretty fast.
+ *
  */
 
 blastIt.addEventListener('click', (event) => {
