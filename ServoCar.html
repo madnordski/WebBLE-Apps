@@ -555,10 +555,9 @@ async function writeOnServo(value){
 		});
 	}
 	catch (error) {
-	    // retry the errors we observed when sending move commands
-	    // in rapid succession
+	    // no reason to retry after switching from _WRITE to _WRITE_NR
 	    if ( error.name === 'NetworkError'
-	       || error.name === 'NotSupportedError' ) { // if busy, try again
+		 || error.name === 'NotSupportedError' ) { // busy, try again?
 		console.warn("busy error", error);
 	    }
 	    else {
