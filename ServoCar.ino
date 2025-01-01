@@ -87,12 +87,18 @@ bool deviceConnected = false;
 bool oldDeviceConnected = false;
 uint32_t value = 0;
 
-// we connect our LEDs and Servos to these pins on the ESP32-C3
-// NB: the C3 requires D9 instead of just 9 -- change this as needed
+// we connect our LEDs and Servos to these pins on the XIAO ESP32-C3 and S3
+// NB: the XIAO C3 & S3 require D9 instead of just 9 -- change this as needed
+
+#if defined(ARDUINO_XIAO_ESP32C3) || defined(ARDUINO_XIAO_ESP32S3) 
 const int redPin = D9; // Use the appropriate GPIO pin for your setup
 const int grnPin = D10; // connected
 const int servo1Pin = D7; // must use D notation for digital pins on this board
-const int servo2Pin = D6; // must use D notation for digital pins on this board
+const int servo2Pin = D4; // must use D notation for digital pins on this board
+#else
+// Define nothing here so that we get a compile error. This ensures
+// the developer edits this when using a new board
+#endif
 
 // we will need servo class instances
 Servo servo1;   // X
@@ -296,7 +302,6 @@ void servoMove(Servo *servo, int speed, int direction) {
   
   // NB: speed: 0 = 90 degrees = stop
   servo->write(code);
-  delay(5);
   gServoStatus = MOVING;
 }
 
@@ -350,7 +355,6 @@ void moveServos(int speed1, int direction1,
 void servoStop(Servo *servo) {
   servoMove(servo, STOP, STOP);
   servo->release();
-  delay(15);
   gServoStatus = STOPPED;
 }
 
