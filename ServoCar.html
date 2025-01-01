@@ -530,23 +530,24 @@ async function writeOnControl(value) {
 /* writeOnServo
 
    The servoAspect tells the ESP32 to move the motors and the
-   direction of movement. We expect this function to produce failures
-   because the BLE write queue is easily filled and touch events are
-   quickly generated in large numbers. NB: Look carefully, you'll find
-   that it retries after an expected error.
+   direction of movement. We this function to produced many failures
+   because the BLE write queue was easily filled and touch events are
+   quickly generated in large numbers.  We discovered that using BLE
+   WRITE was the problem.  We implemented a scheme to retry failed
+   sends only to delete it after switching to WRITE_NR (see ESP32 code).
 
    The format of our messages to the ESP32 is s1<space>s2, where s
    represents speed and direction.  The 1 refers to servo1 and 2 to
    servo2.
 
-   NB: a full stop requires using writeOnControl.
+   NB: to stop the motors, use writeOnControl("STOP")
    
 */
    
 async function writeOnServo(value){
     if (bleServer && bleServer.connected) {
 	try {
-	    // use try/catch to make sure this completes -- retry
+	    // use try/catch to make sure this completes
             await bleServiceFound.getCharacteristic(servoAspect)
 		.then(characteristic => {
                     const data = new Uint8Array(Array.from(
