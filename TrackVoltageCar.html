@@ -188,8 +188,8 @@
  function updateChartView() {
      const slice = history.slice(viewStart, viewStart + MAX_WINDOW);
      voltageChart.data.datasets[0].data = slice;
-     voltageChart.data.labels = view.map((_, 1) =>
-	 (viewStart + 1 - history.length + 1).toString()
+     voltageChart.data.labels = view.map((_, i) =>
+	 (viewStart + i - history.length + 1).toString()
      );
      voltageChart.update();
  }
