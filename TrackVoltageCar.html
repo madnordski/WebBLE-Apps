@@ -49,17 +49,23 @@
  var sensorCharacteristicFound;
 
  // Plot setup code
+ const MAX_HISTORY = 3600;
  const MAX_WINDOW = 20;        // 20-second window
  let viewStart = 0;
  let frozen = false;
  let history = [];
-
+ let timeLabels = [];
+ 
+ for (let i = MAX_POINTS - 1; i >= 0; i--) {
+     timeLabels.push(i.toString());
+ }
+ 
  const ctx = document.getElementById('voltageChart').getContext('2d');
 
  const voltageChart = new Chart(ctx, {
      type: 'line',
      data: {
-	 //labels: timeLabels,
+	 labels: timeLabels,
 	 datasets: [{
 	     label: 'Track Voltage (RMS)',
 	     data: history,
@@ -73,8 +79,8 @@
 	 responsive: true,
 	 scales: {
 	     y: {
-		 min: 8.0,            // adjust as you like
-		 max: 12.0,
+		 min: 6.0,            // adjust as you like
+		 max: 14.0,
 		 title: {
 		     display: true,
 		     text: 'Volts'
@@ -83,7 +89,7 @@
 	     x: {
 		 title: {
 		     display: true,
-		     text: 'Time (s)'
+		     text: 'Seconds'
 		 }
 	     }
 	 }
@@ -169,17 +175,22 @@
      timestampContainer.innerHTML = getDateTime();
 
      // chart update
-     if ( isNaN(volts) ) return;
+     if ( isNaN(volts) || frozen ) return;
      history.push(volts);
-     if ( !frozen ) {
-	 viewStart = Math.max(0, history.length - MAX_WINDOW);
-	 updateChartView();
+     if ( history.length > MAX_HISTORY ) {
+	 history.shift();
+	 viewStart = Math.max(0, viewStart - 1);
      }
+     viewStart = Math.max(0, history.length - MAX_WINDOW);
+     updateChartView();
  }
 
  function updateChartView() {
      const slice = history.slice(viewStart, viewStart + MAX_WINDOW);
      voltageChart.data.datasets[0].data = slice;
+     voltageChart.data.labels = view.map((_, 1) =>
+	 (viewStart + 1 - history.length + 1).toString()
+     );
      voltageChart.update();
  }
 
