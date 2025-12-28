@@ -17,7 +17,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <h1>Track Voltage Car</h1>
+    <h1>Track Voltage Car</h1>
+    <p>Revision: 0.1</p>
   <button id="connectBleButton">Connect to BLE Device</button>
   <button id="disconnectBleButton">Disconnect BLE Device</button>
   <p>BLE state: <strong><span id="bleState" style="color:#d13a30;">Disconnected</span></strong></p>
@@ -56,9 +57,9 @@
  let history = [];
  let timeLabels = [];
  
- for (let i = MAX_POINTS - 1; i >= 0; i--) {
-     timeLabels.push(i.toString());
- }
+ //for (let i = MAX_POINTS - 1; i >= 0; i--) {
+ //    timeLabels.push(i.toString());
+ //}
  
  const ctx = document.getElementById('voltageChart').getContext('2d');
 
