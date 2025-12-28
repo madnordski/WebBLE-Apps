@@ -24,6 +24,10 @@
   <h2 align="center"><span id="valueContainer">NaN</span></h2>
   <p>Last reading: <span id="timestamp"></span></p>
   <canvas id="voltageChart" width="400" height="200"></canvas>
+  <button onclick="scrollBack()">◀</button>
+  <button onclick="scrollForward()">▶</button>
+  <button onclick="toggleFreeze()">Freeze</button>
+
 </body>
 <script>
     // DOM Elements
@@ -45,46 +49,47 @@
  var sensorCharacteristicFound;
 
  // Plot setup code
- const MAX_POINTS = 20;        // 20-second window
-let voltageData = [];
-let timeLabels = [];
+ const MAX_WINDOW = 20;        // 20-second window
+ let viewStart = 0;
+ let frozen = false;
+ let history = [];
 
-const ctx = document.getElementById('voltageChart').getContext('2d');
+ const ctx = document.getElementById('voltageChart').getContext('2d');
 
-const voltageChart = new Chart(ctx, {
-  type: 'line',
-  data: {
-    labels: timeLabels,
-    datasets: [{
-      label: 'Track Voltage (RMS)',
-      data: voltageData,
-      borderWidth: 2,
-      tension: 0.1,          // slight smoothing
-      pointRadius: 3
-    }]
-  },
-  options: {
-    animation: false,
-    responsive: true,
-    scales: {
-      y: {
-        min: 8.0,            // adjust as you like
-        max: 12.0,
-        title: {
-          display: true,
-          text: 'Volts'
-        }
-      },
-      x: {
-        title: {
-          display: true,
-          text: 'Time (s)'
-        }
-      }
-    }
-  }
+ const voltageChart = new Chart(ctx, {
+     type: 'line',
+     data: {
+	 labels: timeLabels,
+	 datasets: [{
+	     label: 'Track Voltage (RMS)',
+	     data: history,
+	     borderWidth: 2,
+	     tension: 0.1,          // slight smoothing
+	     pointRadius: 3
+	 }]
+     },
+     options: {
+	 animation: false,
+	 responsive: true,
+	 scales: {
+	     y: {
+		 min: 8.0,            // adjust as you like
+		 max: 12.0,
+		 title: {
+		     display: true,
+		     text: 'Volts'
+		 }
+	     },
+	     x: {
+		 title: {
+		     display: true,
+		     text: 'Time (s)'
+		 }
+	     }
+	 }
+     }
  });
-
+ 
  // Connect Button (search for BLE Devices only if BLE is available)
  connectButton.addEventListener('click', (event) => {
      if (isWebBluetoothEnabled()){
@@ -165,14 +170,35 @@ const voltageChart = new Chart(ctx, {
 
      // chart update
      if ( isNaN(volts) ) return;
-     const now = new Date().toLocaleTimeString();
-     voltageData.push(volts);
-     timeLabels.push(now);
-     if ( voltageData.length > MAX_POINTS ) {
-	 voltageData.shift();
-	 timeLabels.shift();
+     history.push(volts);
+     if ( !frozen ) {
+	 viewStart = Math.max(0, history.length - MAX_WINDOW);
+	 updateChartView();
      }
+ }
+
+ function updateChartView() {
+     const slice = history.slice(viewStart, viewStart + MAX_WINDOW);
+     voltageChart.data.datasets[0].data = slice;
      voltageChart.update();
+ }
+
+ function toggleFreeze() {
+  frozen = !frozen;
+}
+
+function scrollBack() {
+  frozen = true;
+  viewStart = Math.max(0, viewStart - 1);
+  updateChartView();
+}
+
+function scrollForward() {
+  viewStart = Math.min(
+    history.length - MAX_WINDOW,
+    viewStart + 1
+  );
+  updateChartView();
  }
  
  function writeOnCharacteristic(value){
