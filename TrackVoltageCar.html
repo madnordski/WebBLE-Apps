@@ -71,7 +71,7 @@
 </head>
 <body>
     <h1>Track Voltage Car</h1>
-    <p>Revision: 0.14</p>
+    <p>Revision: 0.15</p>
   <button id="connectBleButton">Connect</button>
   <button id="disconnectBleButton">Disconnect</button>
   <p>BLE state: <strong><span id="bleState" style="color:#d13a30;">Disconnected</span></strong></p>
@@ -189,8 +189,10 @@
 	     },
 	     
 	     y: {
-	//	 min: 6.0,            // adjust as you like
-	//	 max: 14.0,
+		 beginAtZero: false,
+		 ticks: {
+		     precision: 2
+		 }
 		 title: {
 		     display: true,
 		     text: 'Volts'
