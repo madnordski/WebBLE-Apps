@@ -71,7 +71,7 @@
 </head>
 <body>
     <h1>Track Voltage Car</h1>
-    <p>Revision: 0.16</p>
+    <p>Revision: 0.18</p>
   <button id="connectBleButton">Connect</button>
   <button id="disconnectBleButton">Disconnect</button>
   <p>BLE state: <strong><span id="bleState" style="color:#d13a30;">Disconnected</span></strong></p>
@@ -181,14 +181,15 @@
 	 scales: {
 	     x: {
 		 type: 'linear',
-		 autoSkip: true,
 		 title: {
 		     display: true,
-		     text: 'Time (s)'
+		     text: 'Sample'
 		 }
 	     },
 	     
 	     y: {
+		 min: 7,
+		 max: 13,
 		 beginAtZero: false,
 		 ticks: {
 		     precision: 2
@@ -324,8 +325,10 @@
  function updateChartView() {
      const slice = history.slice(viewStart, viewStart + MAX_WINDOW);
      voltageChart.data.datasets[0].data = slice;
-     voltageChart.data.labels = slice.map((_, i) =>
-	 (viewStart + i - history.length + 1).toString()
+     voltagechart.data.labels = slice.map((_i) =>
+	 (viewStart + i).toString()
+     //voltageChart.data.labels = slice.map((_, i) =>
+//	 (viewStart + i - history.length + 1).toString()
      );
      voltageChart.update('none');
  }
