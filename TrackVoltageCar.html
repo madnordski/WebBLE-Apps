@@ -15,6 +15,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/png" href="">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
+
     <style>
      #acquireBtn.active {
 	 background-color: #ffd966;
@@ -69,7 +71,7 @@
 </head>
 <body>
     <h1>Track Voltage Car</h1>
-    <p>Revision: 0.11</p>
+    <p>Revision: 0.12</p>
   <button id="connectBleButton">Connect</button>
   <button id="disconnectBleButton">Disconnect</button>
   <p>BLE state: <strong><span id="bleState" style="color:#d13a30;">Disconnected</span></strong></p>
@@ -159,21 +161,41 @@
 	 parsing: false,
 	 animation: false,
 	 responsive: true,
+	 plugins: {
+	     zoom: {
+		 zoom: {
+		     wheel: {
+			 enabled: true
+		     },
+		     pinch: {
+			 enabled: true
+		     },
+		     mode: 'x'
+		 },
+		 pan: {
+		     enabled: true,
+		     mode: 'x'
+		 }
+	     }
+	 },
 	 scales: {
 	     x: {
 		 type: 'linear',
+		 autoSkip: true,
 		 title: {
 		     display: true,
 		     text: 'Time (s)'
 		 }
-	     },
+	     }
+	     
 	     y: {
-		 min: 6.0,            // adjust as you like
-		 max: 14.0,
+	//	 min: 6.0,            // adjust as you like
+	//	 max: 14.0,
 		 title: {
 		     display: true,
 		     text: 'Volts'
 		 }
+		 
 	     }
 	 }
      }
