@@ -15,8 +15,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/png" href="">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
-
     <style>
      #acquireBtn.active {
 	 background-color: #ffd966;
@@ -71,7 +69,7 @@
 </head>
 <body>
     <h1>Track Voltage Car</h1>
-    <p>Revision: 0.21</p>
+    <p>Revision: 0.11</p>
   <button id="connectBleButton">Connect</button>
   <button id="disconnectBleButton">Disconnect</button>
   <p>BLE state: <strong><span id="bleState" style="color:#d13a30;">Disconnected</span></strong></p>
@@ -161,44 +159,21 @@
 	 parsing: false,
 	 animation: false,
 	 responsive: true,
-	 plugins: {
-	     zoom: {
-		 zoom: {
-		     wheel: {
-			 enabled: true
-		     },
-		     pinch: {
-			 enabled: true
-		     },
-		     mode: 'y'
-		 },
-		 pan: {
-		     enabled: true,
-		     mode: 'y'
-		 }
-	     }
-	 },
 	 scales: {
 	     x: {
-		 type: 'category',
+		 type: 'linear',
 		 title: {
 		     display: true,
-		     text: 'Sample'
+		     text: 'Time (s)'
 		 }
 	     },
-	     
 	     y: {
-		 min: 7,
-		 max: 13,
-		 beginAtZero: false,
-		 ticks: {
-		     precision: 2
-		 },
+		 min: 6.0,            // adjust as you like
+		 max: 14.0,
 		 title: {
 		     display: true,
 		     text: 'Volts'
 		 }
-		 
 	     }
 	 }
      }
@@ -324,13 +299,10 @@
 
  function updateChartView() {
      const slice = history.slice(viewStart, viewStart + MAX_WINDOW);
-     
-     voltageChart.data.datasets[0].data = slice.map(p => p.y);
-     
+     voltageChart.data.datasets[0].data = slice;
      voltageChart.data.labels = slice.map((_, i) =>
-	 (viewStart + i).toString()
+	 (viewStart + i - history.length + 1).toString()
      );
-     
      voltageChart.update('none');
  }
 
