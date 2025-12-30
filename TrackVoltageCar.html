@@ -69,7 +69,7 @@
 </head>
 <body>
     <h1>Track Voltage Car</h1>
-    <p>Revision: 0.10</p>
+    <p>Revision: 0.11</p>
   <button id="connectBleButton">Connect</button>
   <button id="disconnectBleButton">Disconnect</button>
   <p>BLE state: <strong><span id="bleState" style="color:#d13a30;">Disconnected</span></strong></p>
@@ -262,7 +262,7 @@
      if ( referenceValue !== null ) {
 	 const diff = volts - referenceValue;
 	 diffContainer.textContent =
-	     diff >= 0 ? "+" : "" + diff.toFixed(2);
+	     (diff >= 0 ? "+" : "") + diff.toFixed(2);
 	 const diffReadout = document.querySelector(".readout.diff");
 	 diffReadout.classList.remove("positive", "negative", "zero");
 	 if ( Math.abs(diff) < 0.005 ) {
@@ -447,8 +447,8 @@
 	 if (acquireEndIndex > acquireStartIndex) {
 	     lastAcquiredAvg = getAverage(acquireStartIndex, acquireEndIndex);
 	     avgContainer.textContent = lastAcquiredAvg.toFixed(2);
-	     console.log("***: ", acquireStartIndex, acquireEndIndex,
-			 lastAcquiredAvg);
+	     //console.log("***: ", acquireStartIndex, acquireEndIndex,
+	     //		 lastAcquiredAvg);
 	 }
 	 else {
 	     // No samples collected
