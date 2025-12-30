@@ -69,7 +69,7 @@
 </head>
 <body>
     <h1>Track Voltage Car</h1>
-    <p>Revision: 0.9</p>
+    <p>Revision: 0.10</p>
   <button id="connectBleButton">Connect</button>
   <button id="disconnectBleButton">Disconnect</button>
   <p>BLE state: <strong><span id="bleState" style="color:#d13a30;">Disconnected</span></strong></p>
@@ -475,7 +475,7 @@
      let count = 0;
 
      for (let i = startIndex; i < endIndex; i++) {
-	 sum += history[i].v;
+	 sum += history[i].y;
 	 count++;
      }
 
