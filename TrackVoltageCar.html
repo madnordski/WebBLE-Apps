@@ -69,7 +69,7 @@
 </head>
 <body>
     <h1>Track Voltage Car</h1>
-    <p>Revision: 0.6</p>
+    <p>Revision: 0.8</p>
   <button id="connectBleButton">Connect</button>
   <button id="disconnectBleButton">Disconnect</button>
   <p>BLE state: <strong><span id="bleState" style="color:#d13a30;">Disconnected</span></strong></p>
@@ -445,6 +445,7 @@
 	 const acquireEndIndex = history.length;
 	 
 	 if (acquireEndIndex > acquireStartIndex) {
+	     console.log("b: ", acquireStartIndex, acquireEndIndex);
 	     lastAcquiredAvg = getAverage(acquireStartIndex, acquireEndIndex);
 	     avgContainer.textContent = lastAcquiredAvg.toFixed(2);
 	 }
