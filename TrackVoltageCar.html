@@ -15,15 +15,93 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/png" href="">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+     #acquireBtn.active {
+	 background-color: #ffd966;
+     }
+     
+     #readoutRow {
+	 display: flex;
+	 justify-content: center;
+	 gap: 3rem;
+	 margin-top: 1rem;
+     }
+     
+     .readout {
+	 text-align: center;
+     }
+     
+     .readoutValue {
+	 font-size: 3.5rem;
+	 font-weight: bold;
+	 line-height: 1;
+     }
+     
+     .readoutUnits {
+	 font-size: 1rem;
+	 color: #666;
+     }
+     
+     .readout.diff.positive .readoutValue {
+	 color: #0a8a0a;   /* green */
+     }
+     
+     .readout.diff.negative .readoutValue {
+	 color: #c00000;   /* red */
+     }
+     
+     .readout.diff.zero .readoutValue {
+	 color: #333;
+     }
+     
+     #contextRow {
+	 text-align: center;
+	 margin-top: 0.5rem;
+	 font-size: 0.9rem;
+	 color: #444;
+     }
+     
+     #controlRow {
+	 text-align: center;
+	 margin-top: 1rem;
+     }
+    </style>
 </head>
 <body>
     <h1>Track Voltage Car</h1>
     <p>Revision: 0.6</p>
-  <button id="connectBleButton">Connect to BLE Device</button>
-  <button id="disconnectBleButton">Disconnect BLE Device</button>
+  <button id="connectBleButton">Connect</button>
+  <button id="disconnectBleButton">Disconnect</button>
   <p>BLE state: <strong><span id="bleState" style="color:#d13a30;">Disconnected</span></strong></p>
-  <h2 align="center"><span id="valueContainer">NaN</span></h2>
-  <p>Last reading: <span id="timestamp"></span></p>
+  <!-- <h2 align="center"><span id="valueContainer">NaN</span></h2> -->
+  <div id="readoutRow">
+      <div class="readout">
+	  <div class="readoutValue">
+	      <span id="valueContainer">NaN</span>
+	  </div>
+	  <div class="readoutUnits">V</div>
+      </div>
+
+      <div class="readout diff">
+	  <div class="readoutValue">
+	      <span id="diffContainer">—</span>
+	  </div>
+	  <div class="readoutUnits">ΔV</div>
+      </div>
+  </div>
+  <div id="contextRow">
+      <span>Last avg:</span>
+      <strong><span id="avgContainer">—</span> V</strong>
+      &nbsp;&nbsp;|&nbsp;&nbsp;
+      <span>Reference:</span>
+      <strong><span id="refContainer">—</span> V</strong>
+  </div>
+  <div id="controlRow">
+      <button onclick="acquire()" id="acquireBtn">Acquire</button>
+      <button onclick="getReference()" id="referenceBtn">Reference</button>
+  </div>
+
+  <!-- <p>Last reading: <span id="timestamp"></span></p> -->
   <canvas id="voltageChart" width="400" height="200"></canvas>
   <button onclick="scrollBack()">◀</button>
   <button onclick="scrollForward()">▶</button>
@@ -58,7 +136,9 @@
  let frozen = false;
  let sampleIndex = 0;
  let timeZero = performance.now();
-
+ let referenceValue = null;
+ let lastAcquiredAve = null;
+ 
  document.getElementById("exportCsvBtn").addEventListener("click",
 							  exportHistoryToCSV);
  
@@ -174,9 +254,31 @@
      const newValueReceived = new TextDecoder().decode(event.target.value);
      const volts = parseFloat(newValueReceived);
      console.log("Characteristic value changed: ", newValueReceived);
-     retrievedValue.innerHTML = newValueReceived;
-     timestampContainer.innerHTML = getDateTime();
+     valueContainer.textContent = volts.toFixed(2);
+     
+     //retrievedValue.innerHTML = newValueReceived;
+     //timestampContainer.innerHTML = getDateTime();
 
+     if ( referenceValue !== null ) {
+	 const diff = volts - referenceValue;
+	 diffContainer.textContent =
+	     diff >= 0 ? "+" : "" + diff.toFixed(2);
+	 const diffReadout = document.querySelector(".readout.diff");
+	 diffReadout.classList.remove("positive", "negative", "zero");
+	 if ( Math.abs(diff) < 0.005 ) {
+	     diffReadout.classList.add("zero");
+	 }
+	 else if ( diff > 0 ) {
+	     diffReadout.classList.add("positive");
+	 }
+	 else {
+	     diffReadout.classList.add("negative");
+	 }
+     }
+     else {
+	 diffContainer.textContent = "--"
+     }
+     
      // chart update
      if ( isNaN(volts) || frozen ) return;
      const t = (performance.now() - timeZero) / 1000;
@@ -324,6 +426,58 @@
      a.click();
 
      URL.revokeObjectURL(url);
+ }
+
+ let isAcquiring = false;
+ let acquireStartIndex = null;
+ let lastAcquiredAvg = null;
+
+ function acquire() {
+     if (!isAcquiring) {
+	 // START acquisition
+	 acquireStartIndex = history.length;
+	 isAcquiring = true;
+	 acquireBtn.textContent = "Stop Acquire";
+	 acquireBtn.classList.add("active");	 
+     }
+     else {
+	 // STOP acquisition
+	 const acquireEndIndex = history.length;
+	 
+	 if (acquireEndIndex > acquireStartIndex) {
+	     lastAcquiredAvg = getAverage(acquireStartIndex, acquireEndIndex);
+	     avgContainer.textContent = lastAcquiredAvg.toFixed(2);
+	 }
+	 else {
+	     // No samples collected
+	     lastAcquiredAvg = null;
+	     avgContainer.textContent = "—";
+	 }
+
+	 isAcquiring = false;
+	 acquireStartIndex = null;
+	 acquireBtn.textContent = "Acquire";
+	 acquireBtn.classList.remove("active");
+     }
+ }
+
+ function getReference() {
+  if (lastAcquiredAvg !== null) {
+    referenceValue = lastAcquiredAvg;
+    refContainer.textContent = referenceValue.toFixed(2);
+  }
+ }
+
+ function getAverage(startIndex, endIndex) {
+     let sum = 0;
+     let count = 0;
+
+     for (let i = startIndex; i < endIndex; i++) {
+	 sum += history[i].v;
+	 count++;
+     }
+
+     return count > 0 ? sum / count : NaN;
  }
 
 </script>
