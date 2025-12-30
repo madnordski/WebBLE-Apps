@@ -28,10 +28,11 @@
   <button onclick="scrollBack()">◀</button>
   <button onclick="scrollForward()">▶</button>
   <button onclick="toggleFreeze()">Freeze</button>
+  <button id="exportCsvBtn">Download CSV</button>
 
 </body>
 <script>
-    // DOM Elements
+ // DOM Elements
  const connectButton = document.getElementById('connectBleButton');
  const disconnectButton = document.getElementById('disconnectBleButton');
  const retrievedValue = document.getElementById('valueContainer');
@@ -52,21 +53,20 @@
  // Plot setup code
  const MAX_HISTORY = 3600;
  const MAX_WINDOW = 20;        // 20-second window
+ const history = [];
  let viewStart = 0;
  let frozen = false;
- let history = [];
- let timeLabels = [];
- 
- //for (let i = MAX_POINTS - 1; i >= 0; i--) {
- //    timeLabels.push(i.toString());
- //}
+ let sampleIndex = 0;
+ let timeZero = performance.now();
+
+ document.getElementById("exportCsvBtn").addEventListener("click",
+							  exportHistoryToCSV);
  
  const ctx = document.getElementById('voltageChart').getContext('2d');
 
  const voltageChart = new Chart(ctx, {
      type: 'line',
      data: {
-	 labels: timeLabels,
 	 datasets: [{
 	     label: 'Track Voltage (RMS)',
 	     data: history,
@@ -76,21 +76,23 @@
 	 }]
      },
      options: {
+	 parsing: false,
 	 animation: false,
 	 responsive: true,
 	 scales: {
+	     x: {
+		 type: 'linear',
+		 title: {
+		     display: true,
+		     text: 'Time (s)'
+		 }
+	     },
 	     y: {
 		 min: 6.0,            // adjust as you like
 		 max: 14.0,
 		 title: {
 		     display: true,
 		     text: 'Volts'
-		 }
-	     },
-	     x: {
-		 title: {
-		     display: true,
-		     text: 'Seconds'
 		 }
 	     }
 	 }
@@ -177,7 +179,14 @@
 
      // chart update
      if ( isNaN(volts) || frozen ) return;
-     history.push(volts);
+     const t = (performance.now() - timeZero) / 1000;
+
+     history.push({
+	 x: t,
+	 y: volts
+	 i: sampleIndex++,
+     });
+     //history.push(volts);
      if ( history.length > MAX_HISTORY ) {
 	 history.shift();
 	 viewStart = Math.max(0, viewStart - 1);
@@ -192,25 +201,25 @@
      voltageChart.data.labels = slice.map((_, i) =>
 	 (viewStart + i - history.length + 1).toString()
      );
-     voltageChart.update();
+     voltageChart.update('none');
  }
 
  function toggleFreeze() {
-  frozen = !frozen;
-}
+     frozen = !frozen;
+ }
 
-function scrollBack() {
-  frozen = true;
-  viewStart = Math.max(0, viewStart - 1);
-  updateChartView();
-}
+ function scrollBack() {
+     frozen = true;
+     viewStart = Math.max(0, viewStart - 1);
+     updateChartView();
+ }
 
-function scrollForward() {
-  viewStart = Math.min(
-    history.length - MAX_WINDOW,
-    viewStart + 1
-  );
-  updateChartView();
+ function scrollForward() {
+     viewStart = Math.min(
+	 history.length - MAX_WINDOW,
+	 viewStart + 1
+     );
+     updateChartView();
  }
  
  function writeOnCharacteristic(value){
@@ -275,7 +284,48 @@ function scrollForward() {
      return datetime;
  }
  
- 
+ function exportHistoryToCSV() {
+     if (!history.length) {
+	 alert("No data to export");
+	 return;
+     }
+
+     // Collect all unique keys, in stable order
+     const keys = [];
+     history.forEach(row => {
+	 Object.keys(row).forEach(k => {
+	     if (!keys.includes(k)) keys.push(k);
+	 });
+     });
+
+     // Build CSV rows
+     const lines = [];
+     lines.push(keys.join(",")); // header
+
+     history.forEach(row => {
+	 const line = keys.map(k => {
+	     const val = row[k];
+	     if (val === undefined) return "";
+	     if (typeof val === "number") return val;
+	     return `"${String(val).replace(/"/g, '""')}"`;
+	 });
+	 lines.push(line.join(","));
+     });
+
+     // Create downloadable blob
+     const csv = lines.join("\n");
+     const blob = new Blob([csv], { type: "text/csv" });
+     const url = URL.createObjectURL(blob);
+
+     // Trigger download
+     const a = document.createElement("a");
+     a.href = url;
+     a.download = `track_voltage_${new Date().toISOString()}.csv`;
+     a.click();
+
+     URL.revokeObjectURL(url);
+ }
+
 </script>
 
 </html>
