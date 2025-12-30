@@ -18,7 +18,7 @@
 </head>
 <body>
     <h1>Track Voltage Car</h1>
-    <p>Revision: 0.5</p>
+    <p>Revision: 0.6</p>
   <button id="connectBleButton">Connect to BLE Device</button>
   <button id="disconnectBleButton">Disconnect BLE Device</button>
   <p>BLE state: <strong><span id="bleState" style="color:#d13a30;">Disconnected</span></strong></p>
@@ -300,7 +300,7 @@
 
      // Build CSV rows
      const lines = [];
-     lines.push(keys.join(",")); // header
+     lines.push(keys.join("\t")); // header
 
      history.forEach(row => {
 	 const line = keys.map(k => {
