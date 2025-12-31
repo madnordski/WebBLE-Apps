@@ -69,7 +69,7 @@
 </head>
 <body>
     <h1>Track Voltage Car</h1>
-    <p>Revision: 0.13</p>
+    <p>Revision: 0.14</p>
   <button id="connectBleButton">Connect</button>
   <button id="disconnectBleButton">Disconnect</button>
   <p>BLE state: <strong><span id="bleState" style="color:#d13a30;">Disconnected</span></strong></p>
@@ -304,9 +304,6 @@
  function updateChartView() {
      const slice = history.slice(viewStart, viewStart + MAX_WINDOW);
      voltageChart.data.datasets[0].data = slice;
-     //voltageChart.data.labels = slice.map((_, i) =>
-	// (viewStart + i - history.length + 1).toString()
-     //);
      voltageChart.update('none');
  }
 
@@ -451,8 +448,11 @@
 	 if (acquireEndIndex > acquireStartIndex) {
 	     lastAcquiredAvg = getAverage(acquireStartIndex, acquireEndIndex);
 	     avgContainer.textContent = lastAcquiredAvg.toFixed(2);
-	     //console.log("***: ", acquireStartIndex, acquireEndIndex,
-	     //		 lastAcquiredAvg);
+	     voltageChart.options.scales.y.min =
+		 Math.max(0, lastAquireAvg - 2.0);
+	     voltageChart.options.scales.y.max =
+		 Math.max(0, lastAquireAvg + 2.0);
+	     
 	 }
 	 else {
 	     // No samples collected
