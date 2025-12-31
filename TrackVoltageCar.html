@@ -69,7 +69,7 @@
 </head>
 <body>
     <h1>Track Voltage Car</h1>
-    <p>Revision: 0.25</p>
+    <p>Revision: 0.26</p>
   <button id="connectBleButton">Connect</button>
   <button id="disconnectBleButton">Disconnect</button>
   <p>BLE state: <strong><span id="bleState" style="color:#d13a30;">Disconnected</span></strong></p>
@@ -97,8 +97,10 @@
       <strong><span id="refContainer">—</span> V</strong>
   </div>
   <div id="controlRow">
+      <button onclick="zoomIn()" id="zoomBtn">Zoom</button>
       <button onclick="acquire()" id="acquireBtn">Acquire</button>
       <button onclick="getReference()" id="referenceBtn">Reference</button>
+      <button onclick="zoomReset()" id="resetZoomBtn">Reset Zoom</button>      
   </div>
 
   <!-- <p>Last reading: <span id="timestamp"></span></p> -->
@@ -252,10 +254,12 @@
      
      connectToDevice();
  }
+
+ let volts = null;
  
  function handleCharacteristicChange(event){
      const newValueReceived = new TextDecoder().decode(event.target.value);
-     const volts = parseFloat(newValueReceived);
+     volts = parseFloat(newValueReceived);
      console.log("Characteristic value changed: ", newValueReceived);
      valueContainer.textContent = volts.toFixed(2);
      
@@ -447,12 +451,7 @@
 	 
 	 if (acquireEndIndex > acquireStartIndex) {
 	     lastAcquiredAvg = getAverage(acquireStartIndex, acquireEndIndex);
-	     avgContainer.textContent = lastAcquiredAvg.toFixed(2);
-	     voltageChart.options.scales.y.min =
-		 Math.max(0, lastAcquiredAvg - 2.0);
-	     voltageChart.options.scales.y.max =
-		 Math.max(0, lastAcquiredAvg + 2.0);
-	     
+	     avgContainer.textContent = lastAcquiredAvg.toFixed(2);	     
 	 }
 	 else {
 	     // No samples collected
@@ -467,11 +466,21 @@
      }
  }
 
+ function zoomIn() {
+     voltageChart.options.scales.y.min = Math.max(0, volts - 0.5);
+     voltageChart.options.scales.y.max = Math.max(0, volts + 0.5);
+ }
+ 
+ function zoomReset() {
+     voltageChart.options.scales.y.min = 0.0;
+     voltageChart.options.scales.y.max = 16.0;
+ }
+ 
  function getReference() {
-  if (lastAcquiredAvg !== null) {
-    referenceValue = lastAcquiredAvg;
-    refContainer.textContent = referenceValue.toFixed(2);
-  }
+     if (lastAcquiredAvg !== null) {
+	 referenceValue = lastAcquiredAvg;
+	 refContainer.textContent = referenceValue.toFixed(2);
+     }
  }
 
  function getAverage(startIndex, endIndex) {
