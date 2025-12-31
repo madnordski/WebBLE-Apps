@@ -161,8 +161,6 @@
 	 responsive: true,
 	 scales: {
 	     x: {
-		 //min: 0,
-		 //max: 20,
 		 type: 'linear',
 		 ticks: {
 		     stepSize: 1,
@@ -305,8 +303,6 @@
 
  function updateChartView() {
      const slice = history.slice(viewStart, viewStart + MAX_WINDOW);
-     voltageChart.options.scales.x.min = history[viewStart].x;
-     voltageChart.options.scales.x.max = history[viewStart + MAX_WINDOW].x;
      voltageChart.data.datasets[0].data = slice;
 
      voltageChart.update('none');
