@@ -69,7 +69,7 @@
 </head>
 <body>
     <h1>Track Voltage Car</h1>
-    <p>Revision: 0.14</p>
+    <p>Revision: 0.15</p>
   <button id="connectBleButton">Connect</button>
   <button id="disconnectBleButton">Disconnect</button>
   <p>BLE state: <strong><span id="bleState" style="color:#d13a30;">Disconnected</span></strong></p>
@@ -449,9 +449,9 @@
 	     lastAcquiredAvg = getAverage(acquireStartIndex, acquireEndIndex);
 	     avgContainer.textContent = lastAcquiredAvg.toFixed(2);
 	     voltageChart.options.scales.y.min =
-		 Math.max(0, lastAquireAvg - 2.0);
+		 Math.max(0, lastAquiredAvg - 2.0);
 	     voltageChart.options.scales.y.max =
-		 Math.max(0, lastAquireAvg + 2.0);
+		 Math.max(0, lastAquiredAvg + 2.0);
 	     
 	 }
 	 else {
