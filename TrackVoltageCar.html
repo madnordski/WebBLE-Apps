@@ -69,7 +69,7 @@
 </head>
 <body>
     <h1>Track Voltage Car</h1>
-    <p>Revision: 0.11</p>
+    <p>Revision: 0.12</p>
   <button id="connectBleButton">Connect</button>
   <button id="disconnectBleButton">Disconnect</button>
   <p>BLE state: <strong><span id="bleState" style="color:#d13a30;">Disconnected</span></strong></p>
@@ -162,6 +162,10 @@
 	 scales: {
 	     x: {
 		 type: 'linear',
+		 ticks: {
+		     stepSize: 1,
+		     autoSkip: false
+		 }
 		 title: {
 		     display: true,
 		     text: 'Time (s)'
