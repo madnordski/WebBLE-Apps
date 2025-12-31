@@ -69,7 +69,7 @@
 </head>
 <body>
     <h1>Track Voltage Car</h1>
-    <p>Revision: 0.24</p>
+    <p>Revision: 0.25</p>
   <button id="connectBleButton">Connect</button>
   <button id="disconnectBleButton">Disconnect</button>
   <p>BLE state: <strong><span id="bleState" style="color:#d13a30;">Disconnected</span></strong></p>
@@ -152,23 +152,22 @@
 	     data: history,
 	     borderWidth: 2,
 	     tension: 0.1,          // slight smoothing
-	     pointRadius: 3
+	     pointRadius: 2
 	 }]
      },
      options: {
 	 parsing: false,
 	 animation: false,
-	 responsive: true,
 	 scales: {
 	     x: {
 		 type: 'linear',
-		 ticks: {
-		     stepSize: 1,
-		     autoSkip: false
-		 },
+		 //ticks: {
+		 //    stepSize: 1,
+		 //    autoSkip: false
+		 //},
 		 title: {
 		     display: true,
-		     text: 'Time (s)'
+		     text: 'Sample'
 		 }
 	     },
 	     y: {
@@ -288,9 +287,9 @@
      const t = (performance.now() - timeZero) / 1000;
 
      history.push({
-	 x: t,
+	 x: sampleIndex++,
 	 y: volts,
-	 i: sampleIndex++
+	 i: t,
      });
 
      if ( history.length > MAX_HISTORY ) {
