@@ -113,7 +113,7 @@
   <button onclick="toggleFreeze()">Freeze</button>
   <button id="exportCsvBtn">Download CSV</button>
   <br>
-  <font size="-2">$Revision: 1.4 $</font>
+  <font size="-2">$Revision: 1.5 $</font>
   </p>
 </body>
 <script>
@@ -174,7 +174,7 @@
 	     x: {
 		 type: 'linear',
 		 ticks: {
-		     count: 5,
+		     count: 11,
 		     //maxTicksLimit: 10,
 		     stepSize: 1,
 		     autoSkip: false
@@ -185,8 +185,8 @@
 		 }
 	     },
 	     y: {
-		 min: 0.0,            // adjust as you like
-		 max: 14.0,
+		 min: yMin,            // adjust as you like
+		 max: yMax,
 		 title: {
 		     display: true,
 		     text: 'Volts'
