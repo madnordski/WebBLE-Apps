@@ -113,7 +113,7 @@
   <button onclick="toggleFreeze()">Freeze</button>
   <button id="exportCsvBtn">Download CSV</button>
   <br>
-  <font size="-2">$Revision: 1.3 $</font>
+  <font size="-2">$Revision: 1.4 $</font>
   </p>
 </body>
 <script>
@@ -484,6 +484,16 @@
      }
  }
 
+ function getReference() {
+     if ( isAcquiring ) {
+	 acquire();
+     }
+     if (lastAcquiredAvg !== null) {
+	 referenceValue = lastAcquiredAvg;
+	 refContainer.textContent = referenceValue.toFixed(2);
+     }
+ }
+
  function zoomIn() {
      zoomLevel = Math.min(zoomLevel+1, maxZoomLevels);
      zoom(zoomLevel);
@@ -506,13 +516,6 @@
      }
  }
  
- function getReference() {
-     if (lastAcquiredAvg !== null) {
-	 referenceValue = lastAcquiredAvg;
-	 refContainer.textContent = referenceValue.toFixed(2);
-     }
- }
-
  function getAverage(startIndex, endIndex) {
      let sum = 0;
      let count = 0;
