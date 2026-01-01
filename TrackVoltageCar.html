@@ -69,7 +69,7 @@
 </head>
 <body>
     <h1>Track Voltage Car</h1>
-    <p>Revision: 0.28</p>
+    <p>Revision: 0.29</p>
   <button id="connectBleButton">Connect</button>
   <button id="disconnectBleButton">Disconnect</button>
   <p>BLE state: <strong><span id="bleState" style="color:#d13a30;">Disconnected</span></strong></p>
@@ -105,11 +105,12 @@
 
   <!-- <p>Last reading: <span id="timestamp"></span></p> -->
   <canvas id="voltageChart" width="400" height="200"></canvas>
+  <p align="center">
   <button onclick="scrollBack()">◀</button>
   <button onclick="scrollForward()">▶</button>
   <button onclick="toggleFreeze()">Freeze</button>
   <button id="exportCsvBtn">Download CSV</button>
-
+  </p>
 </body>
 <script>
  // DOM Elements
@@ -163,10 +164,11 @@
 	 scales: {
 	     x: {
 		 type: 'linear',
-		 //ticks: {
-		 //    stepSize: 1,
-		 //    autoSkip: false
-		 //},
+		 ticks: {
+		     maxTicksLimit: 10,
+		     stepSize: 2,
+		     autoSkip: false
+		 },
 		 title: {
 		     display: true,
 		     text: 'Sample'
