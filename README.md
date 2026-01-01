@@ -2,6 +2,11 @@
 
 ## What's here.
 
+- TrackVoltageCar is a simple version of ServoCar that measures voltage
+on Lionel convensional control layouts.  If learning WebBLE, ServoTest
+ServoCar will serve you best. TrackVoltageCar is for toy train
+enthusiasts that have trains powered by conventional A/C transformers.
+
 - ServoTest and ServoCar illustrate methods for controlling ESP32
 connected servos with your phone using WebBLE.
 
