@@ -167,7 +167,7 @@
 	     x: {
 		 type: 'linear',
 		 ticks: {
-		     count: 10,
+		     count: 5,
 		     //maxTicksLimit: 10,
 		     stepSize: 1,
 		     autoSkip: false
@@ -211,7 +211,7 @@
  
  // Connect to BLE Device and Enable Notifications
  function connectToDevice(){
-     console.log('Initializing Bluetooth...');
+    // console.log('Initializing Bluetooth...');
      navigator.bluetooth.requestDevice({
          filters: [{name: deviceName}],
          optionalServices: [bleService]
@@ -242,9 +242,9 @@
 		  return characteristic.readValue();
               })
               .then(value => {
-		  console.log("Read value: ", value);
+		  //console.log("Read value: ", value);
 		  const decodedValue = new TextDecoder().decode(value);
-		  console.log("Decoded value: ", decodedValue);
+		  //console.log("Decoded value: ", decodedValue);
 		  retrievedValue.innerHTML = decodedValue;
               })
      //.catch(error => {
@@ -265,7 +265,7 @@
  function handleCharacteristicChange(event){
      const newValueReceived = new TextDecoder().decode(event.target.value);
      volts = parseFloat(newValueReceived);
-     console.log("Characteristic value changed: ", newValueReceived);
+     //console.log("Characteristic value changed: ", newValueReceived);
      valueContainer.textContent = volts.toFixed(2);
      
      //retrievedValue.innerHTML = newValueReceived;
