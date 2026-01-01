@@ -69,7 +69,6 @@
 </head>
 <body>
     <h1 align="center">Track Voltage Car (1.0)</h1>
-    <h4 align="center">$Revision: 1.2 $</h4>
     <p align="center">Bluetooth:<button id="connectBleButton"> 🔗 </button>
 	<button id="disconnectBleButton"> ❌ </button>
     </p>
@@ -100,10 +99,10 @@
       <strong><span id="refContainer">—</span> V</strong>
   </div>
   <div id="controlRow">
-      <button onclick="zoomIn()" id="zoomBtn">🔍</button>
+      <button onclick="zoomIn()" id="zoomInBtn">🔍➕</button>
       <button onclick="acquire()" id="acquireBtn">Acquire</button>
       <button onclick="getReference()" id="referenceBtn">Reference</button>
-      <button onclick="zoomReset()" id="resetZoomBtn">🔄</button>      
+      <button onclick="zoomOut()" id="ZoomOutBtn">🔎➖</button>      
   </div>
 
   <!-- <p>Last reading: <span id="timestamp"></span></p> -->
@@ -113,6 +112,8 @@
   <button onclick="scrollForward()">▶</button>
   <button onclick="toggleFreeze()">Freeze</button>
   <button id="exportCsvBtn">Download CSV</button>
+  <br>
+  <font size="-2">$Revision: 1.3 $</font>
   </p>
 </body>
 <script>
@@ -144,6 +145,11 @@
  let timeZero = performance.now();
  let referenceValue = null;
  let lastAcquiredAve = null;
+ const zoomLevels = [0, 0.75, 0.5, 0.25, 0.12];
+ const maxZoomLevels = zoomLevels.length-1;
+ const yMin = 0.0;
+ const yMax = 20.0;
+ let zoomLevel = 0;
  
  document.getElementById("exportCsvBtn").addEventListener("click",
 							  exportHistoryToCSV);
@@ -479,13 +485,25 @@
  }
 
  function zoomIn() {
-     voltageChart.options.scales.y.min = Math.max(0, volts - 0.5);
-     voltageChart.options.scales.y.max = Math.max(0, volts + 0.5);
+     zoomLevel = Math.min(zoomLevel+1, maxZoomLevels);
+     zoom(zoomLevel);
  }
- 
- function zoomReset() {
-     voltageChart.options.scales.y.min = 0.0;
-     voltageChart.options.scales.y.max = 16.0;
+
+ function zoomOut() {
+     zoomLevel = Math.max(zoomLevel-1, 0);
+     zoom(zoomLevel);
+ }
+
+ function zoom(level) {
+     let window = zoomLevels[level];
+     if ( window == 0 ) {
+	 voltageChart.options.scales.y.min = yMin;
+	 voltageChart.options.scales.y.max = yMax;
+     }
+     else {
+	 voltageChart.options.scales.y.min = Math.max(0, volts - window);
+	 voltageChart.options.scales.y.max = Math.max(0, volts + window);
+     }
  }
  
  function getReference() {
