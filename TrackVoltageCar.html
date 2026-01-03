@@ -20,6 +20,10 @@
 	 background-color: #ffd966;
      }
      
+     #freezeBtn.active {
+	 background-color: #ffd966;
+     }
+     
      #readoutRow {
 	 display: flex;
 	 justify-content: center;
@@ -110,7 +114,7 @@
   <p align="center">
   <button onclick="scrollBack()">◀</button>
   <button onclick="scrollForward()">▶</button>
-  <button onclick="toggleFreeze()">Freeze</button>
+  <button onclick="toggleFreeze()" id="freezeBtn">Freeze</button>
   <button id="exportCsvBtn">Download CSV</button>
   <br>
   <font size="-2">$Revision: 1.11 $</font>
@@ -329,7 +333,16 @@
  }
 
  function toggleFreeze() {
-     frozen = !frozen;
+     if ( !frozen ) {
+	 freezeBtn.textContent = "Unfreeze";
+	 freezeBtn.classList.add("active");
+	 frozen = true;
+     }
+     else {
+	 freezeBtn.textContent = "Freeze";
+	 freezeBtn.classList.remove("active");
+	 frozen = false;
+     }
  }
 
  function scrollBack() {
@@ -455,7 +468,7 @@
  let lastAcquiredAvg = null;
 
  function acquire() {
-     if (!isAcquiring) {
+     if ( !isAcquiring ) {
 	 // START acquisition
 	 acquireStartIndex = history.length;
 	 isAcquiring = true;
