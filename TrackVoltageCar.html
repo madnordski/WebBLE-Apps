@@ -117,7 +117,7 @@
   <button onclick="toggleFreeze()" id="freezeBtn">Freeze</button>
   <button id="exportCsvBtn">Download CSV</button>
   <br>
-  <font size="-2">$Revision: 1.12 $</font>
+  <font size="-2">$Revision: 1.13 $</font>
   </p>
 </body>
 <script>
@@ -277,6 +277,8 @@
      volts = parseFloat(newValueReceived);
      //console.log("Characteristic value changed: ", newValueReceived);
      valueContainer.textContent = volts.toFixed(2);
+     // no value, nothing to do
+     if ( isNaN(volts) ) return;
      
      //retrievedValue.innerHTML = newValueReceived;
      //timestampContainer.innerHTML = getDateTime();
@@ -300,9 +302,7 @@
      else {
 	 diffContainer.textContent = "--"
      }
-     
-     // chart update
-     if ( isNaN(volts) || frozen ) return;
+
      const t = (performance.now() - timeZero) / 1000;
 
      history.push({
@@ -315,6 +315,10 @@
 	 history.shift();
 	 //viewStart = Math.max(0, viewStart - 1);
      }
+
+     // chart update unless frozen
+     if ( frozen ) return;
+
      viewStart = Math.max(0, history.length - MAX_WINDOW);
      updateChartView();
  }
