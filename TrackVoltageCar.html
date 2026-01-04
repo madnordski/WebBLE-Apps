@@ -116,7 +116,7 @@
   <button onclick="toggleFreeze()" id="freezeBtn">Freeze</button>
   <button id="exportCsvBtn">Download CSV</button>
   <br>
-  <font size="-2">$Revision: 1.14 $</font>
+  <font size="-2">$Revision: 1.15 $</font>
   </p>
 </body>
 
@@ -161,6 +161,8 @@
  
  const ctx = document.getElementById('voltageChart').getContext('2d');
 
+ // for the plot we ue Chart.js
+ 
  const voltageChart = new Chart(ctx, {
      type: 'line',
      data: {
@@ -176,6 +178,7 @@
 	 parsing: false,
 	 animation: false,
 	 scales: {
+	     // to keep ticks from changing we set the count and stepSize
 	     x: {
 		 type: 'linear',
 		 ticks: {
@@ -214,7 +217,8 @@
  function isWebBluetoothEnabled() {
      if (!navigator.bluetooth) {
          console.log("Web Bluetooth API is not available in this browser!");
-         bleStateContainer.innerHTML = "Web Bluetooth API is not available in this browser!";
+         bleStateContainer.innerHTML =
+	     "Web Bluetooth API is not available in this browser!";
      }
      console.log('Web Bluetooth API supported in this browser.');
      return true
@@ -247,7 +251,8 @@
 		  return service.getCharacteristic(sensorAspect);
               })
               .then(characteristic => {
-		  console.log("Characteristic discovered:", characteristic.uuid);
+		  console.log("Characteristic discovered:",
+			      characteristic.uuid);
 		  sensorAspectFound = characteristic;
 		  characteristic.addEventListener('characteristicvaluechanged',
 						  handleCharacteristicChange);
