@@ -4,14 +4,7 @@
      along and monitor voltage changes with your phone.
 
      J. King 27 Dec 2025
-     $Id: TrackVoltageCar.html,v 1.18 2026/01/08 12:40:58 jking Exp $
-     $Log: TrackVoltageCar.html,v $
-     Revision 1.18  2026/01/08 12:40:58  jking
-     Summary: moved isConnected flag
-
-     Revision 1.17  2026/01/08 12:36:51  jking
-     Summary: try to disable connect button
-
+     $Id: TrackVoltageCar.html,v 1.19 2026/01/08 12:44:24 jking Exp $
      
      To run this as the front end to the ESP32 ServoCar visit:
      https://madnordski.github.io/WebBLE-Apps/TrackVoltageCar.html
@@ -124,7 +117,7 @@
   <button onclick="toggleFreeze()" id="freezeBtn">Freeze</button>
   <button id="exportCsvBtn">Download CSV</button>
   <br>
-  <font size="-2">$Revision: 1.18 $</font>
+  <font size="-2">$Revision: 1.19 $</font>
   </p>
 </body>
 
@@ -382,6 +375,7 @@
  
  function disconnectDevice() {
      console.log("Disconnect Device.");
+     isConnected = false;
      if (bleServer && bleServer.connected) {
          if (sensorAspectFound) {
              sensorAspectFound.stopNotifications()
