@@ -4,7 +4,12 @@
      along and monitor voltage changes with your phone.
 
      J. King 27 Dec 2025
+     $Id: TrackVoltageCar.html,v 1.17 2026/01/08 12:36:51 jking Exp $
+     $Log: TrackVoltageCar.html,v $
+     Revision 1.17  2026/01/08 12:36:51  jking
+     Summary: try to disable connect button
 
+     
      To run this as the front end to the ESP32 ServoCar visit:
      https://madnordski.github.io/WebBLE-Apps/TrackVoltageCar.html
 -->
@@ -116,7 +121,7 @@
   <button onclick="toggleFreeze()" id="freezeBtn">Freeze</button>
   <button id="exportCsvBtn">Download CSV</button>
   <br>
-  <font size="-2">$Revision: 1.15 $</font>
+  <font size="-2">$Revision: 1.17 $</font>
   </p>
 </body>
 
@@ -139,7 +144,8 @@
  var bleServer;
  var bleServiceFound;
  var sensorAspectFound;
-
+ var isConnected = false;
+ 
  // Plot setup code
  const MAX_HISTORY = 3600;
  const MAX_WINDOW = 20;        // 20-second window
@@ -205,7 +211,7 @@
  
  // Connect Button (search for BLE Devices only if BLE is available)
  connectButton.addEventListener('click', (event) => {
-     if (isWebBluetoothEnabled()){
+     if ( isWebBluetoothEnabled() && ! isConnected ){
          connectToDevice();
      }
  });
@@ -238,6 +244,7 @@
 		  bleStateContainer.style.color = "#24af37";
 		  device.addEventListener('gattservicedisconnected',
 					  onDisconnected);
+		  isConnected = true;
 		  return device.gatt.connect();
               })
               .then(gattServer =>{
@@ -275,7 +282,7 @@
      console.log('Device Disconnected:', event.target.device.name);
      bleStateContainer.innerHTML = "Device disconnected";
      bleStateContainer.style.color = "#d13a30";
-     
+     isConnected = false;
      connectToDevice();
  }
 
