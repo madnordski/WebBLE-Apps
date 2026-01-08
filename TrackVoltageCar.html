@@ -4,8 +4,11 @@
      along and monitor voltage changes with your phone.
 
      J. King 27 Dec 2025
-     $Id: TrackVoltageCar.html,v 1.17 2026/01/08 12:36:51 jking Exp $
+     $Id: TrackVoltageCar.html,v 1.18 2026/01/08 12:40:58 jking Exp $
      $Log: TrackVoltageCar.html,v $
+     Revision 1.18  2026/01/08 12:40:58  jking
+     Summary: moved isConnected flag
+
      Revision 1.17  2026/01/08 12:36:51  jking
      Summary: try to disable connect button
 
@@ -121,7 +124,7 @@
   <button onclick="toggleFreeze()" id="freezeBtn">Freeze</button>
   <button id="exportCsvBtn">Download CSV</button>
   <br>
-  <font size="-2">$Revision: 1.17 $</font>
+  <font size="-2">$Revision: 1.18 $</font>
   </p>
 </body>
 
@@ -244,7 +247,6 @@
 		  bleStateContainer.style.color = "#24af37";
 		  device.addEventListener('gattservicedisconnected',
 					  onDisconnected);
-		  isConnected = true;
 		  return device.gatt.connect();
               })
               .then(gattServer =>{
@@ -265,6 +267,7 @@
 						  handleCharacteristicChange);
 		  characteristic.startNotifications();
 		  console.log("Notifications Started.");
+		  isConnected = true;
 		  return characteristic.readValue();
               })
               .then(value => {
